@@ -5,7 +5,7 @@ from sys import argv
 from multiprocessing import Process, Pipe
 
 #Enable product to monitor
-enable_product = ["sle", "sleha"]
+enable_product = ["sleha", "sle"]
 
 #Configure url and pattern when change
 URL = "http://download.suse.de/install/SLE-12-SP1-UNTESTED/"
@@ -128,11 +128,11 @@ def main():
 				PRODUCTS[product]["iso"] = PRODUCTS[product]["pipe"].recv()
 				PRODUCTS[product]["process"].join()
 
-			#Mount and add repo
-			if PRODUCTS[product]["iso"] != "":
-				mountISO(product)
+				#Mount and add repo
+				if PRODUCTS[product]["iso"] != "":
+					mountISO(product)
 
-			PRODUCTS[product]["process"] = ""
+				PRODUCTS[product]["process"] = ""
 
 		if len(argv) == 1:
 			break
