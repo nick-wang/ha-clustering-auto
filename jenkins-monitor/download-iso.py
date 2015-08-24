@@ -27,7 +27,7 @@ enable_product = ["sle", "sleha"]
 def verifySha256(name):
 	get_sha = os.popen("/usr/bin/sha256sum ./ISO/%s" % name)
 	shaNo = get_sha.readline().split()[0]
-	if os.system("grep %s %s" % (shaNo, name+postfix_sha)) >> 8 == 0:
+	if os.system("grep %s ./ISO/%s" % (shaNo, name+postfix_sha)) >> 8 == 0:
 		return True
 	else:
 		return False
