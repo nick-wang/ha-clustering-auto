@@ -2,12 +2,15 @@
 
 import re, urllib, time, os
 from sys import argv
-from multiprocessing import Process 
+from multiprocessing import Process, Pipe
 
+#Enable product to monitor
+enable_product = ["sle", "sleha"]
+
+#Configure url and pattern when change
 URL = "http://download.suse.de/install/SLE-12-SP1-UNTESTED/"
 postfix_sha = ".sha256"
 seraddr = "/srv/www/htdocs/"
-
 #Pause between build download
 pause_time = 600
 
@@ -18,16 +21,15 @@ sleha_pattern = "SLE-12-SP1-HA-DVD-x86_64-Build%s-Media1.iso"
 sleha_db = ".sleha_version"
 
 #Support product
-PRODUCTS = { "sle": {"pattern": sle_pattern, "database": sle_db, "verify": postfix_sha, "process": "", "iso":""},
-             "sleha": {"pattern": sleha_pattern, "database": sleha_db, "verify": postfix_sha, "process": "", "iso":""} }
-
-#Enable product to monitor
-enable_product = ["sle", "sleha"]
+PRODUCTS = { "sle": {"pattern": sle_pattern, "database": sle_db, "verify": postfix_sha,
+                     "process": "", "iso":"", "pipe": ""},
+             "sleha": {"pattern": sleha_pattern, "database": sleha_db, "verify": postfix_sha,
+                     "process": "", "iso":"", "pipe": ""} }
 
 def verifySha256(name):
 	get_sha = os.popen("/usr/bin/sha256sum ./ISO/%s" % name)
 	shaNo = get_sha.readline().split()[0]
-	if os.system("grep %s ./ISO/%s" % (shaNo, name+postfix_sha)) >> 8 == 0:
+	if os.system("grep %s ./ISO/%s >/dev/null 2>&1" % (shaNo, name+postfix_sha)) >> 8 == 0:
 		return True
 	else:
 		return False
@@ -37,9 +39,8 @@ def updateRecord(pname, build):
 	fd.write(build)
 	fd.close()
 
-def downloadFiles(pname, nbuild):
+def downloadFiles(pname, nbuild, conn):
 	name = PRODUCTS[pname]["pattern"] % nbuild
-	PRODUCTS[pname]["iso"] == ""
 
 	print "Process %d - Start to download: %s." % (PRODUCTS[pname]["process"].pid, URL+name+postfix_sha,)
 	urllib.urlretrieve(URL+name+postfix_sha, "./ISO/"+name+postfix_sha)
@@ -47,10 +48,16 @@ def downloadFiles(pname, nbuild):
 	urllib.urlretrieve(URL+name, "./ISO/"+name)
 
 	if not verifySha256(name):
+		conn.send("")
+		conn.close()
 		return False
 	else:
-		PRODUCTS[pname]["iso"] = name
+		#Save new downloaded ISO's name
+		conn.send(name)
+		conn.close()
+
 		updateRecord(pname, nbuild)
+		return True
 
 def hasNew(pname, old):
 	urlfd = urllib.urlopen(URL)
@@ -79,9 +86,11 @@ def getNewISO(pname):
 
 	nbuild = hasNew(pname, obuild)
 	if nbuild != "":
+		parent_conn, child_conn = Pipe()
 		PRODUCTS[pname]["process"] = Process(target=downloadFiles,
-                                             args=(pname, nbuild),
+                                             args=(pname, nbuild, child_conn),
                                              name=pname)
+		PRODUCTS[pname]["pipe"] = parent_conn
 		PRODUCTS[pname]["process"].start()
 
 def mountISO(pname):
@@ -102,7 +111,7 @@ def mountISO(pname):
 
 	if os.system("mount -o loop %s %s" % (iso_dir+PRODUCTS[pname]["iso"], mount_dir)) >> 8 == 0:
 		if obsolete_iso != "":
-			os.system("rm -rf %s >/dev/null 2>&1" % obsolete_iso)
+			os.system("rm -rf %s* >/dev/null 2>&1" % obsolete_iso)
 		return True
 	else:
 		return False
@@ -116,13 +125,13 @@ def main():
 
 		for product in enable_product:
 			if PRODUCTS[product]["process"] != "":
+				PRODUCTS[product]["iso"] = PRODUCTS[product]["pipe"].recv()
 				PRODUCTS[product]["process"].join()
 
 			#Mount and add repo
-			if PRODUCTS[pname]["iso"] != "":
+			if PRODUCTS[product]["iso"] != "":
 				mountISO(product)
 
-			#TODO change process back to ""
 			PRODUCTS[product]["process"] = ""
 
 		if len(argv) == 1:
