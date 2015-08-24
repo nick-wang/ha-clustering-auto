@@ -1,23 +1,15 @@
-#!/usr/bin/env python 
-import re, urllib, time
-from os import popen, system
+#!/usr/bin/env python
+
+import re, urllib, time, os
 from sys import argv
 from multiprocessing import Process 
 
-# Usage:
-# 1) How to launch
-#   Check new ISO for once: ./download-iso.py
-#   Insistently check new ISO: ./download-iso.py daemon
-# 2) How to configure
-#   Enable monitor product in "enable_product" and "PRODUCTS"
-#   Add pattern and database file for new product. 
-#       like sle_pattern and sle_db
-
 URL = "http://download.suse.de/install/SLE-12-SP1-UNTESTED/"
 postfix_sha = ".sha256"
+seraddr = "/srv/www/htdocs/"
 
 #Pause between build download
-pause_time = 120
+pause_time = 600
 
 sle_pattern = "SLE-12-SP1-Server-DVD-x86_64-Build%s-Media1.iso"
 sle_db = ".sle_version"
@@ -26,37 +18,39 @@ sleha_pattern = "SLE-12-SP1-HA-DVD-x86_64-Build%s-Media1.iso"
 sleha_db = ".sleha_version"
 
 #Support product
-PRODUCTS = { "sle": {"pattern": sle_pattern, "database": sle_db, "verify": postfix_sha, "process": ""},
-             "sleha": {"pattern": sleha_pattern, "database": sleha_db, "verify": postfix_sha, "process": ""} }
+PRODUCTS = { "sle": {"pattern": sle_pattern, "database": sle_db, "verify": postfix_sha, "process": "", "iso":""},
+             "sleha": {"pattern": sleha_pattern, "database": sleha_db, "verify": postfix_sha, "process": "", "iso":""} }
 
 #Enable product to monitor
 enable_product = ["sle", "sleha"]
 
-def verify_sha256(name):
-	getSha = popen("/usr/bin/sha256sum %s" % name)
-	shaNo = getSha.readline().split()[0]
-	if system("grep %s %s" % (shaNo, name+postfix_sha)) >> 8 == 0:
+def verifySha256(name):
+	get_sha = os.popen("/usr/bin/sha256sum ./ISO/%s" % name)
+	shaNo = get_sha.readline().split()[0]
+	if os.system("grep %s %s" % (shaNo, name+postfix_sha)) >> 8 == 0:
 		return True
 	else:
 		return False
 
-def update_record(pname, build):
+def updateRecord(pname, build):
 	fd = open(PRODUCTS[pname]["database"], "w")
 	fd.write(build)
 	fd.close()
 
-def download_files(pname, nbuild):
+def downloadFiles(pname, nbuild):
 	name = PRODUCTS[pname]["pattern"] % nbuild
+	PRODUCTS[pname]["iso"] == ""
 
 	print "Process %d - Start to download: %s." % (PRODUCTS[pname]["process"].pid, URL+name+postfix_sha,)
-	urllib.urlretrieve(URL+name+postfix_sha, name+postfix_sha)
+	urllib.urlretrieve(URL+name+postfix_sha, "./ISO/"+name+postfix_sha)
 	print "Process %d - Start to download: %s." % (PRODUCTS[pname]["process"].pid, URL+name)
-	urllib.urlretrieve(URL+name, name)
+	urllib.urlretrieve(URL+name, "./ISO/"+name)
 
-	if not verify_sha256(name):
+	if not verifySha256(name):
 		return False
 	else:
-		update_record(pname, nbuild)
+		PRODUCTS[pname]["iso"] = name
+		updateRecord(pname, nbuild)
 
 def hasNew(pname, old):
 	urlfd = urllib.urlopen(URL)
@@ -85,16 +79,37 @@ def getNewISO(pname):
 
 	nbuild = hasNew(pname, obuild)
 	if nbuild != "":
-		PRODUCTS[pname]["process"] = Process(target=download_files, 
+		PRODUCTS[pname]["process"] = Process(target=downloadFiles,
                                              args=(pname, nbuild),
                                              name=pname)
 		PRODUCTS[pname]["process"].start()
-		#TODO Add repo
-		#TODO old clean ISO env
-		#TODO change process back to ""
 
+def mountISO(pname):
+	# /srv/www/htdocs/ -> repo/UNTESTED/
+	# (seraddr)        -> ISO/download-iso.py
+	#                        /xxx.iso
+	obsolete_iso = ""
+	iso_dir = seraddr+"ISO/"
+	mount_dir = seraddr+"repo/UNTESTED/"+PRODUCTS[pname]["pattern"].split("-Build")[0]
+
+	if not os.path.isdir(mount_dir):
+		os.mkdir(mount_dir)
+	else:
+		mount_info = os.popen("mount |grep %s" % mount_dir).readline()
+		if mount_info != "":
+			obsolete_iso = mount_info.split()[0]
+			os.system("umount -d %s >/dev/null 2>&1" % mount_dir)
+
+	if os.system("mount -o loop %s %s" % (iso_dir+PRODUCTS[pname]["iso"], mount_dir)) >> 8 == 0:
+		if obsolete_iso != "":
+			os.system("rm -rf %s >/dev/null 2>&1" % obsolete_iso)
+		return True
+	else:
+		return False
 
 def main():
+	os.chdir(seraddr)
+
 	while True:
 		for product in enable_product:
 			getNewISO(product)
@@ -102,6 +117,13 @@ def main():
 		for product in enable_product:
 			if PRODUCTS[product]["process"] != "":
 				PRODUCTS[product]["process"].join()
+
+			#Mount and add repo
+			if PRODUCTS[pname]["iso"] != "":
+				mountISO(product)
+
+			#TODO change process back to ""
+			PRODUCTS[product]["process"] = ""
 
 		if len(argv) == 1:
 			break
