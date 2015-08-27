@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 
-import re, urllib, time, os
-from sys import argv
+import re, urllib, time, os, getopt
+from sys import argv, exit
 from multiprocessing import Process, Pipe
 
 #Enable product to monitor
-enable_product = ["sleha", "sle"]
+Enable_product = ["sleha", "sle"]
+Enable_debug = False
 
 #Configure url and pattern when change
 URL = "http://download.suse.de/install/SLE-12-SP1-UNTESTED/"
@@ -26,7 +27,17 @@ PRODUCTS = { "sle": {"pattern": sle_pattern, "database": sle_db, "verify": postf
              "sleha": {"pattern": sleha_pattern, "database": sleha_db, "verify": postfix_sha,
                      "process": "", "iso":"", "pipe": ""} }
 
-Enable_debug = False
+run_as_daemon = False
+
+def usage():
+	print '''Download and mount daily build ISO tool.\n
+Syntax:
+%s <options>
+
+Options:
+-d(--daemon) Constantly check and download new build.
+-h(--help) Show usage.
+''' % argv[0]
 
 def DEBUG(string):
 	if Enable_debug:
@@ -141,14 +152,34 @@ def mountISO(pname):
 	else:
 		return False
 
+def getOption():
+	DEBUG("Options are: %s" % argv[1:])
+	global run_as_daemon
+
+	try:
+		opts, args = getopt.getopt(argv[1:], "dh", ["help", "daemon"])
+	except getopt.GetoptError:
+		print "Get options Error!"
+		exit(1)
+
+	for opt, value in opts:
+		if opt in ("-d", "--daemon"):
+			run_as_daemon=True
+		elif opt in ("-h", "--help"):
+			usage()
+		else:
+			pass
+
 def main():
 	os.chdir(seraddr)
 
+	getOption()
+
 	while True:
-		for product in enable_product:
+		for product in Enable_product:
 			getNewISO(product)
 
-		for product in enable_product:
+		for product in Enable_product:
 			if PRODUCTS[product]["process"] != "":
 				PRODUCTS[product]["iso"] = PRODUCTS[product]["pipe"].recv()
 				PRODUCTS[product]["process"].join()
@@ -159,7 +190,7 @@ def main():
 
 				PRODUCTS[product]["process"] = ""
 
-		if len(argv) == 1:
+		if not run_as_daemon:
 			break
 		else:
 			time.sleep(pause_time)
