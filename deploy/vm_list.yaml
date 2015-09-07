@@ -1,0 +1,38 @@
+master:
+- name: manager
+  mac: 00:0C:29:6B:CA:02
+  disk: qcow2:/mnt/vm/sles_liub/sles12sp1-HA-liubin_manager.qcow2
+  ostype: sles11
+  vcpus: 2
+  memory: 1024
+  disk_size: 8192
+  source:
+  nic:
+  graphics:
+  os_settings:
+  
+slave:
+- name: node01
+  mac: 00:0C:29:C9:21:D5
+  disk: qcow2:/mnt/vm/sles_liub/sles12sp1-HA-liubin_node01.qcow2
+  ostype: sles11
+  vcpus: 2
+  memory: 1024
+  disk_size: 8192
+  source:
+  nic:
+  graphics:
+  os_settings:  
+
+- name: node02
+  mac: 00:0C:29:D7:4C:31
+  disk: qcow2:/mnt/vm/sles_liub/sles12sp1-HA-liubin_node02.qcow2
+  ostype: sles11
+  vcpus: 2
+  memory: 1024
+  disk_size: 8192
+  source:
+  nic:
+  graphics:
+  os_settings:
+
