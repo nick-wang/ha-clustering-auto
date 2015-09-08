@@ -960,4 +960,31 @@
       <username>root</username>
     </user>
   </users>
+  <!--files config:type="list">
+    <file>
+      <file_contents><![CDATA[ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC6LKxNNRsAhR1Ov7KsoijAaVu3VuNu08llrS7q/m+wLqAabx0XB+8iSkjo+WBblpqdanPYJ55Z2I7GpOWdMu/0+Rv2XP0w2yr8BXxnMSxYDZuxGXpG4P1YbZMCK1Z/Hxbts+Mcsr/IaUYllGEwkxG6cONMAQxA5bkyIilp1UMymPjWvPNqXcoLrMmiLXdPxynn10WSIbbO1ZTPw8ewpV155I1RdN9+SfiIGlM8B7Y2pHEOVCKnJfYWp8OQtJVI+rbEwD9JHutxn7w8yrPFbhSUMyYSsf7AarYVvJ7FXNMlmqLgImp0LBINuvEtbSne9WychbvzL21LUzcezkWKZEMZ root@bj-ha-4]]></file_contents>
+      <file_owner>root</file_owner>
+      <file_path>/root/.ssh/id_rsa.pub</file_path>
+      <file_permissions>644</file_permissions>
+    </file>
+  </files-->
+  <scripts>
+    <init-scripts config:type="list">
+      <script>
+        <debug config:type="boolean">true</debug>
+        <filename>loginAndFormat.sh</filename>
+        <location><![CDATA[]]></location>
+        <source><![CDATA[iscsiadm -m discovery -t st -p 147.2.207.237
+iscsiadm -m node -T iqn.2015-08.suse.bej.bliu:441a202b-6aa3-479f-b56f-374e2f38ba20 -p 147.2.207.237 -l
+sleep 20
+sbd -d '/dev/disk/by-path/ip-147.2.207.237:3260-iscsi-iqn.2015-08.suse.bej.bliu:441a202b-6aa3-479f-b56f-374e2f38ba20-lun-0' create
+modprobe softdog
+echo "SBD_DEVICE='/dev/disk/by-path/ip-147.2.207.237:3260-iscsi-iqn.2015-08.suse.bej.bliu:441a202b-6aa3-479f-b56f-374e2f38ba20-lun-0'" > /etc/sysconfig/sbd
+echo "SBD_OPTS ='-W'" >> /etc/sysconfig/sbd
+echo "modprobe softdog" >> /etc/init.d/boot.local
+mkdir -p /root/.ssh/
+echo "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC6LKxNNRsAhR1Ov7KsoijAaVu3VuNu08llrS7q/m+wLqAabx0XB+8iSkjo+WBblpqdanPYJ55Z2I7GpOWdMu/0+Rv2XP0w2yr8BXxnMSxYDZuxGXpG4P1YbZMCK1Z/Hxbts+Mcsr/IaUYllGEwkxG6cONMAQxA5bkyIilp1UMymPjWvPNqXcoLrMmiLXdPxynn10WSIbbO1ZTPw8ewpV155I1RdN9+SfiIGlM8B7Y2pHEOVCKnJfYWp8OQtJVI+rbEwD9JHutxn7w8yrPFbhSUMyYSsf7AarYVvJ7FXNMlmqLgImp0LBINuvEtbSne9WychbvzL21LUzcezkWKZEMZ root@bj-ha-4" >> /root/.ssh/authorized_keys]]></source>
+      </script>
+    </init-scripts>
+  </scripts>
 </profile>
