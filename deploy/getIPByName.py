@@ -1,6 +1,8 @@
+#! /usr/bin/python
 import subprocess
 import yaml
 import xml.etree.ElementTree as ET
+import sys
 #virsh domiflist sles12sp1-HA
 #Interface  Type       Source     Model       MAC
 #-------------------------------------------------------
@@ -147,6 +149,46 @@ def get_ip_by_mac(vm_name, ip_range='147.2.207.1-253'):
         MAC_ADDRESS = mac
         ip_address = find_ip_address_for_mac_address(xml, MAC_ADDRESS)
         if (ip_address != None) and (ip_address.strip() != ""):
-            return ip_address, MAC_ADDRESS
-    return (-1,-1)
-#print get_ip_by_mac(vm_name="sles12sp1-HA-2-zlliu")
+            return ip_address, MAC_ADDRESS, vm_name
+    return ("","", vm_name)
+
+def write_cluster_conf(iprange='147.2.207.1-253'):
+    vm_list={}
+    deployfile = 'vm_list.yaml'
+    dp = GET_VM_CONF(deployfile)
+    vm_list = dp.get_vms_conf()
+
+    #os.sleep(20)
+    #ip_range_list = ['147.2.207.1-253', '147.2.208.1-253']
+    i = 1
+    num_vms = len(vm_list.keys())
+    contents = "NODES=%d\n" % num_vms
+    #for ip_range1 in ip_range_list:
+    for vm_name1 in vm_list.keys():
+        ip, mac, vm_name = get_ip_by_mac(vm_name=vm_name1, ip_range=iprange)
+        #if ip == "":
+        #    continue
+        contents = contents + "HOSTNAME_NODE%d=%s\n" % ( i, vm_name )
+        contents = contents + "IP_NODE%d=%s\n" % (i, ip)
+        i = i + 1
+    #installVM(VMName="sles12sp1-HA-liubin", OSType="sles11",disk="qcow2:/mnt/vm/sles_liub/sles12sp1-HA-liubin.qcow2")
+    f=open('cluster_conf', 'w')
+    f.write(contents)
+    f.close()
+    return contents
+
+
+def usage():
+    print "usage:"
+    print "\t./getIPByName.py getIPByName vm_name ip_range"
+    print "\t./getIPByName.py writeClusterConf"
+    print "example:\n\t./getIPByName.py getIPByName sles12-HA 147.2.207.1-253"
+    sys.exit(1)
+
+if __name__ == "__main__":
+    if sys.argv[1] == "getIPByName":
+        print get_ip_by_mac(sys.argv[2], sys.argv[3])
+    elif sys.argv[1] == "writeClusterConf":
+        print write_cluster_conf()
+    else:
+        usage()

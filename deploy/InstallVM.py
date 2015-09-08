@@ -3,7 +3,7 @@ import subprocess
 import os
 import sys
 import multiprocessing
-from getIPByName import get_ip_by_mac, GET_VM_CONF
+from getIPByName import get_ip_by_mac, GET_VM_CONF, write_cluster_conf
 
 #SP_VERSION=SP1
 #REL_VERSION=Beta2
@@ -103,13 +103,13 @@ def installVMs(vm_list={}):
     for vm in vm_list.keys():
         processes[vm]["process"].join()
 
-vm_list={}
-deployfile = 'vm_list.yaml'
-dp = GET_VM_CONF(deployfile)
-vm_list = dp.get_vms_conf()
-installVMs(vm_list)
-#os.sleep(20)
-#ip_range_list = ['147.2.207.1-253', '147.2.208.1-253']
-#for ip_range1 in ip_range_list:
-#    print get_ip_by_mac(vm_name=vm_name1, ip_range=ip_range1)
-#installVM(VMName="sles12sp1-HA-liubin", OSType="sles11",disk="qcow2:/mnt/vm/sles_liub/sles12sp1-HA-liubin.qcow2")
+if __name__ == "__main__":
+    newInstallation="false"
+    vm_list={}
+    deployfile = 'vm_list.yaml'
+    dp = GET_VM_CONF(deployfile)
+    vm_list = dp.get_vms_conf()
+    if len(sys.argv) >= 2:
+        newInstallation = sys.argv[2]
+    if newInstallation.lower() == 'true':
+        installVMs(vm_list)
