@@ -72,6 +72,18 @@ then
         /etc/ssh/ssh_config
 fi
 
+#login iscsi target
+#and create sbd
+iscsiadm -m discovery -t st -p $TARGET_IP
+iscsiadm -m node -T $TARGET_LUN -p $TARGET_IP -l
+sleep 20
+sbd -d "/dev/disk/by-path/ip-$TARGET_IP:3260-iscsi-$(TARGET_LUN)-lun-0" create
+modprobe softdog
+echo "SBD_DEVICE='/dev/disk/by-path/ip-$TARGET_IP:3260-iscsi-$(TARGET_LUN)-lun-0'" > /etc/sysconfig/sbd
+echo "SBD_OPTS ='-W'" >> /etc/sysconfig/sbd
+echo "modprobe softdog" >> /etc/init.d/boot.local
+
+
 #Open ports if firewall enabled
 #Default disable after installation
 
