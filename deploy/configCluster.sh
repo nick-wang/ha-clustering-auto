@@ -64,6 +64,14 @@ cp -rf csync2.cfg_templete /etc/csync2/csync2.cfg
 cp -rf key_hagroup_templete /etc/csync2/key_hagroup
 cp -rf corosync.conf_templete /etc/corosync/corosync.conf
 
+#Disable hostkey checking of ssh
+grep "^ *StrictHostKeyChecking" /etc/ssh/ssh_config >/dev/null
+if [ $? -ne 0 ]
+then
+    sed -i "/^# *StrictHostKeyChecking ask/a\StrictHostKeyChecking no" \
+        /etc/ssh/ssh_config
+fi
+
 #Open ports if firewall enabled
 #Default disable after installation
 
