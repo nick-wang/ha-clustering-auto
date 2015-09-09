@@ -97,6 +97,7 @@ class GET_VM_CONF:
         vm['nic'] = master.get('nic')
         vm['graphics'] = master.get('graphics')
         vm['os_settings'] = master.get('os_settings')
+        vm['ha_source'] = master.get('ha_source')
         return vm
 
 def getMacAddrs(domname):

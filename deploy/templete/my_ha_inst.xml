@@ -4,8 +4,8 @@
   <add-on>
     <add_on_products config:type="list">
       <listentry>
-        <media_url><![CDATA[http://download.suse.de/install/SLP/SLE-12-SP1-HA-LATEST/x86_64/DVD1/]]></media_url>
-        <!--media_url><![CDATA[http://mirror.bej.suse.com/dist/install/SLP/SLE-11-SP4-HA-RC1/x86_64/DVD1/]]></media_url-->
+        <media_url>HA_SOURCE</media_url>
+        <!--media_url><![CDATA[http://download.suse.de/install/SLP/SLE-12-SP1-HA-LATEST/x86_64/DVD1/]]></media_url-->
         <product>SUSE Linux Enterprise High Availability Extension 12</product>
         <product_dir>/</product_dir>
       </listentry>

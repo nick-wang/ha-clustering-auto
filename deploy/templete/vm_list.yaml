@@ -7,6 +7,7 @@ nodes:
   memory: 1024
   disk_size: 8192
   source:
+  ha_source: http://mirror.bej.suse.com/dist/install/SLP/SLE-12-HA-LATEST/x86_64/DVD1/
   nic:
   graphics:
   os_settings:
@@ -19,6 +20,7 @@ nodes:
   memory: 1024
   disk_size: 8192
   source:
+  ha_source: http://mirror.bej.suse.com/dist/install/SLP/SLE-12-HA-LATEST/x86_64/DVD1/
   nic:
   graphics:
   os_settings:  
@@ -31,6 +33,7 @@ nodes:
   memory: 1024
   disk_size: 8192
   source:
+  ha_source: http://mirror.bej.suse.com/dist/install/SLP/SLE-12-HA-LATEST/x86_64/DVD1/
   nic:
   graphics:
   os_settings:
