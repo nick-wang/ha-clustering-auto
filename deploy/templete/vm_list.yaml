@@ -36,3 +36,6 @@ slave:
   graphics:
   os_settings:
 
+storage:
+  target_ip: 147.2.207.237
+  target_lun: iqn.2015-08.suse.bej.bliu:441a202b-6aa3-479f-b56f-374e2f38ba20

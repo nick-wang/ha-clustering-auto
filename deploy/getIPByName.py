@@ -3,6 +3,7 @@ import subprocess
 import yaml
 import xml.etree.ElementTree as ET
 import sys
+import os
 #virsh domiflist sles12sp1-HA
 #Interface  Type       Source     Model       MAC
 #-------------------------------------------------------
@@ -63,7 +64,10 @@ class GET_VM_CONF:
         with open(url,'r') as f:
             ya = yaml.load(f)
         return ya
-    
+    def get_iscsi_conf(self):
+        storage = self.ya.get('storage')
+        return storage.get('target_ip'), storage.get('target_lun')
+
     def get_vms_conf(self):
         master = self.ya.get('master')
         for ms in master:
@@ -154,7 +158,7 @@ def get_ip_by_mac(vm_name, ip_range='147.2.207.1-253'):
 
 def write_cluster_conf(iprange='147.2.207.1-253'):
     vm_list={}
-    deployfile = 'template/vm_list.yaml'
+    deployfile = "%s/%s" % (os.getcwd(), 'templete/vm_list.yaml')
     dp = GET_VM_CONF(deployfile)
     vm_list = dp.get_vms_conf()
 
@@ -172,6 +176,13 @@ def write_cluster_conf(iprange='147.2.207.1-253'):
         contents = contents + "IP_NODE%d=%s\n" % (i, ip)
         i = i + 1
     #installVM(VMName="sles12sp1-HA-liubin", OSType="sles11",disk="qcow2:/mnt/vm/sles_liub/sles12sp1-HA-liubin.qcow2")
+    target_ip, target_lun = dp.get_iscsi_conf()
+    if target_ip is None:
+        target_ip = "147.2.207.237"
+    if target_lun is None:
+        target_lun = "iqn.2015-08.suse.bej.bliu:441a202b-6aa3-479f-b56f-374e2f38ba20"
+    contents = contents + "TARGET_IP=%s\n" % target_ip
+    contents = contents + "TARGET_LUN=%s\n" % target_lun
     f=open('cluster_conf', 'w')
     f.write(contents)
     f.close()

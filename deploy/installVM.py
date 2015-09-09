@@ -73,7 +73,7 @@ def installVMs(vm_list={}):
         source='http://mirror.bej.suse.com/dist/install/SLP/SLE-12-SP1-Server-LATEST/x86_64/DVD1/'
         nic='bridge=br1,model=virtio'
         graphics='cirrus'
-        os_settings='templete/my_ha_inst.xml'
+        os_settings= '%s/%s' % os.getcwd(), 'templete/my_ha_inst.xml'
         # get value from vm config
         disk = vm_list[vm]['disk']
         if vm_list[vm]['ostype'] is not None:
