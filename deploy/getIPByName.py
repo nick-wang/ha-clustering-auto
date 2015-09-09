@@ -154,7 +154,7 @@ def get_ip_by_mac(vm_name, ip_range='147.2.207.1-253'):
 
 def write_cluster_conf(iprange='147.2.207.1-253'):
     vm_list={}
-    deployfile = 'vm_list.yaml'
+    deployfile = 'template/vm_list.yaml'
     dp = GET_VM_CONF(deployfile)
     vm_list = dp.get_vms_conf()
 
