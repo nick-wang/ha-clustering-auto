@@ -409,7 +409,7 @@
     <dns>
       <dhcp_hostname config:type="boolean">false</dhcp_hostname>
       <domain>site</domain>
-      <hostname>sles12sp1_ha_liub2</hostname>
+      <hostname>HOSTNAME</hostname>
       <resolv_conf_policy>auto</resolv_conf_policy>
       <write_hostname config:type="boolean">false</write_hostname>
     </dns>

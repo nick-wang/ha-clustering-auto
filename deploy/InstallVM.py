@@ -92,6 +92,15 @@ def installVMs(vm_list={}):
             graphics = vm_list[vm]['graphics']
         if vm_list[vm]['os_settings'] is not None:
             os_settings = vm_list[vm]['os_settings']
+
+        f = open(os_settings, 'r')
+        conf_str = f.read()
+        f.close()
+        f = open(vm, 'w')
+        f.write(conf_str.replace("HOSTNAME", vm))
+        f.close()
+
+        os_settings = vm
         parent_fd, child_fd = multiprocessing.Pipe()
         process["process"] = multiprocessing.Process(target=installVM,
                                 args=(vm, disk, ostype,vcpus, memory, disk_size, source, nic, graphics, os_settings, child_fd),
