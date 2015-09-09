@@ -184,7 +184,7 @@ def write_cluster_conf(iprange='147.2.207.1-253'):
         target_lun = "iqn.2015-08.suse.bej.bliu:441a202b-6aa3-479f-b56f-374e2f38ba20"
     contents = contents + "TARGET_IP=%s\n" % target_ip
     contents = contents + "TARGET_LUN=%s\n" % target_lun
-    f=open('cluster_conf', 'w')
+    f=open('templete/cluster_conf', 'w')
     f.write(contents)
     f.close()
     return contents
