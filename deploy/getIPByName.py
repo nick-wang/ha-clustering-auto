@@ -15,10 +15,10 @@ import os
 #</host>
 
 '''
-master:
-- name: manager
+nodes:
+- name: node01
   mac: 00:0C:29:6B:CA:02
-  disk: qcow2:/mnt/vm/sles_liub/sles12sp1-HA-liubin_manager.qcow2
+  disk: qcow2:/mnt/vm/sles_liub/sles12sp1-HA-liubin_node01.qcow2
   ostype: sles11
   vcpus: 2
   memory: 1024
@@ -28,10 +28,9 @@ master:
   graphics:
   os_settings:
 
-slave:
-- name: node01
+- name: node02
   mac: 00:0C:29:C9:21:D5
-  disk: qcow2:/mnt/vm/sles_liub/sles12sp1-HA-liubin_node01.qcow2
+  disk: qcow2:/mnt/vm/sles_liub/sles12sp1-HA-liubin_node02.qcow2
   ostype: sles11
   vcpus: 2
   memory: 1024
@@ -41,9 +40,9 @@ slave:
   graphics:
   os_settings:  
 
-- name: node02
+- name: node03
   mac: 00:0C:29:D7:4C:31
-  disk: qcow2:/mnt/vm/sles_liub/sles12sp1-HA-liubin_node02.qcow2
+  disk: qcow2:/mnt/vm/sles_liub/sles12sp1-HA-liubin_node03.qcow2
   ostype: sles11
   vcpus: 2
   memory: 1024
@@ -52,6 +51,10 @@ slave:
   nic:
   graphics:
   os_settings:
+
+storage:
+  target_ip: 147.2.207.237
+  target_lun: iqn.2015-08.suse.bej.bliu:441a202b-6aa3-479f-b56f-374e2f38ba20
 '''
 class GET_VM_CONF:
     def __init__(self, url):
@@ -69,20 +72,18 @@ class GET_VM_CONF:
         return storage.get('target_ip'), storage.get('target_lun')
 
     def get_vms_conf(self):
-        master = self.ya.get('master')
-        for ms in master:
-            vms = self.get_vm_conf(ms)
-            return vms
-    def get_vm_conf(self, master):
-        vm = self.store_vm_conf(master)
         vms = {}
-        vms[vm['name']] = vm
-        slaves = self.ya.get('slave')
-        for slave in slaves:
-            vm = self.store_vm_conf(slave)
-            vms[vm['name']] = vm
+        nodes = self.ya.get('nodes')
+        for node in nodes:
+            vm = self.store_vm_conf(node)
+
+            if not vms.has_key(vm['name']):
+                vms[vm['name']] = vm
+            else:
+                print "Error! Duplicate node name(%s) detected." % vm['name']
+                sys.exit(2)
         return vms
-    
+
     def store_vm_conf(self, master):
         vm = {}
         vm['name'] = master.get('name')

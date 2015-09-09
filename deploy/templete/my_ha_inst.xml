@@ -632,6 +632,7 @@
       </password_settings>
       <shell>/bin/bash</shell>
       <uid>1000</uid>
+      <!--PASSWORD>suse<!--PASSWORD>
       <user_password>$6$zbmzwGPtj2ze$0EjYZ10dtE2yMZCiK8m1L568r4NpZ.p0J5lPqtUaVgJPWhYdmdCCS.bZt4yNgfM6wbbbVA3jH9LqWSKvjl4ww0</user_password>
       <username>bliu</username>
     </user>
