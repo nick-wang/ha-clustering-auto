@@ -94,3 +94,8 @@ systemctl enable pacemaker
 #Start service
 systemctl start csync2.socket
 systemctl start pacemaker
+
+#config stonith resource and restart pacemaker
+crm configure primitive stonith_sbd stonith:external/sbd
+systemctl enable sbd
+systemctl restart pacemaker
