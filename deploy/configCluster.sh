@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #Import ENV conf
-. ../cluster_conf
+. cluster_conf
 
 hosts_content=""
 csync2_content=""
