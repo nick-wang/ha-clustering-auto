@@ -5,53 +5,17 @@ import sys
 import multiprocessing
 from getIPByName import get_ip_by_mac, GET_VM_CONF, write_cluster_conf
 
-#SP_VERSION=SP1
-#REL_VERSION=Beta2
-#INSTANCE=ha004
-#AUTOINS_TEMPLATE=/root/12SP1-Beta2-HA.autoinst.xml
-#AUTOINS_TEMPLATE=sle12sp1-ha-autoinst.xml
-#
-#VMNAME=12${SP_VERSION}-${REL_VERSION}-${INSTANCE}
-#VM_INSTALL_SOURCE=http://mirror.bej.suse.com/dist/install/\
-#SLP/SLE-12-${SP_VERSION}-Server-${REL_VERSION}/x86_64/DVD1/
-#
-#AUTOINS_FILE=${VMNAME}.autoinst.xml
-#cat ${AUTOINS_TEMPLATE} | \
-#sed "s/\(HA-\).*\(\/x86_64\)/\1${REL_VERSION}\2/g" | \
-#sed "s/<hostname.*/<hostname\>${VMNAME}<\/hostname\>/g" \
-#> ${AUTOINS_FILE}
-#
-#echo << EOF | vm-install --debug \
-#--os-type sles12 \
-#--name "${VMNAME}" \
-#--vcpus 1 \
-#--memory 1024 \
-#--disk qcow2:/work/images/${VMNAME}.qcow2,vda,disk,w,8192,sparse=0 \
-#--source=${VM_INSTALL_SOURCE} \
-#--nic bridge=br1,model=virtio \
-#--graphics cirrus \
-#--os-settings=${AUTOINS_FILE}
-
-
-
-
-
-#EOF 
 SP_VERSION=""
 REL_VERSION=""
 AUTOINS_TEMPLATE=""
 
-def readConf(filePath):
-    pass
-
-#def installVM(VMName, disk, OSType="sles12", vcpus=1, memory=1024, disk_size=8192, source='http://mirror.bej.suse.com/dist/install/SLP/SLE-12-SP1-Server-LATEST/x86_64/DVD1/', nic='bridge=br1,model=virtio', graphics='cirrus', os_settings='sle12-ha-autoinst.xml'):
 def installVM(VMName, disk, OSType, vcpus, memory, disk_size, source, nic, graphics, os_settings, child_fd):
     options = "--debug --os-type %s --name %s --vcpus %d --memory %d --disk %s,vda,disk,w,%d,sparse=0, --source %s --nic %s --graphics %s --os-settings=%s" \
               %(OSType, VMName, vcpus, memory, disk, disk_size, source, nic, graphics, os_settings)
-    #cmd = "echo << EOF| vm-install %s%s%s" % (options, "\n\n\n\n\n\n\n", "EOF")
+    cmd = "echo << EOF| vm-install %s%s%s" % (options, "\n\n\n\n\n\n\n", "EOF")
     
     print "cmd=%s" % cmd
-    #status, output = commands.getstatusoutput(cmd)
+    status, output = commands.getstatusoutput(cmd)
     #p = subprocess.Popen(args=["vm-install", options], \
     #    stdin=subprocess.PIPE, stderr=subprocess.PIPE)
     #p.communicate("\n\n\n\n\n\n\n")
