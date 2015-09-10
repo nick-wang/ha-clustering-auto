@@ -81,7 +81,7 @@ def installVMs(vm_list={}):
 if __name__ == "__main__":
     newInstallation="false"
     vm_list={}
-    deployfile = 'vm_list.yaml'
+    deployfile = 'templete/vm_list.yaml'
     dp = GET_VM_CONF(deployfile)
     vm_list = dp.get_vms_conf()
     if len(sys.argv) >= 2:
