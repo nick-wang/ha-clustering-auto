@@ -14,7 +14,6 @@ def installVM(VMName, disk, OSType, vcpus, memory, disk_size, source, nic, graph
               %(OSType, VMName, vcpus, memory, disk, disk_size, source, nic, graphics, os_settings)
     cmd = "echo << EOF| vm-install %s%s%s" % (options, "\n\n\n\n\n\n\n", "EOF")
     
-    print "cmd=%s" % cmd
     status, output = commands.getstatusoutput(cmd)
     #p = subprocess.Popen(args=["vm-install", options], \
     #    stdin=subprocess.PIPE, stderr=subprocess.PIPE)
