@@ -4,16 +4,21 @@
 # mail: bliu@suse.com
 # Created Time: Tue 15 Sep 2015 10:05:57 AM CST
 #########################################################################
+#example:
+#./substring.sh "n1,n2,n3" "n2"
+
 #!/bin/bash
 
 node_list=$1
 node=$2
 
-OLD_IFS="$IFS"
-IFS=","
-
+node_list=`echo ${node_list//','/' '}`
+echo $node_list
+#OLD_IFS="$IFS"
+#IFS=","
+#
 arr=($node_list)
-IFS="$OLD_IFS"
+#IFS="$OLD_IFS"
 str=' '
 for s in ${arr[@]}
 do
