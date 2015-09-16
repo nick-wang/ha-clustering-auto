@@ -1,3 +1,7 @@
+resources:
+  sle_source: http://147.2.207.237/repo/UNTESTED/SLE-12-SP1-Server-DVD-x86_64/
+  ha_source: http://147.2.207.237/repo/UNTESTED/SLE-12-SP1-HA-DVD-x86_64/
+
 nodes:
 - name: node01
   mac: 00:0C:29:6B:CA:02

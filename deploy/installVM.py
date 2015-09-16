@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 import commands
 import subprocess
 import os
@@ -36,7 +38,7 @@ def installVMs(vm_list={}):
         source='http://mirror.bej.suse.com/dist/install/SLP/SLE-12-SP1-Server-LATEST/x86_64/DVD1/'
         nic='bridge=br1,model=virtio'
         graphics='cirrus'
-        os_settings = '%s/%s' % os.getcwd(), 'templete/my_ha_inst.xml'
+        os_settings = '%s/%s' % (os.getcwd(), 'templete/my_ha_inst.xml')
         ha_source = 'http://mirror.bej.suse.com/dist/install/SLP/SLE-12-HA-LATEST/x86_64/DVD1/'
         # get value from vm config
         disk = vm_list[vm]['disk']
@@ -84,6 +86,6 @@ if __name__ == "__main__":
     dp = GET_VM_CONF(deployfile)
     vm_list = dp.get_vms_conf()
     if len(sys.argv) >= 2:
-        newInstallation = sys.argv[2]
+        newInstallation = sys.argv[1]
     if newInstallation.lower() == 'true':
         installVMs(vm_list)
