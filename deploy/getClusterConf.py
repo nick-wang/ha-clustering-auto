@@ -58,10 +58,6 @@ def find_ip_address_for_mac_address(xml, mac_address):
         if mac.lower() == mac_address.lower():
             return ipv4
 
-def get_address_of_type(host_elem, type_):
-    """Return the host's address of the given type."""
-    return host_elem.find('./address[@addrtype="%s"]' % type_).get('addr')
-
 def get_ip_list_by_mac(vm_name_list, ip_range="147.2.207.0/24"):
     result = {}
     xml = scan_for_hosts(ip_range)

@@ -5,39 +5,39 @@ resources:
 nodes:
 - name: node01
   mac: 00:0C:29:6B:CA:02
-  disk: qcow2:/mnt/vm/sles_liub/sles12sp1-HA-liubin_node01.qcow2
+  disk: qcow2:/mnt/vm/sles_liub/sles12sp1-HA-node01.qcow2
   ostype: sles11
   vcpus: 2
   memory: 1024
   disk_size: 8192
   source:
-  ha_source: http://mirror.bej.suse.com/dist/install/SLP/SLE-12-HA-LATEST/x86_64/DVD1/
+  ha_source: 
   nic:
   graphics:
   os_settings:
   
 - name: node02
   mac: 00:0C:29:C9:21:D5
-  disk: qcow2:/mnt/vm/sles_liub/sles12sp1-HA-liubin_node02.qcow2
+  disk: qcow2:/mnt/vm/sles_liub/sles12sp1-HA-node02.qcow2
   ostype: sles11
   vcpus: 2
   memory: 1024
   disk_size: 8192
   source:
-  ha_source: http://mirror.bej.suse.com/dist/install/SLP/SLE-12-HA-LATEST/x86_64/DVD1/
+  ha_source: 
   nic:
   graphics:
   os_settings:  
 
 - name: node03
   mac: 00:0C:29:D7:4C:31
-  disk: qcow2:/mnt/vm/sles_liub/sles12sp1-HA-liubin_node03.qcow2
+  disk: qcow2:/mnt/vm/sles_liub/sles12sp1-HA-node03.qcow2
   ostype: sles11
   vcpus: 2
   memory: 1024
   disk_size: 8192
   source:
-  ha_source: http://mirror.bej.suse.com/dist/install/SLP/SLE-12-HA-LATEST/x86_64/DVD1/
+  ha_source: 
   nic:
   graphics:
   os_settings:
