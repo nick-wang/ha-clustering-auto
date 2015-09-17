@@ -1,91 +1,100 @@
 #!/usr/bin/python
 
-import commands
-import subprocess
-import os
-import sys
+import commands, subprocess
+import os, sys
 import multiprocessing
-from getIPByName import get_ip_by_mac, GET_VM_CONF, write_cluster_conf
 
-SP_VERSION=""
-REL_VERSION=""
-AUTOINS_TEMPLATE=""
+from parseYAML import GET_VM_CONF
 
-def installVM(VMName, disk, OSType, vcpus, memory, disk_size, source, nic, graphics, os_settings, child_fd):
+def installVM(VMName, disk, OSType, vcpus, memory, disk_size, source, nic, graphics, autoyast, child_fd):
     options = "--debug --os-type %s --name %s --vcpus %d --memory %d --disk %s,vda,disk,w,%d,sparse=0, --source %s --nic %s --graphics %s --os-settings=%s" \
-              %(OSType, VMName, vcpus, memory, disk, disk_size, source, nic, graphics, os_settings)
+              %(OSType, VMName, vcpus, memory, disk, disk_size, source, nic, graphics, autoyast)
     cmd = "echo << EOF| vm-install %s%s%s" % (options, "\n\n\n\n\n\n\n", "EOF")
+    os.system(cmd)
     
-    status, output = commands.getstatusoutput(cmd)
+    #status, output = commands.getstatusoutput(cmd)
     #p = subprocess.Popen(args=["vm-install", options], \
     #    stdin=subprocess.PIPE, stderr=subprocess.PIPE)
     #p.communicate("\n\n\n\n\n\n\n")
     #print p.wait()
-   
-    os.system(cmd)
 
-def installVMs(vm_list={}):
+def installVMs(vm_list={}, res={}):
     processes = {}
-    vms = vm_list.keys()
-    print vms
+    default_vm_instll = {'ostype': "sles12sp1",
+                         'vcpus': 1,
+                         'memory': 1024,
+                         'disk_size': 8192,
+                         'nic': 'bridge=br1,model=virtio'
+                         'graphics': 'cirrus'
+                        }
+    default_res= {'sle_source': 'http://mirror.bej.suse.com/dist/install/SLP/SLE-12-SP1-Server-LATEST/x86_64/DVD1/'
+                  'ha_source':'http://mirror.bej.suse.com/dist/install/SLP/SLE-12-SP1-HA-LATEST/x86_64/DVD1/'
+                 }
+    os_settings = '%s/%s' % (os.getcwd(), 'templete/my_ha_inst.xml')
+
+    for key in default_res.keys():
+        if res[key] is None:
+            res[key] = default_res[key]
+
     for vm in vm_list.keys():
+        print "DEBUG: install virt-machine %s." % vm
         process = {}
-        #init default values
-        OSType="sles12"
-        vcpus=1
-        memory=1024
-        disk_size=8192
-        source='http://mirror.bej.suse.com/dist/install/SLP/SLE-12-SP1-Server-LATEST/x86_64/DVD1/'
-        nic='bridge=br1,model=virtio'
-        graphics='cirrus'
-        os_settings = '%s/%s' % (os.getcwd(), 'templete/my_ha_inst.xml')
-        ha_source = 'http://mirror.bej.suse.com/dist/install/SLP/SLE-12-HA-LATEST/x86_64/DVD1/'
         # get value from vm config
-        disk = vm_list[vm]['disk']
-        if vm_list[vm]['ostype'] is not None:
-            ostype = vm_list[vm]['ostype']
-        if vm_list[vm]['vcpus'] is not None:
-            vcpus = vm_list[vm]['vcpus']
-        if vm_list[vm]['memory'] is not None:
-            memory= vm_list[vm]['memory']
-        if vm_list[vm]['disk_size'] is not None:
-            disk_size = vm_list[vm]['disk_size']
-        if vm_list[vm]['source'] is not None:
-            source = vm_list[vm]['source']
-        if vm_list[vm]['nic'] is not None:
-            nic = vm_list[vm]['nic']
-        if vm_list[vm]['graphics'] is not None:
-            graphics = vm_list[vm]['graphics']
-        if vm_list[vm]['os_settings'] is not None:
-            os_settings = vm_list[vm]['os_settings']
-        if vm_list[vm]['ha_source'] is not None:
-            ha_source = vm_list[vm]['ha_source']
+        if vm_list[vm]['disk'] is None:
+            disk = "qcow2:/mnt/vm/sles_liub/sles12sp1-HA-%s.qcow2" % vm
+        else:
+            disk = vm_list[vm]['disk']
+
+        for key in default_vm_instll.keys():
+            if vm_list[vm][key] is None:
+                vm_list[vm][key] = default_vm_instll[key]
+
         f = open(os_settings, 'r')
         conf_str = f.read()
         f.close()
+
         f = open(vm, 'w')
-        f.write(conf_str.replace("HOSTNAME", vm).replace("HA_SOURCE", ha_source))
+        f.write(conf_str.replace("HOSTNAME", vm).replace("HA_SOURCE", res['ha_source']))
         f.close()
 
-        os_settings = vm
+        autoyast = vm
         parent_fd, child_fd = multiprocessing.Pipe()
         process["process"] = multiprocessing.Process(target=installVM,
-                                args=(vm, disk, ostype,vcpus, memory, disk_size, source, nic, graphics, os_settings, child_fd),
+                                args=(vm, vm_list[vm]["disk"], vm_list[vm]["ostype"],
+                                      vm_list[vm]["vcpus"], vm_list[vm]["memory"],
+                                      vm_list[vm]["disk_size"], vm_list[vm]["sle_source"],
+                                      vm_list[vm]["nic"], vm_list[vm]["graphics"],
+                                      autoyast, child_fd),
                                 name=vm)
-        process['pipe'] = parent_fd
+        process["pipe"] = parent_fd
+        process["autoyast"] = autoyast
         processes[vm] = process
+
         process["process"].start()
 
     for vm in vm_list.keys():
         processes[vm]["process"].join()
+        os.remove(processes[vm]["autoyast"])
+
+def get_config_and_install(deployconf='templete/vm_list.yaml'):
+    dp = GET_VM_CONF(deployfile)
+
+    vm_list = dp.get_vms_conf()
+    resource = dp.get_single_section_conf("resource")
+
+    installVMs(vm_list, resource)
+
+def usage():
+    print "usage:"
+    print "\t./installVM.py <yaml-conf>"
+    print "\tDefault yaml file in 'templete/vm_list.yaml'"
+    sys.exit(1)
 
 if __name__ == "__main__":
-    newInstallation="false"
-    vm_list={}
-    deployfile = 'templete/vm_list.yaml'
-    dp = GET_VM_CONF(deployfile)
-    vm_list = dp.get_vms_conf()
-    if len(sys.argv) >= 2:
-        newInstallation = sys.argv[1]
-    if newInstallation.lower() == 'true':
-        installVMs(vm_list)
+    if len(sys.argv) > 2:
+        usage()
+    elif len(sys.argv) == 1:
+       get_config_and_install(sys.argv[1])
+    else:
+       get_config_and_install()
+
