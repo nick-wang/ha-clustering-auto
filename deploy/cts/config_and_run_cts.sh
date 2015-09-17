@@ -8,6 +8,10 @@
 
 zypper in -y pacemaker-cts
 
+#we can get these args by ENV later
+. cluster_conf
+
+#get args
 node_list=$1
 ip_base=$2
 stonith_type=$3
@@ -15,6 +19,7 @@ stonith_args=""
 host_ip=$4
 node=`hostname`
 
+#remove local node from node list
 node_list=`echo ${node_list//','/' '}`
 echo $node_list
 arr=($node_list)
@@ -33,12 +38,15 @@ do
 done
 node_list=`echo ${new_node_list//','/' '}`
 
+#deal with stonith, external/libvirt, external/sbd and external/ssh so far
 if [ $stonith_type == "external/libvirt" ]
 then
 	zypper in -y libvirt
     stonith_args="--stonith_args hypervisor_uri='qemu+tcp://$host_ip/system',hostlist='$node_list'"
 elif [ $stonith_type == "external/sbd" ]
 then
-	stonith_args="--stonith_args SBD_DEVICE=/dev/sda,SBD_OPTS='-W'"
+	stonith_args="--stonith_args SBD_DEVICE='/dev/disk/by-path/ip-$TARGET_IP:3260-iscsi-$(TARGET_LUN)-lun-0',SBD_OPTS='-W'"
 fi
+
+#form the commandline
 echo "/usr/share/pacemaker/tests/cts/CTSlab.py --nodes $new_node_list --outputfile my.log --populate-resources --test-ip-base $ip_base --stonith 1 --stack corosync --stonith_type $stonith_type $stonith_args"
