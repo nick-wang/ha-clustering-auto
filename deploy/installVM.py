@@ -24,10 +24,10 @@ def installVMs(vm_list={}, res={}):
                          'vcpus': 1,
                          'memory': 1024,
                          'disk_size': 8192,
-                         'nic': 'bridge=br1,model=virtio'
+                         'nic': 'bridge=br1,model=virtio',
                          'graphics': 'cirrus'
                         }
-    default_res= {'sle_source': 'http://mirror.bej.suse.com/dist/install/SLP/SLE-12-SP1-Server-LATEST/x86_64/DVD1/'
+    default_res= {'sle_source': 'http://mirror.bej.suse.com/dist/install/SLP/SLE-12-SP1-Server-LATEST/x86_64/DVD1/',
                   'ha_source':'http://mirror.bej.suse.com/dist/install/SLP/SLE-12-SP1-HA-LATEST/x86_64/DVD1/'
                  }
     os_settings = '%s/%s' % (os.getcwd(), 'templete/my_ha_inst.xml')
@@ -62,7 +62,7 @@ def installVMs(vm_list={}, res={}):
         process["process"] = multiprocessing.Process(target=installVM,
                                 args=(vm, vm_list[vm]["disk"], vm_list[vm]["ostype"],
                                       vm_list[vm]["vcpus"], vm_list[vm]["memory"],
-                                      vm_list[vm]["disk_size"], vm_list[vm]["sle_source"],
+                                      vm_list[vm]["disk_size"], res["sle_source"],
                                       vm_list[vm]["nic"], vm_list[vm]["graphics"],
                                       autoyast, child_fd),
                                 name=vm)
@@ -76,11 +76,11 @@ def installVMs(vm_list={}, res={}):
         processes[vm]["process"].join()
         os.remove(processes[vm]["autoyast"])
 
-def get_config_and_install(deployconf='templete/vm_list.yaml'):
+def get_config_and_install(deployfile='templete/vm_list.yaml'):
     dp = GET_VM_CONF(deployfile)
 
     vm_list = dp.get_vms_conf()
-    resource = dp.get_single_section_conf("resource")
+    resource = dp.get_single_section_conf("resources")
 
     installVMs(vm_list, resource)
 

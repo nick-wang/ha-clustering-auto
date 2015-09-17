@@ -67,7 +67,7 @@ class GET_VM_CONF:
             Only for single section, can not use for list. 
         '''
         if not self.structs.has_key(section):
-            print "Need to config a new section."
+            print "Need to config a new section (%s)." % section
             sys.exit(4)
 
         conf = {}
