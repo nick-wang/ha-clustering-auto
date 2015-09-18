@@ -10,7 +10,10 @@
    Split templete for installation/cluster configuration.
 
 6. Change the autoyast xml file more generic and simple.
+   Removing unnecessary packages and configurations from autoyast xml
 
 7. Configure a deploy cluster script.(move from jenkins)
 
 8. Result output tools.
+
+9. Commit the code of jekins job to ha-share
