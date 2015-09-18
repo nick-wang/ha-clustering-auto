@@ -6,6 +6,8 @@
 hosts_content=""
 csync2_content=""
 
+cd templete
+
 #Modify templete according to cluster configuration
 temp=$NODES
 while [ "$temp" -ge 1 ]
@@ -77,9 +79,9 @@ fi
 iscsiadm -m discovery -t st -p $TARGET_IP
 iscsiadm -m node -T $TARGET_LUN -p $TARGET_IP -l
 sleep 20
-sbd -d "/dev/disk/by-path/ip-$TARGET_IP:3260-iscsi-$(TARGET_LUN)-lun-0" create
+sbd -d "/dev/disk/by-path/ip-$TARGET_IP:3260-iscsi-${TARGET_LUN}-lun-0" create
 modprobe softdog
-echo "SBD_DEVICE='/dev/disk/by-path/ip-$TARGET_IP:3260-iscsi-$(TARGET_LUN)-lun-0'" > /etc/sysconfig/sbd
+echo "SBD_DEVICE='/dev/disk/by-path/ip-$TARGET_IP:3260-iscsi-${TARGET_LUN}-lun-0'" > /etc/sysconfig/sbd
 echo "SBD_OPTS ='-W'" >> /etc/sysconfig/sbd
 echo "modprobe softdog" >> /etc/init.d/boot.local
 
