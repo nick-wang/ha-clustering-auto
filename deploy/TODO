@@ -8,3 +8,9 @@
 
 5. Reorder the file name/location. 
    Split templete for installation/cluster configuration.
+
+6. Change the autoyast xml file more generic and simple.
+
+7. Configure a deploy cluster script.(move from jenkins)
+
+8. Result output tools.
