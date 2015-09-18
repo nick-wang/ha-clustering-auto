@@ -1,0 +1,10 @@
+1. rpm package/script for deploy jenkins slave.
+
+2. rpm package/script for deploy virt guest.
+
+3. Generic replace function for autoyast file.
+
+4. Automatic calc subnet via selected host net device.
+
+5. Reorder the file name/location. 
+   Split templete for installation/cluster configuration.
