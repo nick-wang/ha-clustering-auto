@@ -20,7 +20,7 @@ def installVM(VMName, disk, OSType, vcpus, memory, disk_size, source, nic, graph
 
 def installVMs(vm_list={}, res={}):
     processes = {}
-    default_vm_instll = {'ostype': "sles12sp1",
+    default_vm_instll = {'ostype': "sles11",
                          'vcpus': 1,
                          'memory': 1024,
                          'disk_size': 8192,
