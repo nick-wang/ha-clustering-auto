@@ -51,13 +51,10 @@ def get_net_mask(interface):
         return ''
 
 def get_netaddr(interface):
-    netmask = get_net_mask(interface)
-    ipaddr = get_ipaddr_by_interface(interface)
-
-    if netmask.strip() == '' or ipaddr.strip() == '':
-        return ''
-    netmast = netmask.split('.')
-    ipaddr = ipaddr.split('.')
+    netmask = get_net_mask(interface).split('.')
+    ipaddr = get_ipaddr_by_interface(interface).split('.')
+#    if netmask.strip() == '' or ipaddr.strip() == '':
+#        return ''
     if len(netmask) != 4 or len(ipaddr) != 4:
         return ''
     return "%d.%d.%d.%d" %(((int(ipaddr[0]))&(int(netmask[0]))), \
@@ -70,6 +67,7 @@ if __name__ == "__main__":
     if len(sys.argv) == 2:
         if is_interface_existed(sys.argv[1]):
             print "The interface %s has ipaddr %s/%s" % (sys.argv[1], get_ipaddr_by_interface(sys.argv[1]), get_net_mask(sys.argv[1]))
+            print "The netaddr is %s " % get_netaddr(sys.argv[1])
         else:
             print "no such a interface %s" % sys.argv[1]
     else:
