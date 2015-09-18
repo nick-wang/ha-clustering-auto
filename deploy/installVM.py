@@ -60,7 +60,7 @@ def installVMs(vm_list={}, res={}):
         autoyast = vm
         parent_fd, child_fd = multiprocessing.Pipe()
         process["process"] = multiprocessing.Process(target=installVM,
-                                args=(vm, vm_list[vm]["disk"], vm_list[vm]["ostype"],
+                                args=(vm, disk, vm_list[vm]["ostype"],
                                       vm_list[vm]["vcpus"], vm_list[vm]["memory"],
                                       vm_list[vm]["disk_size"], res["sle_source"],
                                       vm_list[vm]["nic"], vm_list[vm]["graphics"],
