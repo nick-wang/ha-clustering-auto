@@ -5,8 +5,8 @@ Q. How to deploy a host server?
   2. Install package "java".
   3. Add to jenkins server slave.
   4. Install package "zypper in python-PyYAML".
-  5. Copy running scripts to hosts (Or maybe update via rpm?git).
-     Copy ssh private key.
+  5. Copy running scripts to host (Or maybe update via rpm?git).
+     Copy ssh private key to host, mode 0600
   6. Install package "nmap"
   7. Modify /etc/ssh/ssh_config, add one line:
      StrictHostKeyChecking no
