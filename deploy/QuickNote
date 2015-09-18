@@ -10,3 +10,5 @@ Q. How to deploy a host server?
   6. Install package "nmap"
   7. Modify /etc/ssh/ssh_config, add one line:
      StrictHostKeyChecking no
+  8. Create a directory for storing vm images.
+     Like /mnt/vm/xxxxx
