@@ -2,6 +2,7 @@
 
 #Import ENV conf
 . cluster_conf
+. scripts/functions
 
 hosts_content=""
 csync2_content=""
@@ -98,6 +99,10 @@ systemctl start csync2.socket
 systemctl start pacemaker
 
 #config stonith resource and restart pacemaker
-crm configure primitive stonith_sbd stonith:external/sbd
+if [ isMaster "$HOSTNAME_NODE1" -eq 0 ]
+then
+    crm configure primitive stonith_sbd stonith:external/sbd
+fi
+
 systemctl enable sbd
 systemctl restart pacemaker
