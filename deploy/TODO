@@ -17,3 +17,5 @@
 8. Result output tools.
 
 9. Commit the code of jekins job to ha-share
+
+10. [important] Move "cluster_conf" into working dir.

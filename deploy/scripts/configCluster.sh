@@ -7,7 +7,7 @@
 hosts_content=""
 csync2_content=""
 
-cd ../templete
+cd templete
 
 #Modify templete according to cluster configuration
 temp=$NODES

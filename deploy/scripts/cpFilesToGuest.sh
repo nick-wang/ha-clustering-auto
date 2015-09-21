@@ -12,8 +12,8 @@ do
 {
 ssh root@${ip} "mkdir -p ${CLUSTER_DIR}/templete; mkdir -p ${CLUSTER_DIR}/scripts"
 
-scp configCluster.sh root@${ip}:${CLUSTER_DIR}/scripts
-scp ../templete/cluster_conf root@${ip}:${CLUSTER_DIR}
+scp ./configCluster.sh ./functions root@${ip}:${CLUSTER_DIR}/scripts/
+scp ../cluster_conf root@${ip}:${CLUSTER_DIR}
 scp ../templete/*_templete root@${ip}:${CLUSTER_DIR}/templete/
 
 ssh root@${ip} "cd ${CLUSTER_DIR}; ${CLUSTER_DIR}/scripts/configCluster.sh "
