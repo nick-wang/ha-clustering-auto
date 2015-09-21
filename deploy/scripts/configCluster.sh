@@ -99,7 +99,8 @@ systemctl start csync2.socket
 systemctl start pacemaker
 
 #config stonith resource and restart pacemaker
-if [ isMaster "$HOSTNAME_NODE1" -eq 0 ]
+isMaster "$HOSTNAME_NODE1"
+if [ $? -eq 0 ]
 then
     crm configure primitive stonith_sbd stonith:external/sbd
 fi
