@@ -1,6 +1,6 @@
 #! /usr/bin/python
 
-import subprocess
+import subprocess, getopt
 import xml.etree.ElementTree as ET
 import sys, os, time
 
@@ -74,7 +74,7 @@ def get_ip_list_by_mac(vm_name_list, ip_range="147.2.207.0/24"):
             result[vm_name] = ("", "")
     return result
 
-def get_cluster_conf(subnet='207', sleep_time="0"):
+def get_cluster_conf(subnet='207', sleep_time="0", configuration="../cluster_conf"):
     vm_list={}
 
     if sleep_time != "0":
@@ -110,7 +110,7 @@ def get_cluster_conf(subnet='207', sleep_time="0"):
     contents += "TARGET_LUN=%s\n" % target_lun
 
     #Write env file to "../cluster_conf"
-    f=open('../cluster_conf', 'w')
+    f=open(configuration, 'w')
     f.write(contents)
     f.close()
 
@@ -119,17 +119,32 @@ def get_cluster_conf(subnet='207', sleep_time="0"):
 
 def usage():
     print "usage:"
-    print "\t./getClusterConf.py <subnet> <sleep-time>"
-    print "example:\n\t./getClusterConf.py 207 120"
-    print "\tsubnet will use 147.2.*.0/24"
+    print "\t./getClusterConf.py -n <subnet> -s <sleep-time> -f <configuration>"
+    print "example:\n\t./getClusterConf.py -n 207 -s 120 -f ../cluster_conf"
+    print "\tsubnet will use 147.2.<subnet>.0/24"
     sys.exit(1)
 
-if __name__ == "__main__":
-    argc = len(sys.argv)
-    if argc == 1 or argc > 3:
-        usage()
-    elif argc == 3:
-        get_cluster_conf(sys.argv[1], sys.argv[2])
-    else:
-        get_cluster_conf(sys.argv[1])
+def getOption():
+    options = {"net": "207", "sleep": "0", "configuration": "../cluster_conf"}
 
+    try:
+        opts, args = getopt.getopt(sys.argv[1:], "n:s:f:", ["net=", "sleep=", "configuration="])
+    except getopt.GetoptError:
+        print "Get options Error!"
+        sys.exit(2)
+
+    for opt, value in opts:
+        if opt in ("-n", "--net"):
+            options["net"] = value
+        elif opt in ("-s", "--sleep"):
+            options["sleep"] = value
+        elif opt in ("-f", "--configuration"):
+            options["configuration"] = value
+        else:
+            usage()
+
+    return options
+
+if __name__ == "__main__":
+    options = getOption()
+    get_cluster_conf(options["net"], options["sleep"], options["configuration"])

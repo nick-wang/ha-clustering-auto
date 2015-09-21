@@ -104,6 +104,7 @@ if [ $? -eq 0 ]
 then
     crm configure primitive stonith_sbd stonith:external/sbd
 fi
+sleep 2
 
 systemctl enable sbd
 systemctl restart pacemaker
