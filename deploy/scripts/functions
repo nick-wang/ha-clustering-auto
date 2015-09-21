@@ -1,0 +1,21 @@
+#!/bin/bash
+
+function isMaster()
+{
+    # Usage:
+    #     isMaster <nodename>
+    if [ $# -ne 1 ]
+    then 
+        return 1
+    fi
+
+    LOCALHOST=$(uname -n|cut -d "." -f 1)
+
+    if [ "$1" == "$LOCALHOST" ]
+    then
+        #Master node
+        return 0
+    else
+        return 1
+    fi
+}
