@@ -80,7 +80,7 @@ def get_cluster_conf(subnet='207', sleep_time="0"):
     if sleep_time != "0":
         time.sleep(int(sleep_time))
 
-    deployfile = "%s/%s" % (os.getcwd(), 'templete/vm_list.yaml')
+    deployfile = "%s/%s" % (os.getcwd(), '../confs/vm_list.yaml')
     dp = GET_VM_CONF(deployfile)
     vm_list = dp.get_vms_conf()
 
@@ -109,8 +109,8 @@ def get_cluster_conf(subnet='207', sleep_time="0"):
     contents += "TARGET_IP=%s\n" % target_ip
     contents += "TARGET_LUN=%s\n" % target_lun
 
-    #Write env file to "templete/cluster_conf"
-    f=open('templete/cluster_conf', 'w')
+    #Write env file to "../cluster_conf"
+    f=open('../cluster_conf', 'w')
     f.write(contents)
     f.close()
 

@@ -31,7 +31,7 @@ def installVMs(vm_list={}, res={}):
     default_res= {'sle_source': 'http://mirror.bej.suse.com/dist/install/SLP/SLE-12-SP1-Server-LATEST/x86_64/DVD1/',
                   'ha_source':'http://mirror.bej.suse.com/dist/install/SLP/SLE-12-SP1-HA-LATEST/x86_64/DVD1/'
                  }
-    os_settings = '%s/%s' % (os.getcwd(), 'templete/my_ha_inst.xml')
+    os_settings = '%s/%s' % (os.getcwd(), '../confs/my_ha_inst.xml')
 
     for key in default_res.keys():
         if res[key] is None:
@@ -77,7 +77,7 @@ def installVMs(vm_list={}, res={}):
         processes[vm]["process"].join()
         os.remove(processes[vm]["autoyast"])
 
-def get_config_and_install(deployfile='templete/vm_list.yaml'):
+def get_config_and_install(deployfile='../confs/vm_list.yaml', autoyast='../confs/my_ha_inst.xml'):
     dp = GET_VM_CONF(deployfile)
 
     vm_list = dp.get_vms_conf()
@@ -87,14 +87,17 @@ def get_config_and_install(deployfile='templete/vm_list.yaml'):
 
 def usage():
     print "usage:"
-    print "\t./installVM.py <yaml-conf>"
-    print "\tDefault yaml file in 'templete/vm_list.yaml'"
+    print "\t./installVM.py <yaml-conf> <autoyast>"
+    print "\tDefault yaml file in '../confs/vm_list.yaml'"
+    print "\t        autoyast file in '../confs/my_ha_inst.xml'"
     sys.exit(1)
 
 if __name__ == "__main__":
-    if len(sys.argv) > 2:
+    if len(sys.argv) > 3:
         usage()
-    elif len(sys.argv) == 1:
+    elif len(sys.argv) == 3:
+       get_config_and_install(sys.argv[1], sys.argv[2])
+    elif len(sys.argv) == 2:
        get_config_and_install(sys.argv[1])
     else:
        get_config_and_install()

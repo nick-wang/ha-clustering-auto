@@ -112,7 +112,7 @@ class GET_VM_CONF:
 def test():
     # vm_list.yaml is for testing only.
     # Should get the yaml configuration file from scheduler(jenkins).
-    deployfile = "%s/%s" % (os.getcwd(), 'templete/vm_list.yaml')
+    deployfile = "%s/%s" % (os.getcwd(), '../confs/vm_list.yaml')
 
     dp = GET_VM_CONF(deployfile)
     vm_list = dp.get_vms_conf()
