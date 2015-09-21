@@ -10,6 +10,7 @@ def installVM(VMName, disk, OSType, vcpus, memory, disk_size, source, nic, graph
     options = "--debug --os-type %s --name %s --vcpus %d --memory %d --disk %s,vda,disk,w,%d,sparse=0, --source %s --nic %s --graphics %s --os-settings=%s" \
               %(OSType, VMName, vcpus, memory, disk, disk_size, source, nic, graphics, autoyast)
     cmd = "echo << EOF| vm-install %s%s%s" % (options, "\n\n\n\n\n\n\n", "EOF")
+    print "Install command is: %s" % cmd
     os.system(cmd)
     
     #status, output = commands.getstatusoutput(cmd)
