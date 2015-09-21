@@ -8,7 +8,7 @@ function usage()
 CLUSTER_CONF=$1
 CLUSTER_DIR=$2
 
-for ip in `cat ../cluster_conf |grep IP_NODE |cut -d "=" -f 2`
+for ip in `cat ${CLUSTER_CONF} |grep IP_NODE |cut -d "=" -f 2`
 do
 {
 ssh root@${ip} "mkdir -p ${CLUSTER_DIR}/templete; mkdir -p ${CLUSTER_DIR}/scripts"
