@@ -7,9 +7,8 @@ from getHostIP import *
 
 sys.path.append('../')
 
-def getCtsConf(stonith_type="external/libvirt", interface1='br1', configuration="../cts_conf"):
-    deployfile = "%s/%s" % (os.getcwd(), '../confs/vm_list.yaml')
-    dp = GET_VM_CONF(deployfile)
+def getCtsConf(stonith_type="external/libvirt", interface1='br1', configuration="../cts_conf", yamlfile='../confs/vm_list.yaml'):
+    dp = GET_VM_CONF(yamlfile)
     stonith_type="external/libvirt"
     content=""
     
@@ -33,10 +32,10 @@ def getCtsConf(stonith_type="external/libvirt", interface1='br1', configuration=
     f.write(content)
 
 def getOption():
-    options = {"interface": "br1", "stonith_type": "external/libvirt", "configuration": "../cts_conf"}
+    options = {"interface": "br1", "stonith_type": "external/libvirt", "configuration": "../cts_conf", "yamlfile": "../confs/vm_list.yaml"}
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "i:s:f:", ["interface=", "stonith_type=", "configuration="])
+        opts, args = getopt.getopt(sys.argv[1:], "i:s:f:d:", ["interface=", "stonith_type=", "configuration=", "yamlfile="])
     except getopt.GetoptError:
         print "Get options Error!"
         sys.exit(1)
@@ -48,6 +47,8 @@ def getOption():
             options["sleep"] = value
         elif opt in ("-f", "--configuration"):
             options["configuration"] = value
+        elif opt in ("-y","--yamlfile"):
+            options["yamlfile"] = value
         else:
             usage()
 
@@ -55,4 +56,4 @@ def getOption():
 
 if __name__ == "__main__":
     options = getOption()
-    getCtsConf(options["stonith_type"], options["interface"], options["configuration"])
+    getCtsConf(options["stonith_type"], options["interface"], options["configuration"], options["yamlfile"])
