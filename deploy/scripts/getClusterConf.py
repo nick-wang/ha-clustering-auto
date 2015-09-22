@@ -74,14 +74,13 @@ def get_ip_list_by_mac(vm_name_list, ip_range="147.2.207.0/24"):
             result[vm_name] = ("", "")
     return result
 
-def get_cluster_conf(subnet='207', sleep_time="0", configuration="../cluster_conf"):
+def get_cluster_conf(subnet='207', sleep_time="0", configuration="../cluster_conf", yaml="../confs/vm_list.yaml"):
     vm_list={}
 
     if sleep_time != "0":
         time.sleep(int(sleep_time))
 
-    deployfile = "%s/%s" % (os.getcwd(), '../confs/vm_list.yaml')
-    dp = GET_VM_CONF(deployfile)
+    dp = GET_VM_CONF(yaml)
     vm_list = dp.get_vms_conf()
 
     #subnet = 207 or subnet = 208
@@ -119,16 +118,17 @@ def get_cluster_conf(subnet='207', sleep_time="0", configuration="../cluster_con
 
 def usage():
     print "usage:"
-    print "\t./getClusterConf.py -n <subnet> -s <sleep-time> -f <configuration>"
+    print "\t./getClusterConf.py -n <subnet> -s <sleep-time> -f <configuration> -y <yaml>"
     print "example:\n\t./getClusterConf.py -n 207 -s 120 -f ../cluster_conf"
     print "\tsubnet will use 147.2.<subnet>.0/24"
     sys.exit(1)
 
 def getOption():
-    options = {"net": "207", "sleep": "0", "configuration": "../cluster_conf"}
+    options = {"net": "207", "sleep": "0", "configuration": "../cluster_conf", "yaml": "../confs/vm_list.yaml"}
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "n:s:f:", ["net=", "sleep=", "configuration="])
+        opts, args = getopt.getopt(sys.argv[1:], "n:s:f:y:",
+                    ["net=", "sleep=", "configuration=", "yaml="])
     except getopt.GetoptError:
         print "Get options Error!"
         sys.exit(2)
@@ -140,6 +140,8 @@ def getOption():
             options["sleep"] = value
         elif opt in ("-f", "--configuration"):
             options["configuration"] = value
+        elif opt in ("-y", "--ymal"):
+            options["yaml"] = value
         else:
             usage()
 
@@ -147,4 +149,4 @@ def getOption():
 
 if __name__ == "__main__":
     options = getOption()
-    get_cluster_conf(options["net"], options["sleep"], options["configuration"])
+    get_cluster_conf(options["net"], options["sleep"], options["configuration"], options["yaml"])
