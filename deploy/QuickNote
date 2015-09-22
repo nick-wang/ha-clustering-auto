@@ -13,3 +13,13 @@ Q. How to deploy a host server?
   8. Create a directory for storing vm images.
      Like /mnt/vm/xxxxx
   9. Modify libvirtd to support TCP.
+
+
+A.To make the cmd 
+"virsh -c qemu+tcp://host_ip/system", we have to modify 
+
+listen_tls = 0
+listen_tcp = 1
+tcp_port = "16509"
+listen_addr = "0.0.0.0"
+auth_tcp = "none"
