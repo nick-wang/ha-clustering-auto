@@ -47,7 +47,7 @@ then
     stonith_args="--stonith-args hypervisor_uri='qemu+tcp://$host_ip/system',hostlist='$node_list'"
 elif [ $stonith_type == "external/sbd" ];
 then
-	stonith_args="--stonith-args SBD_DEVICE='/dev/disk/by-path/ip-$TARGET_IP:3260-iscsi-$(TARGET_LUN)-lun-0',SBD_OPTS='-W'"
+	stonith_args="--stonith-args SBD_DEVICE='/dev/disk/by-path/ip-$TARGET_IP:3260-iscsi-${TARGET_LUN}-lun-0',SBD_OPTS='-W'"
 fi
 
 #form the commandline

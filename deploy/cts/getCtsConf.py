@@ -36,10 +36,10 @@ def getOption():
     options = {"interface": "br1", "stonith_type": "external/libvirt", "configuration": "../cts_conf"}
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "i:s:f:", ["net=", "sleep=", "configuration="])
+        opts, args = getopt.getopt(sys.argv[1:], "i:s:f:", ["interface=", "stonith_type=", "configuration="])
     except getopt.GetoptError:
         print "Get options Error!"
-        sys.exit(2)
+        sys.exit(1)
 
     for opt, value in opts:
         if opt in ("-i", "--interface"):

@@ -1,14 +1,13 @@
 #!/bin/bash
 function usage()
 {
-  echo "cpCtsFilesToGuest.sh <CTS_CONF> <WORKING_DIR_IN_GUEST>"
+  echo "cpCtsFilesToGuest.sh <CTS_CONF> <CLUSTER_CONF> <WORKING_DIR_IN_GUEST>"
   exit
 }
 
 CTS_CONF=$1
-CTS_DIR=$2
-CLUSTER_CONF=$3
-echo $CLUSTER_CONF
+CLUSTER_CONF=$2
+CTS_DIR=$3
 
 for ip in `cat $CLUSTER_CONF |grep IP_NODE |cut -d "=" -f 2`
 do
