@@ -12,3 +12,4 @@ Q. How to deploy a host server?
      StrictHostKeyChecking no
   8. Create a directory for storing vm images.
      Like /mnt/vm/xxxxx
+  9. Modify libvirtd to support TCP.
