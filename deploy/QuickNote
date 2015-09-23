@@ -13,6 +13,7 @@ Q. How to deploy a host server?
   8. Create a directory for storing vm images.
      Like /mnt/vm/xxxxx
   9. Modify libvirtd to support TCP.
+  10. Add a virbr0 for NAT.
 
 
 A.To make the cmd 
