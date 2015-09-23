@@ -99,12 +99,13 @@ def get_cluster_conf(sleep_time="0", configuration="../cluster_conf", yaml="../c
     else:
         netmask_int = 0
         for i in netmask:
-            netmask_int += i[2:].count("1")
+            netmask_int += bin(int(i))[2:].count("1")
     ip_range = "%s/%d" % (netaddr, netmask_int)
 
     num_vms = len(vm_list.keys())
     contents = "NODES=%d\n" % num_vms
 
+    print "DEBUG: Checking ip range: %s" % ip_range
     vm_info_list = get_ip_list_by_mac(vm_list.keys(), ip_range)
 
     i = 1
