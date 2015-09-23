@@ -35,7 +35,7 @@ def getOption():
     options = {"interface": "br1", "stonith_type": "external/libvirt", "configuration": "../cts_conf", "yamlfile": "../confs/vm_list.yaml"}
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "i:s:f:d:", ["interface=", "stonith_type=", "configuration=", "yamlfile="])
+        opts, args = getopt.getopt(sys.argv[1:], "i:s:f:y:", ["interface=", "stonith_type=", "configuration=", "yamlfile="])
     except getopt.GetoptError:
         print "Get options Error!"
         sys.exit(1)
