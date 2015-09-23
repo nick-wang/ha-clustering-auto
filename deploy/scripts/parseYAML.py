@@ -43,6 +43,10 @@ nodes:
   graphics:
   os_settings:
 
+devices:
+  disk_dir: /mnt/vm/sles_ha_auto/
+  nic: br0
+
 iscsi:
   target_ip: 147.2.207.237
   target_lun: iqn.2015-08.suse.bej.bliu:441a202b-6aa3-479f-b56f-374e2f38ba20
@@ -52,6 +56,7 @@ class GET_VM_CONF:
     def __init__(self, url):
         self.ya = self.get_yaml(url)
         self.structs = {'iscsi': ('target_ip', 'target_lun'),
+                        'devices': ('disk_dir', 'nic'),
                         'resources': ('sle_source', 'ha_source')}
 
     def get_yaml(self, url):
@@ -77,7 +82,7 @@ class GET_VM_CONF:
             print "Lack of '%s' section in yaml file." % section
             return
 
-        # So far, only for 'iscsi' and 'resources'
+        # So far, only for 'iscsi', 'devices' and 'resources'
         for ele in self.structs[section]:
             conf[ele] = struct.get(ele)
 

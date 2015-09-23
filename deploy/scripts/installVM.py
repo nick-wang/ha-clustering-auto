@@ -19,18 +19,24 @@ def installVM(VMName, disk, OSType, vcpus, memory, disk_size, source, nic, graph
     #p.communicate("\n\n\n\n\n\n\n")
     #print p.wait()
 
-def installVMs(vm_list={}, res={}):
+def installVMs(vm_list={}, res={}, devices={}):
+    nic_pattern = "bridge=%s,model=virtio"
+    disk_pattern = "qcow2:%s/sles12sp1-HA-%s.qcow2"
+
     processes = {}
     default_vm_instll = {'ostype': "sles11",
                          'vcpus': 1,
                          'memory': 1024,
                          'disk_size': 8192,
-                         'nic': 'bridge=br1,model=virtio',
+                         'nic': 'br0',
                          'graphics': 'cirrus'
                         }
-    default_res= {'sle_source': 'http://mirror.bej.suse.com/dist/install/SLP/SLE-12-SP1-Server-LATEST/x86_64/DVD1/',
+    default_res = {'sle_source': 'http://mirror.bej.suse.com/dist/install/SLP/SLE-12-SP1-Server-LATEST/x86_64/DVD1/',
                   'ha_source':'http://mirror.bej.suse.com/dist/install/SLP/SLE-12-SP1-HA-LATEST/x86_64/DVD1/'
-                 }
+                  }
+    default_dev = {'disk_dir':"/mnt/vm/sles_ha_auto/"
+                  }
+
     os_settings = '%s/%s' % (os.getcwd(), '../confs/my_ha_inst.xml')
 
     for key in default_res.keys():
@@ -41,12 +47,23 @@ def installVMs(vm_list={}, res={}):
         print "DEBUG: install virt-machine %s." % vm
         process = {}
         # get value from vm config
-        if vm_list[vm]['disk'] is None:
-            disk = "qcow2:/mnt/vm/sles_liub/sles12sp1-HA-%s.qcow2" % vm
-        else:
+        if vm_list[vm]['disk'] is not None:
             disk = vm_list[vm]['disk']
+        elif devices.has_key("disk_dir") and devices["disk_dir"] is not None:
+            disk = disk_pattern % (devices["disk_dir"], vm)
+        else:
+            disk = disk_pattern % (default_dev["disk_dir"], vm)
 
         for key in default_vm_instll.keys():
+            if key == "nic":
+                if vm_list[vm]["nic"] is not None:
+                    vm_list[vm]["nic"] = nic_pattern % vm_list[vm]["nic"]
+                elif devices.has_key("nic") and devices["nic"] is not None:
+                    vm_list[vm]["nic"] = nic_pattern % devices["nic"]
+                else:
+                    vm_list[vm]["nic"] = nic_pattern % default_vm_instll["nic"]
+                continue
+
             if vm_list[vm][key] is None:
                 vm_list[vm][key] = default_vm_instll[key]
 
@@ -82,8 +99,9 @@ def get_config_and_install(deployfile='../confs/vm_list.yaml', autoyast='../conf
 
     vm_list = dp.get_vms_conf()
     resource = dp.get_single_section_conf("resources")
+    devices = dp.get_single_section_conf("devices")
 
-    installVMs(vm_list, resource)
+    installVMs(vm_list, resource, devices)
 
 def usage():
     print "usage:"
