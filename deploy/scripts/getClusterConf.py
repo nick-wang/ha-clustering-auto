@@ -5,7 +5,7 @@ import xml.etree.ElementTree as ET
 import sys, os, time
 
 from parseYAML import GET_VM_CONF
-from getHostIP import get_net_mask, get_netaddr
+from getHostIP import get_net_mask, get_netaddr, get_ipaddr_by_interface
 
 #virsh domiflist sles12sp1-HA
 #Interface  Type       Source     Model       MAC
@@ -91,7 +91,7 @@ def get_cluster_conf(sleep_time="0", configuration="../cluster_conf", yaml="../c
         interface = devices["nic"]
     else:
         interface = "br0"
-
+    ipaddr = get_ipaddr_by_interface(interface)
     netaddr = get_netaddr(interface)
     netmask = get_net_mask(interface).split(".")
     if len(netmask) != 4:
@@ -124,7 +124,8 @@ def get_cluster_conf(sleep_time="0", configuration="../cluster_conf", yaml="../c
         target_lun = "iqn.2015-08.suse.bej.bliu:441a202b-6aa3-479f-b56f-374e2f38ba20"
     contents += "TARGET_IP=%s\n" % target_ip
     contents += "TARGET_LUN=%s\n" % target_lun
-
+    contents += "NETADDR=%s\n" % netaddr
+    contents += "IPADDR=%s\n" % ipaddr
     #Write env file to "../cluster_conf"
     f=open(configuration, 'w')
     f.write(contents)

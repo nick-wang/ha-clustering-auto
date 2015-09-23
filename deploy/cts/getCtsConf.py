@@ -19,16 +19,9 @@ def getCtsConf(stonith_type="external/libvirt", interface1='br1', configuration=
             node_list = vm
         else:
             node_list += ',' + vm
-    #    contents += "HOSTNAME_NODE%d=%s\n" % (i, vm)
-    #    contents += "IP_NODE%d=%s\n" % (i, vm_info_list[vm][0])
-    #    i += 1
-    host_ip=get_ipaddr_by_interface(interface = interface1)
-    netaddr=get_netaddr(interface = interface1)
     f = open(configuration, 'w')
     content += "NODE_LIST=%s\n" % node_list
     content += "STONITH_TYPE=%s\n" % stonith_type
-    content += "HOST_IP=%s\n" % host_ip
-    content += "IP_BASE=%s" % netaddr
     f.write(content)
 
 def getOption():
