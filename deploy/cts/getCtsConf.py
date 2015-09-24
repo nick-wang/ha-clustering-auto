@@ -23,6 +23,7 @@ def getCtsConf(stonith_type="external/libvirt", interface1='br1', configuration=
     content += "NODE_LIST=%s\n" % node_list
     content += "STONITH_TYPE=%s\n" % stonith_type
     f.write(content)
+    f.close()
 
 def getOption():
     options = {"interface": "br1", "stonith_type": "external/libvirt", "configuration": "../cts_conf", "yamlfile": "../confs/vm_list.yaml"}
