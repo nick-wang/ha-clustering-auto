@@ -2,9 +2,20 @@
 
 import commands, subprocess
 import os, sys
+import re
 import multiprocessing
 
 from parseYAML import GET_VM_CONF
+
+def _replaceXML(line, key, value):
+    pattern = "( *<%s>).*(</%s> *)"
+    m_pa = pattern % (key, key)
+
+    result = re.match(m_pa, line)
+    if result is not None:
+        return "%s%s%s\n" % (result.groups()[0], value, result.groups()[1])
+    else:
+        return line
 
 def installVM(VMName, disk, OSType, vcpus, memory, disk_size, source, nic, graphics, autoyast, child_fd):
     options = "--debug --os-type %s --name %s --vcpus %d --memory %d --disk %s,vda,disk,w,%d,sparse=0, --source %s --nic %s --graphics %s --os-settings=%s" \
@@ -68,11 +79,14 @@ def installVMs(vm_list={}, res={}, devices={}):
                 vm_list[vm][key] = default_vm_instll[key]
 
         f = open(os_settings, 'r')
-        conf_str = f.read()
+        conf_str = f.readlines()
         f.close()
 
         f = open(vm, 'w')
-        f.write(conf_str.replace("HOSTNAME", vm).replace("HA_SOURCE", res['ha_source']))
+        for line in conf_str:
+            line = _replaceXML(line, "media_url", res['ha_source'])
+            line = _replaceXML(line, "hostname", vm)
+            f.write(line)
         f.close()
 
         autoyast = vm

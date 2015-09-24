@@ -2,9 +2,9 @@
 
 2. rpm package/script for deploy virt guest.
 
-3. Generic replace function for autoyast file.
+[Done]3. Generic replace function for autoyast file.
 
-4. Automatic calc subnet via selected host net device.
+[Done]4. Automatic calc subnet via selected host net device.
 
 [Done]5. Reorder the file name/location. 
    Split templete for installation/cluster configuration.
@@ -12,10 +12,15 @@
 [Done]6. Change the autoyast xml file more generic and simple.
    Removing unnecessary packages and configurations from autoyast xml
 
-[Done]7. Configure a deploy cluster script.(move from jenkins)
+[Done]7. Configure a deploy cluster script. (move from jenkins)
 
 8. Result output tools.
+   junit xml or cucumber result?
 
 9. Commit the code of jekins job to ha-share
 
 [Done]10.Move "cluster_conf" into working dir.
+
+11. Create log and informations into working dir.
+
+12. Create lib to add vir/shared disk.
