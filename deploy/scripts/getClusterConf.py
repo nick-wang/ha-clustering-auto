@@ -3,6 +3,7 @@
 import subprocess, getopt
 import xml.etree.ElementTree as ET
 import sys, os, time
+from multiprocessing import Process
 
 from parseYAML import GET_VM_CONF
 from getHostIP import get_net_mask, get_netaddr, get_ipaddr_by_interface
@@ -76,7 +77,31 @@ def get_ip_list_by_mac(vm_name_list, ip_range="147.2.207.0/24"):
             result[vm_name] = ("", "")
     return result
 
-def get_cluster_conf(sleep_time="0", configuration="../cluster_conf", yaml="../confs/vm_list.yaml"):
+def isAllIpAssigned(vm_info_list):
+    for vm in vm_info_list.keys():
+        if vm_info_list[vm][0] == "":
+            return False
+    return True
+
+def restartGuest(name):
+    print "Restart guest %s" % name
+    os.system("virsh shutdown %s" % name)
+    time.sleep(20)
+    os.system("virsh start %s" % name)
+
+def restartNoIpNodes(vm_info_list):
+    processes = []
+    for vm in vm_info_list.keys():
+        if vm_info_list[vm][0] == "":
+            p = Process(target=restartGuest, args=(vm, ), name=vm)
+            p.start()
+            processes.append(p)
+
+    for p in processes:
+        p.join()
+
+def get_cluster_conf(sleep_time="0", configuration="../cluster_conf",
+                     yaml="../confs/vm_list.yaml", recursive=False):
     vm_list={}
 
     if sleep_time != "0":
@@ -106,7 +131,29 @@ def get_cluster_conf(sleep_time="0", configuration="../cluster_conf", yaml="../c
     contents = "NODES=%d\n" % num_vms
 
     print "DEBUG: Checking ip range: %s" % ip_range
-    vm_info_list = get_ip_list_by_mac(vm_list.keys(), ip_range)
+    vm_names = vm_list.keys()
+    vm_info_list = get_ip_list_by_mac(vm_names, ip_range)
+
+    recur_times = 0
+    already_restart = False
+    while recursive:
+        if isAllIpAssigned(vm_info_list):
+            print "All nodes have been assigned IP address."
+            break
+
+        if recur_times == 20:
+            if already_restart:
+                print "Failed to get IP address!"
+                sys.exit(3)
+            else:
+                restartNoIpNodes(vm_info_list)
+                recur_times = 0
+                already_restart = True
+
+        time.sleep(10)
+        recur_times += 1
+        print "Checking again..."
+        vm_info_list = get_ip_list_by_mac(vm_names, ip_range)
 
     i = 1
     for vm in vm_info_list.keys():
@@ -142,11 +189,12 @@ def usage():
     sys.exit(1)
 
 def getOption():
-    options = {"sleep": "0", "configuration": "../cluster_conf", "yaml": "../confs/vm_list.yaml"}
+    options = {"sleep": "0", "configuration": "../cluster_conf",
+               "yaml": "../confs/vm_list.yaml", "recursive": False}
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "s:f:y:",
-                    ["sleep=", "configuration=", "yaml="])
+        opts, args = getopt.getopt(sys.argv[1:], "s:f:y:R",
+                    ["sleep=", "configuration=", "yaml=", "recursive"])
     except getopt.GetoptError:
         print "Get options Error!"
         sys.exit(2)
@@ -158,6 +206,8 @@ def getOption():
             options["configuration"] = value
         elif opt in ("-y", "--ymal"):
             options["yaml"] = value
+        elif opt in ("-R", "--recursive"):
+            options["recursive"] = True
         else:
             usage()
 
@@ -165,4 +215,5 @@ def getOption():
 
 if __name__ == "__main__":
     options = getOption()
-    get_cluster_conf(options["sleep"], options["configuration"], options["yaml"])
+    get_cluster_conf(options["sleep"], options["configuration"],
+                     options["yaml"], options["recursive"])
