@@ -14,6 +14,8 @@ Q. How to deploy a host server?
      Like /mnt/vm/xxxxx
   9. Modify libvirtd to support TCP.
   10. Add a virbr0 for NAT.
+  11. Install python library junit-xml.
+      For sles, need python-setuptools.
 
 
 A.To make the cmd 
