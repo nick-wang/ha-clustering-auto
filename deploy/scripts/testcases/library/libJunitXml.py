@@ -2,8 +2,8 @@
 
 from junit_xml import TestSuite, TestCase
 
-def assertCase(testcase, func, conf=None):
-    result = func(conf)
+def assertCase(testcase, func, *args):
+    result = func(args)
     if not result["pass"]:
         testcase.add_error_info(result["message"], result['output'])
     elif result["skip"]:

@@ -7,10 +7,12 @@ from junit_xml import TestSuite, TestCase
 from library.libJunitXml import assertCase, skipCase
 from library.libReadConf import readClusterConf
 
-def runPackmakerService(cluster_env=None):
+def runPackmakerService(args=None):
     isOK = False
     output = ""
     result = {"pass":False, "message":"", "output":"", "skip":False, "skipall": False}
+
+    cluster_env = args[0]
 
     #Own test steps
     lines = os.popen("ssh root@%s crm_mon -1r" % cluster_env["IP_NODE1"]).readlines()
@@ -30,10 +32,12 @@ def runPackmakerService(cluster_env=None):
         result["skipall"] = True
         return result
 
-def runNodesNumber(cluster_env=None):
+def runNodesNumber(args=None):
     isOK = False
     output = ""
     result = {"pass":False, "message":"", "output":"", "skip":False, "skipall": False}
+
+    cluster_env = args[0]
 
     #Own test steps
     lines = os.popen("ssh root@%s crm_mon -1r" % cluster_env["IP_NODE1"]).readlines()
@@ -54,10 +58,12 @@ def runNodesNumber(cluster_env=None):
         result["output"] = "Only %s of %s nodes configured." % (output, cluster_env["NODES"])
         return result
 
-def runNodesStatus(cluster_env=None):
+def runNodesStatus(args=None):
     isOK = False
     output = ""
     result = {"pass":False, "message":"", "output":"", "skip":False, "skipall": False}
+
+    cluster_env = args[0]
 
     #Own test steps
     lines = os.popen("ssh root@%s crm_mon -1r" % cluster_env["IP_NODE1"]).readlines()
@@ -76,10 +82,12 @@ def runNodesStatus(cluster_env=None):
         result["output"] = output
         return result
 
-def runConfigureRes(cluster_env=None):
+def runConfigureRes(args=None):
     isOK = False
     output = ""
     result = {"pass":False, "message":"", "output":"", "skip":False, "skipall": False}
+
+    cluster_env = args[0]
 
     lines = os.popen("ssh root@%s crm_mon -1r" % cluster_env["IP_NODE1"]).readlines()
     for line in lines:
