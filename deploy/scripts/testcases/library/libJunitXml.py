@@ -46,8 +46,8 @@ def _test():
 
     print(ts.to_xml_string([ts]))
 
-    #with open('output.xml') as f:
-    #    ts.write_to_file(f)
+    #with open('output.xml', 'w') as f:
+    #    ts.to_file(f, [ts])
 
 if __name__ == "__main__":
     '''

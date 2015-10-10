@@ -22,7 +22,8 @@ def runPackmakerService(cluster_env=None):
         isOK = True
 
     if isOK:
-        return {"pass":True, "message":"", "output":""}
+        result["pass"] = True
+        return result
     else:
         result["message"] = "Packmaker service not started."
         result["output"] = output
@@ -46,7 +47,8 @@ def runNodesNumber(cluster_env=None):
             break
 
     if isOK:
-        return {"pass":True, "message":"", "output":""}
+        result["pass"] = True
+        return result
     else:
         result["message"] = "Not all nodes configured."
         result["output"] = "Only %s of %s nodes configured." % (output, cluster_env["NODES"])
@@ -67,7 +69,8 @@ def runNodesStatus(cluster_env=None):
         isOK = True
 
     if isOK:
-        return {"pass":True, "message":"", "output":""}
+        result["pass"] = True
+        return result
     else:
         result["message"] = "Not all nodes started."
         result["output"] = output
@@ -89,7 +92,8 @@ def runConfigureRes(cluster_env=None):
             break
 
     if isOK:
-        return {"pass":True, "message":"", "output":""}
+        result["pass"] = True
+        return result
     else:
         result["message"] = "Resources configured?"
         result["output"] = "%s custom resources configured." % output
@@ -122,10 +126,12 @@ def Run(conf, xmldir):
             skipCase(case, "Pacemaker service of the first node not started.")
         skip_flag = assertCase(case, a_case[2], cluster_env)
 
+        testcases.append(case)
+
     ts = TestSuite(TestSuiteName, testcases)
 
-    with open(xmldir+"/"+JunitXML) as f:
-        ts.write_to_file(f)
+    with open(xmldir+"/"+JunitXML, "w") as f:
+        ts.to_file(f, [ts])
 
 if __name__ == "__main__":
     Run(sys.argv[1], sys.argv[2])
