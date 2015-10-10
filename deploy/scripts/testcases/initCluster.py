@@ -38,7 +38,7 @@ def runNodesNumber(cluster_env=None):
     #Own test steps
     lines = os.popen("ssh root@%s crm_mon -1r" % cluster_env["IP_NODE1"]).readlines()
     for line in lines:
-        tmp = re.match("(\d+) nodes and 0 resources configured", line)
+        tmp = re.match("(\d+) nodes? and (\d+) resources? configured", line)
         if tmp is not None:
             if int(tmp.groups()[0]) == int(cluster_env["NODES"]):
                 isOK = True
@@ -83,7 +83,7 @@ def runConfigureRes(cluster_env=None):
 
     lines = os.popen("ssh root@%s crm_mon -1r" % cluster_env["IP_NODE1"]).readlines()
     for line in lines:
-        tmp = re.match("(\d+) nodes and (\d+) resources configured", line)
+        tmp = re.match("(\d+) nodes? and (\d+) resources? configured", line)
         if tmp is not None:
             if int(tmp.groups()[1]) == 0:
                 isOK = True
