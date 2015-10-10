@@ -123,8 +123,8 @@ def Run(conf, xmldir):
     #Define function runPackmakerService before using
     cases_def = [('PacemakerService', 'SetupCluster.service', runPackmakerService),
                  ('NodesNumber', 'SetupCluster.nodes', runNodesNumber),
-                 ('NodesStatus', 'SetupCluster.nodes', runNodesStatus),
-                 ('ConfigureRes', 'SetupCluster.resources', runConfigureRes)]
+                 ('NodesStatus', 'SetupCluster.nodes', runNodesStatus)]
+                 #('ConfigureRes', 'SetupCluster.resources', runConfigureRes)]
 
     #Not necessary to modify the lines below!
     skip_flag = False
