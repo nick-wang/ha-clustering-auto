@@ -9,7 +9,6 @@ sys.path.append('../')
 
 def getCtsConf(stonith_type="external/libvirt", interface1='br1', configuration="../cts_conf", yamlfile='../confs/vm_list.yaml'):
     dp = GET_VM_CONF(yamlfile)
-    stonith_type="external/libvirt"
     content=""
     
     vm_list = dp.get_vms_conf()
@@ -20,8 +19,10 @@ def getCtsConf(stonith_type="external/libvirt", interface1='br1', configuration=
         else:
             node_list += ',' + vm
     f = open(configuration, 'w')
+    host_ip=get_ipaddr_by_interface(interface = interface1)
     content += "NODE_LIST=%s\n" % node_list
     content += "STONITH_TYPE=%s\n" % stonith_type
+    content += "HOST_IP=%s\n" % host_ip
     f.write(content)
     f.close()
 
