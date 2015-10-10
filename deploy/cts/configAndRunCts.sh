@@ -53,6 +53,12 @@ fi
 
 #form the commandline
 new_node_list=`echo ${new_node_list//','/' '}`
+
+#filter unnecessary message "Script /var/lib/pacemaker/notify.sh does not exist"
+#"Value '/var/lib/pacemaker/notify.sh' for cluster option 'notification-agent' is invalid.  Defaulting to /dev/null"
+echo "exit 0" > /var/lib/pacemaker/notify.sh
+chmod +x /var/lib/pacemaker/notify.sh
+
 isMaster "$HOSTNAME_NODE1"
 if [ $? -ne 0 ]
 then
@@ -60,10 +66,10 @@ then
 fi
 systemctl stop pacemaker
 
-a=`echo $ip_base|awk -F . {'print $1'}`
-b=`echo $ip_base|awk -F . {'print $2'}`
-c=`echo $ip_base|awk -F . {'print $3'}`
-ip_base="$a.$b.$c.220"
+#a=`echo $ip_base|awk -F . {'print $1'}`
+#b=`echo $ip_base|awk -F . {'print $2'}`
+#c=`echo $ip_base|awk -F . {'print $3'}`
+#ip_base="$a.$b.$c.220"
 #echo "/usr/share/pacemaker/tests/cts/CTSlab.py --nodes '$new_node_list' --outputfile my.log --populate-resources --test-ip-base $ip_base --stonith 1 --stack corosync --stonith-type $stonith_type $stonith_args"  > run_cts.sh
 echo "/usr/share/pacemaker/tests/cts/CTSlab.py --nodes '$new_node_list' --outputfile my.log --clobber-cib --stonith 1 --once --stack corosync --stonith-type $stonith_type $stonith_args 1"  > run_cts.sh
 bash run_cts.sh
