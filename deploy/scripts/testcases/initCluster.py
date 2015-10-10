@@ -93,7 +93,8 @@ def runConfigureRes(args=None):
     for line in lines:
         tmp = re.match("(\d+) nodes? and (\d+) resources? configured", line)
         if tmp is not None:
-            if int(tmp.groups()[1]) == 0:
+            #Only one resource - sbd
+            if int(tmp.groups()[1]) == 1:
                 isOK = True
             else:
                 output = tmp.groups()[1]
@@ -140,6 +141,10 @@ def Run(conf, xmldir):
 
     with open(xmldir+"/"+JunitXML, "w") as f:
         ts.to_file(f, [ts])
+
+    lines = os.popen("ssh root@%s crm_mon -1r" % cluster_env["IP_NODE1"]).readlines()
+    with open(xmldir+"/"+"crm_mon", "w") as p:
+        p.writelines(lines)
 
 if __name__ == "__main__":
     Run(sys.argv[1], sys.argv[2])
