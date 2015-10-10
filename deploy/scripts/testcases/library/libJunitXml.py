@@ -6,6 +6,8 @@ def assertCase(testcase, func, conf=None):
     result = func(conf)
     if not result["pass"]:
         testcase.add_error_info(result["message"], result['output'])
+    elif result["skip"]:
+        testcase.add_skipped_info(result["message"], result['output'])
     if result["skipall"]:
         return True
     return False

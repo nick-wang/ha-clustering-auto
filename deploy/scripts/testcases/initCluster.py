@@ -10,7 +10,7 @@ from library.libReadConf import readClusterConf
 def runPackmakerService(cluster_env=None):
     isOK = False
     output = ""
-    result = {"pass":False, "message":"", "output":"", "skipall": False}
+    result = {"pass":False, "message":"", "output":"", "skip":False, "skipall": False}
 
     #Own test steps
     lines = os.popen("ssh root@%s crm_mon -1r" % cluster_env["IP_NODE1"]).readlines()
@@ -33,7 +33,7 @@ def runPackmakerService(cluster_env=None):
 def runNodesNumber(cluster_env=None):
     isOK = False
     output = ""
-    result = {"pass":False, "message":"", "output":"", "skipall": False}
+    result = {"pass":False, "message":"", "output":"", "skip":False, "skipall": False}
 
     #Own test steps
     lines = os.popen("ssh root@%s crm_mon -1r" % cluster_env["IP_NODE1"]).readlines()
@@ -57,7 +57,7 @@ def runNodesNumber(cluster_env=None):
 def runNodesStatus(cluster_env=None):
     isOK = False
     output = ""
-    result = {"pass":False, "message":"", "output":"", "skipall": False}
+    result = {"pass":False, "message":"", "output":"", "skip":False, "skipall": False}
 
     #Own test steps
     lines = os.popen("ssh root@%s crm_mon -1r" % cluster_env["IP_NODE1"]).readlines()
@@ -79,7 +79,7 @@ def runNodesStatus(cluster_env=None):
 def runConfigureRes(cluster_env=None):
     isOK = False
     output = ""
-    result = {"pass":False, "message":"", "output":"", "skipall": False}
+    result = {"pass":False, "message":"", "output":"", "skip":False, "skipall": False}
 
     lines = os.popen("ssh root@%s crm_mon -1r" % cluster_env["IP_NODE1"]).readlines()
     for line in lines:
