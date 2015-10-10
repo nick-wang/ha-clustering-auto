@@ -3,7 +3,7 @@
 import sys
 
 def readClusterConf(conf):
-    fd = file(conf, "r")
+    fd = open(conf, "r")
     lines = [ x.strip() for x in fd.readlines() ]
     fd.close()
 

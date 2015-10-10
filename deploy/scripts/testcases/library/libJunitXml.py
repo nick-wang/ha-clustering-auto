@@ -1,13 +1,16 @@
-#!/usr/bin/env
+#!/usr/bin/python
 
 from junit_xml import TestSuite, TestCase
 
-def assertCase(testcase, func):
-    result = func
+def assertCase(testcase, func, conf=None):
+    result = func(conf)
     if not result["pass"]:
         testcase.add_error_info(result["message"], result['output'])
+    if result["skipall"]:
+        return True
+    return False
 
-def skipCase(testcase, message, output):
+def skipCase(testcase, message, output=None):
     testcase.add_skipped_info(message, output)
 
 def _exampleFunc(temp):
