@@ -6,16 +6,10 @@ from junit_xml import TestSuite, TestCase
 from library.libJunitXml import assertCase, skipCase
 from library.libReadConf import readClusterConf
 
-testcases = ["Test Flip", "Test Restart", "Test Stonithd", "Test StartOnebyOne", \
-              "Test SimulStart", "Test SimulStop", "Test StopOnebyOne", "Test RestartOnebyOne", \
-              "Test PartialStart", "Test Standby", "Test MaintenanceMode", "Test ResourceRecover", \
-              "Test ComponentFail", "Test Reattach", "Test SpecialTest1", "Test NearQuorumPoint", \
-              "Test RemoteBasic", "Test RemoteStonithd", "Test RemoteMigrate", "Test RemoteRscFailure"]
-
 def get_result(args=None):
-    isOK = False
+    message = ""
     output = ""
-    result = {"pass":False, "message":"", "output":"", "skip":False, "skipall": False}
+    result = {"status":"fail", "message":"", "output":"", "skipall": False}
 
     cluster_env = args[0]
     testcase = args[1]
@@ -23,16 +17,15 @@ def get_result(args=None):
 
     tmp = get_result_of_testcase(testcase, logfile)
     if tmp['calls'] > 0 and tmp['failure'] == 0:
-        isOK = True
         if tmp['skip'] == 0:
-            result["pass"] = True
+            result["status"] = "pass"
         else
-            result["skip"] = True
-        return result
+            result["status"] = "skip"
     elif tmp['calls'] > 0:
-        result["message"] = "Running testcase %s failed." % testcase
-        result["output"] = tmp["reason"]
-        return result
+        message = "Running testcase %s failed." % testcase
+        output = tmp["output"]
+
+    return result
 
 def get_result_of_testcase(testcase, logfile):
     result = {}
@@ -97,11 +90,12 @@ def Run(conf, xmldir, logfile):
     skip_flag = False
     for a_case in cases_def:
         case = TestCase(a_case[0], a_case[1])
+        testcases.append(case)
+
         if skip_flag:
             skipCase(case, "Pacemaker service of the first node not started.")
+            continue
         skip_flag = assertCase(case, a_case[2], cluster_env, a_case[0], logfile)
-
-        testcases.append(case)
 
     ts = TestSuite(TestSuiteName, testcases)
 

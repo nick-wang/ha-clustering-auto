@@ -4,10 +4,15 @@ from junit_xml import TestSuite, TestCase
 
 def assertCase(testcase, func, *args):
     result = func(args)
-    if not result["pass"]:
+    if result["status"] == "fail":
         testcase.add_error_info(result["message"], result['output'])
-    elif result["skip"]:
+    elif result["status"] == "skip":
         testcase.add_skipped_info(result["message"], result['output'])
+    elif result["status"] == "pass":
+        pass
+    else:
+        testcase.add_error_info(result["message"], result['output'])
+
     if result["skipall"]:
         return True
     return False

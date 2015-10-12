@@ -8,9 +8,9 @@ from library.libJunitXml import assertCase, skipCase
 from library.libReadConf import readClusterConf
 
 def runPackmakerService(args=None):
-    isOK = False
+    message = ""
     output = ""
-    result = {"pass":False, "message":"", "output":"", "skip":False, "skipall": False}
+    result = {"status":"fail", "message":"", "output":"", "skipall": False}
 
     cluster_env = args[0]
 
@@ -18,24 +18,25 @@ def runPackmakerService(args=None):
     lines = os.popen("ssh root@%s crm_mon -1r" % cluster_env["IP_NODE1"]).readlines()
     for line in lines:
         if re.match("Connection to cluster failed:", line) is not None:
+            message = "Packmaker service not started."
             output = line
             break
     else:
-        isOK = True
+        result["status"] = "pass"
 
-    if isOK:
-        result["pass"] = True
-        return result
-    else:
-        result["message"] = "Packmaker service not started."
-        result["output"] = output
+    result["message"] = message
+    result["output"] = output
+
+    #Skipall following test cases when this failed
+    if result["status"] == "fail":
         result["skipall"] = True
-        return result
+
+    return result
 
 def runNodesNumber(args=None):
-    isOK = False
+    message = ""
     output = ""
-    result = {"pass":False, "message":"", "output":"", "skip":False, "skipall": False}
+    result = {"status":"fail", "message":"", "output":"", "skipall": False}
 
     cluster_env = args[0]
 
@@ -45,23 +46,21 @@ def runNodesNumber(args=None):
         tmp = re.match("(\d+) nodes? and (\d+) resources? configured", line)
         if tmp is not None:
             if int(tmp.groups()[0]) == int(cluster_env["NODES"]):
-                isOK = True
+                result["status"] = "pass"
             else:
-                output = tmp.groups()[0]
+                message = "Not all nodes configured."
+                output = "Only %s of %s nodes configured." % (tmp.groups()[0], cluster_env["NODES"])
             break
 
-    if isOK:
-        result["pass"] = True
-        return result
-    else:
-        result["message"] = "Not all nodes configured."
-        result["output"] = "Only %s of %s nodes configured." % (output, cluster_env["NODES"])
-        return result
+    result["message"] = message
+    result["output"] = output
+
+    return result
 
 def runNodesStatus(args=None):
-    isOK = False
+    message = ""
     output = ""
-    result = {"pass":False, "message":"", "output":"", "skip":False, "skipall": False}
+    result = {"status":"fail", "message":"", "output":"", "skipall": False}
 
     cluster_env = args[0]
 
@@ -69,23 +68,20 @@ def runNodesStatus(args=None):
     lines = os.popen("ssh root@%s crm_mon -1r" % cluster_env["IP_NODE1"]).readlines()
     for line in lines:
         if re.match("OFFLINE:", line) is not None:
+            message = "Not all nodes started."
             output = line
             break
     else:
-        isOK = True
+        result["status"] = "pass"
 
-    if isOK:
-        result["pass"] = True
-        return result
-    else:
-        result["message"] = "Not all nodes started."
-        result["output"] = output
-        return result
+    result["message"] = message
+    result["output"] = output
+    return result
 
 def runConfigureRes(args=None):
-    isOK = False
+    message = ""
     output = ""
-    result = {"pass":False, "message":"", "output":"", "skip":False, "skipall": False}
+    result = {"status":"fail", "message":"", "output":"", "skipall": False}
 
     cluster_env = args[0]
 
@@ -95,18 +91,15 @@ def runConfigureRes(args=None):
         if tmp is not None:
             #Only one resource - sbd
             if int(tmp.groups()[1]) == 1:
-                isOK = True
+                result["status"] = "pass"
             else:
-                output = tmp.groups()[1]
+                message = "Not only one resources configured."
+                output = "%s custom resources configured." % tmp.groups()[1]
             break
 
-    if isOK:
-        result["pass"] = True
-        return result
-    else:
-        result["message"] = "Resources configured?"
-        result["output"] = "%s custom resources configured." % output
-        return result
+    result["message"] = message
+    result["output"] = output
+    return result
 
 def Run(conf, xmldir):
     cluster_env = readClusterConf(conf)
@@ -131,11 +124,12 @@ def Run(conf, xmldir):
     skip_flag = False
     for a_case in cases_def:
         case = TestCase(a_case[0], a_case[1])
-        if skip_flag:
-            skipCase(case, "Pacemaker service of the first node not started.")
-        skip_flag = assertCase(case, a_case[2], cluster_env)
-
         testcases.append(case)
+        if skip_flag:
+            skipCase(case, "Can not test!",
+                     "Pacemaker service of the first node not started.")
+            continue
+        skip_flag = assertCase(case, a_case[2], cluster_env)
 
     ts = TestSuite(TestSuiteName, testcases)
 
