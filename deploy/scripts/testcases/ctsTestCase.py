@@ -19,7 +19,7 @@ def get_result(args=None):
     if tmp['calls'] > 0 and tmp['failure'] == 0:
         if tmp['skip'] == 0:
             result["status"] = "pass"
-        else
+        else:
             result["status"] = "skip"
     elif tmp['calls'] > 0:
         message = "Running testcase %s failed." % testcase
