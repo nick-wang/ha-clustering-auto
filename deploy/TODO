@@ -23,6 +23,11 @@
 
 [Done]11. Create log and informations into working dir.
 
-12. Create lib to add vir/shared disk.
+!12!. Create lib to add vir/shared disk, iscsi device.
 
 13. Parameterized the jenkins task. Support input yaml file via command line.
+
+14. New options for iscsi in Yaml file.
+    Enable/disable iscsi (sbd).
+    Auto deploy or manually input.
+    Manually field.(No need to change.)
