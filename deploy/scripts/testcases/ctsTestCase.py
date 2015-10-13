@@ -51,7 +51,8 @@ def get_result_of_testcase(testcase, logfile):
 
     return result
 
-def Run(conf, xmldir, logfile):
+def Run(conf, xmldir):
+    logfile = "%s/my.log" % xmldir
     cluster_env = readClusterConf(conf)
 
     testcases = []
@@ -84,7 +85,7 @@ def Run(conf, xmldir, logfile):
                  ("Test RemoteBasic", "Pacemaker-cts", get_result),
                  ("Test RemoteStonithd", "Pacemaker-cts", get_result),
                  ("Test RemoteMigrate", "Pacemaker-cts", get_result),
-                 ("Test RemoteRscFailure","Pacemaker-cts", get_result]
+                 ("Test RemoteRscFailure","Pacemaker-cts", get_result)]
 
     #Not necessary to modify the lines below!
     skip_flag = False
@@ -103,4 +104,4 @@ def Run(conf, xmldir, logfile):
         ts.to_file(f, [ts])
 
 if __name__ == "__main__":
-    Run(sys.argv[1], sys.argv[2], sys.argv[3])
+    Run(sys.argv[1], sys.argv[2])

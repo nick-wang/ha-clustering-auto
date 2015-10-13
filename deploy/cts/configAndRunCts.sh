@@ -45,6 +45,11 @@ node_list=`echo ${new_node_list//','/' '}`
 if [ $stonith_type == "external/libvirt" ];
 then
     zypper in -y libvirt
+	#disable sbd
+	systemctl disable sbd
+    systemctl stop pacemaker
+	systemctl start pacemaker
+
     stonith_args="--stonith-args hypervisor_uri='qemu+tcp://$host_ip/system',hostlist='$node_list'"
 elif [ $stonith_type == "external/sbd" ];
 then
