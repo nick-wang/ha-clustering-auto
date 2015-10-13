@@ -1,31 +1,11 @@
 #!/bin/bash
 function usage()
 {
-  echo "cpCtsFilesToGuest.sh <CTS_CONF> <CLUSTER_CONF> <WORKING_DIR_IN_GUEST>"
+  echo "cpCtsFilesToGuest.sh <CTS_CONF> <CLUSTER_CONF> <WORKING_DIR_IN_GUEST> <BUILD_LOG_DIR_IN_HOST>"
   exit
 }
 
-function isMaster()
-{
-    # Usage:
-    #     isMaster <nodename>
-    if [ $# -ne 1 ]
-    then 
-        return 1
-    fi
-
-    LOCALHOST=$(uname -n|cut -d "." -f 1)
-
-    if [ "$1" == "$LOCALHOST" ]
-    then
-        #Master node
-        return 0
-    else
-        return 1
-    fi
-}
-
-if [ $# -ne 3 ]
+if [ $# -ne 4 ]
 then
     usage
     exit -1
@@ -44,14 +24,8 @@ scp ../cts/configAndRunCts.sh ../scripts/functions root@${ip}:${CTS_DIR}/scripts
 scp ${CTS_CONF} ${CLUSTER_CONF} root@${ip}:${CTS_DIR}
 
 ssh root@${ip} "chmod 0600 /root/.ssh/id_rsa;cd ${CTS_DIR}; ${CTS_DIR}/scripts/configAndRunCts.sh "
+scp root@${ip}:/tmp/cts-configuration/my.log .
 } &
 done
 
-for hostname in `cat $CLUSTER_CONF | grep HOSTNAME_NODE | cut -d "=" -f 2`
-do
-    isMaster $hostname
-	if [ $? -eq 0 ]; then
-		scp $hostname:/tmp/cts-confihuration/my.log $4
-	fi
-done
 wait
