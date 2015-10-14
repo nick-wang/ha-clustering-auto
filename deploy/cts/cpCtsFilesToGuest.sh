@@ -28,9 +28,9 @@ ssh root@${ip} "chmod 0600 /root/.ssh/id_rsa;cd ${CTS_DIR}; ${CTS_DIR}/scripts/c
 done
 wait
 
-#source $CLUSTER_CONF
-#scp root@${IP_NODE1}:/tmp/cts-configuration/my.log $4
-#echo "scp root@${IP_NODE1}:/tmp/cts-configuration/my.log $4"
+source $CLUSTER_CONF
+scp root@${IP_NODE1}:/tmp/cts-configuration/my.log $4
+echo "scp root@${IP_NODE1}:/tmp/cts-configuration/my.log $4"
 
 for ip in `cat $CLUSTER_CONF |grep IP_NODE |cut -d "=" -f 2`
 do
