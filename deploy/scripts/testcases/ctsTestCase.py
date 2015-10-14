@@ -59,33 +59,33 @@ def Run(conf, xmldir):
     #Name of Test Suite
     TestSuiteName = "Running pacemaker-cts"
     #Name of junit xml file
-    JunitXML = "junit-pacemaker-cts-ha.xml"
+    JunitXML = "junit-pacemakerCTS-ha.xml"
 
     #Define testcases
     #testcases = [(TestcaseName, TestcaseClass, TestcaseFunction)]
     #eg.
     # ('PacemakerService', 'SetupCluster.service', runPackmakerService)
     #Define function runPackmakerService before using
-    cases_def = [("Test Flip", "Pacemaker-cts", get_result),
-                 ("Test Restart", "Pacemaker-cts", get_result),
-                 ("Test Stonithd", "Pacemaker-cts", get_result),
-                 ("Test StartOnebyOne", "Pacemaker-cts", get_result),
-                 ("Test SimulStart", "Pacemaker-cts", get_result),
-                 ("Test SimulStop", "Pacemaker-cts", get_result),
-                 ("Test StopOnebyOne", "Pacemaker-cts", get_result),
-                 ("Test RestartOnebyOne", "Pacemaker-cts", get_result),
-                 ("Test PartialStart", "Pacemaker-cts", get_result),
-                 ("Test Standby", "Pacemaker-cts", get_result),
-                 ("Test MaintenanceMode", "Pacemaker-cts", get_result),
-                 ("Test ResourceRecover", "Pacemaker-cts", get_result),
-                 ("Test ComponentFail", "Pacemaker-cts", get_result),
-                 ("Test Reattach", "Pacemaker-cts", get_result),
-                 ("Test SpecialTest1", "Pacemaker-cts", get_result),
-                 ("Test NearQuorumPoint", "Pacemaker-cts", get_result)]#,
-#                 ("Test RemoteBasic", "Pacemaker-cts", get_result),
-#                 ("Test RemoteStonithd", "Pacemaker-cts", get_result),
-#                 ("Test RemoteMigrate", "Pacemaker-cts", get_result),
-#                 ("Test RemoteRscFailure","Pacemaker-cts", get_result)]
+    cases_def = [("Test Flip", "PacemakerCTS.service", get_result),
+                 ("Test Restart", "PacemakerCTS.service", get_result),
+                 ("Test Stonithd", "PacemakerCTS.service", get_result),
+                 ("Test StartOnebyOne", "PacemakerCTS.service", get_result),
+                 ("Test SimulStart", "PacemakerCTS.service", get_result),
+                 ("Test SimulStop", "PacemakerCTS.service", get_result),
+                 ("Test StopOnebyOne", "PacemakerCTS.service", get_result),
+                 ("Test RestartOnebyOne", "PacemakerCTS.service", get_result),
+                 ("Test PartialStart", "PacemakerCTS.service", get_result),
+                 ("Test Standby", "PacemakerCTS.service", get_result),
+                 ("Test MaintenanceMode", "PacemakerCTS.service", get_result),
+                 ("Test ResourceRecover", "PacemakerCTS.service", get_result),
+                 ("Test ComponentFail", "PacemakerCTS.service", get_result),
+                 ("Test Reattach", "PacemakerCTS.service", get_result),
+                 ("Test SpecialTest1", "PacemakerCTS.service", get_result),
+                 ("Test NearQuorumPoint", "PacemakerCTS.service", get_result)]#,
+#                 ("Test RemoteBasic", "PacemakerCTS.service", get_result),
+#                 ("Test RemoteStonithd", "PacemakerCTS.service", get_result),
+#                 ("Test RemoteMigrate", "PacemakerCTS.service", get_result),
+#                 ("Test RemoteRscFailure","PacemakerCTS.service", get_result)]
 
     #Not necessary to modify the lines below!
     skip_flag = False
