@@ -81,11 +81,11 @@ def Run(conf, xmldir):
                  ("Test ComponentFail", "Pacemaker-cts", get_result),
                  ("Test Reattach", "Pacemaker-cts", get_result),
                  ("Test SpecialTest1", "Pacemaker-cts", get_result),
-                 ("Test NearQuorumPoint", "Pacemaker-cts", get_result),
-                 ("Test RemoteBasic", "Pacemaker-cts", get_result),
-                 ("Test RemoteStonithd", "Pacemaker-cts", get_result),
-                 ("Test RemoteMigrate", "Pacemaker-cts", get_result),
-                 ("Test RemoteRscFailure","Pacemaker-cts", get_result)]
+                 ("Test NearQuorumPoint", "Pacemaker-cts", get_result)]#,
+#                 ("Test RemoteBasic", "Pacemaker-cts", get_result),
+#                 ("Test RemoteStonithd", "Pacemaker-cts", get_result),
+#                 ("Test RemoteMigrate", "Pacemaker-cts", get_result),
+#                 ("Test RemoteRscFailure","Pacemaker-cts", get_result)]
 
     #Not necessary to modify the lines below!
     skip_flag = False
