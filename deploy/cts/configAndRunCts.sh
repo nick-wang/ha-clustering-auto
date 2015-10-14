@@ -6,7 +6,7 @@
 #########################################################################
 #!/bin/bash
 
-zypper in -y pacemaker-cts
+zypper in -y pacemaker-cts pacemaker-remote
 
 #we can get these args by ENV later
 . cluster_conf
