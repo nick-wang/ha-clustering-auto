@@ -21,10 +21,9 @@ def get_result(args=None):
             result["status"] = "pass"
         else:
             result["status"] = "skip"
-    elif tmp['calls'] > 0:
-        message = "Running testcase %s failed." % testcase
-        output = tmp["output"]
-
+    if tmp['failure'] > 0:
+        result['message'] = "Running testcase %s failed." % testcase
+        result['output'] = tmp["output"]
     return result
 
 def get_result_of_testcase(testcase, logfile):
@@ -66,26 +65,26 @@ def Run(conf, xmldir):
     #eg.
     # ('PacemakerService', 'SetupCluster.service', runPackmakerService)
     #Define function runPackmakerService before using
-    cases_def = [("Test Flip", "PacemakerCTS.service", get_result),
-                 ("Test Restart", "PacemakerCTS.service", get_result),
-                 ("Test Stonithd", "PacemakerCTS.service", get_result),
-                 ("Test StartOnebyOne", "PacemakerCTS.service", get_result),
-                 ("Test SimulStart", "PacemakerCTS.service", get_result),
-                 ("Test SimulStop", "PacemakerCTS.service", get_result),
-                 ("Test StopOnebyOne", "PacemakerCTS.service", get_result),
-                 ("Test RestartOnebyOne", "PacemakerCTS.service", get_result),
-                 ("Test PartialStart", "PacemakerCTS.service", get_result),
-                 ("Test Standby", "PacemakerCTS.service", get_result),
-                 ("Test MaintenanceMode", "PacemakerCTS.service", get_result),
-                 ("Test ResourceRecover", "PacemakerCTS.service", get_result),
-                 ("Test ComponentFail", "PacemakerCTS.service", get_result),
-                 ("Test Reattach", "PacemakerCTS.service", get_result),
-                 ("Test SpecialTest1", "PacemakerCTS.service", get_result),
-                 ("Test NearQuorumPoint", "PacemakerCTS.service", get_result)]#,
-#                 ("Test RemoteBasic", "PacemakerCTS.service", get_result),
-#                 ("Test RemoteStonithd", "PacemakerCTS.service", get_result),
-#                 ("Test RemoteMigrate", "PacemakerCTS.service", get_result),
-#                 ("Test RemoteRscFailure","PacemakerCTS.service", get_result)]
+    cases_def = [("Test Flip", "Flip.PacemakerCTS.service", get_result),
+                 ("Test Restart", "Restart.PacemakerCTS.service", get_result),
+                 ("Test Stonithd", "Stonithd.PacemakerCTS.service", get_result),
+                 ("Test StartOnebyOne", "StartOnebyOne.PacemakerCTS.service", get_result),
+                 ("Test SimulStart", "SimulStart.PacemakerCTS.service", get_result),
+                 ("Test SimulStop", "SimulStop.PacemakerCTS.service", get_result),
+                 ("Test StopOnebyOne", "StopOnebyOne.PacemakerCTS.service", get_result),
+                 ("Test RestartOnebyOne", "RestartOnebyOne.PacemakerCTS.service", get_result),
+                 ("Test PartialStart", "PartialStart.PacemakerCTS.service", get_result),
+                 ("Test Standby", "Standby.PacemakerCTS.service", get_result),
+                 ("Test MaintenanceMode", "MaintenanceMode.PacemakerCTS.service", get_result),
+                 ("Test ResourceRecover", "ResourceRecover.PacemakerCTS.service", get_result),
+                 ("Test ComponentFail", "ComponentFail.PacemakerCTS.service", get_result),
+                 ("Test Reattach", "Reattach.PacemakerCTS.service", get_result),
+                 ("Test SpecialTest1", "SpecialTest1.PacemakerCTS.service", get_result),
+                 ("Test NearQuorumPoint", "NearQuorumPoint.PacemakerCTS.service", get_result),
+                 ("Test RemoteBasic", "RemoteBasic.PacemakerCTS.service", get_result),
+                 ("Test RemoteStonithd", "RemoteStonithd.PacemakerCTS.service", get_result),
+                 ("Test RemoteMigrate", "RemoteMigrate.PacemakerCTS.service", get_result),
+                 ("Test RemoteRscFailure","RemoteRscFailure.PacemakerCTS.service", get_result)]
 
     #Not necessary to modify the lines below!
     skip_flag = False
