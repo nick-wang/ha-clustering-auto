@@ -6,7 +6,7 @@
 #########################################################################
 #!/bin/bash
 
-zypper in -y pacemaker-cts pacemaker-remote
+zypper in -y pacemaker-cts
 
 #we can get these args by ENV later
 . cluster_conf
@@ -27,6 +27,7 @@ node_list=`echo ${node_list//','/' '}`
 echo $node_list
 arr=($node_list)
 new_node_list=' '
+remote_node_list=' '
 for s in ${arr[@]}
 do
 	if [ $s == $node ];then
@@ -35,8 +36,10 @@ do
 
 	if [ "$new_node_list" == ' ' ];then
 		new_node_list=$s
+		remote_node_list="remote_$s:$s"
 	else
 	    new_node_list="$new_node_list,$s"
+		remote_nost_list="$remote_node_list remote_$s:$s"
 	fi
 done
 node_list=`echo ${new_node_list//','/' '}`
@@ -44,13 +47,13 @@ node_list=`echo ${new_node_list//','/' '}`
 #deal with stonith, external/libvirt, external/sbd and external/ssh so far
 if [ $stonith_type == "external/libvirt" ];
 then
-    zypper in -y libvirt
+    zypper in -y libvirt pacemaker-remote
 	#disable sbd
 	systemctl disable sbd
     systemctl stop pacemaker
 	systemctl start pacemaker
 
-    stonith_args="--stonith-args hypervisor_uri='qemu+tcp://$host_ip/system',hostlist='$node_list'"
+    stonith_args="--stonith-args hypervisor_uri='qemu+tcp://$host_ip/system',hostlist='$node_list $remote_node_list'"
 elif [ $stonith_type == "external/sbd" ];
 then
 	stonith_args="--stonith-args SBD_DEVICE='/dev/disk/by-path/ip-$TARGET_IP:3260-iscsi-${TARGET_LUN}-lun-0',SBD_OPTS='-W'"
