@@ -39,7 +39,7 @@ do
 		remote_node_list="remote_$s:$s"
 	else
 	    new_node_list="$new_node_list,$s"
-		remote_nost_list="$remote_node_list remote_$s:$s"
+		remote_node_list="$remote_node_list remote_$s:$s"
 	fi
 done
 node_list=`echo ${new_node_list//','/' '}`
