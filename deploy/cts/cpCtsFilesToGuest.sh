@@ -37,7 +37,8 @@ do
 {
 	date_str=`date +%s`
 	hb_report="hb_report_${ip}_${date_str}"
-	ssh root@${ip} "systemctl start pacemaker; hb_report -f 0:00 $hb_report"
+	ssh root@${ip} "systemctl start pacemaker; sleep 3; hb_report -f 0:00 $hb_report"
+        echo "ssh root@${ip}" "systemctl start pacemaker; sleep 3; hb_report -f 0:00 $hb_report"
 	scp ${ip}:/root/$hb_report* $4
 }
 done
