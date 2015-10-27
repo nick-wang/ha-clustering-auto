@@ -30,7 +30,7 @@ def installVM(VMName, disk, OSType, vcpus, memory, disk_size, source, nic, graph
     #p.communicate("\n\n\n\n\n\n\n")
     #print p.wait()
 
-def installVMs(vm_list={}, res={}, devices={}):
+def installVMs(vm_list={}, res={}, devices={}, autoyast=""):
     nic_pattern = "bridge=%s,model=virtio"
     disk_pattern = "qcow2:%s/sles12sp1-HA-%s.qcow2"
 
@@ -47,8 +47,10 @@ def installVMs(vm_list={}, res={}, devices={}):
                   }
     default_dev = {'disk_dir':"/mnt/vm/sles_ha_auto/"
                   }
-
-    os_settings = '%s/%s' % (os.getcwd(), '../confs/my_ha_inst.xml')
+    if autoyast.strip() == '':
+        os_settings = '%s/%s' % (os.getcwd(), '../confs/my_ha_inst.xml')
+    else:
+        os_settings = autoyast
 
     for key in default_res.keys():
         if res[key] is None:
@@ -108,14 +110,13 @@ def installVMs(vm_list={}, res={}, devices={}):
         processes[vm]["process"].join()
         os.remove(processes[vm]["autoyast"])
 
-def get_config_and_install(deployfile='../confs/vm_list.yaml', autoyast='../confs/my_ha_inst.xml'):
+def get_config_and_install(deployfile='../confs/vm_list.yaml', autoyast=''):
     dp = GET_VM_CONF(deployfile)
 
     vm_list = dp.get_vms_conf()
     resource = dp.get_single_section_conf("resources")
     devices = dp.get_single_section_conf("devices")
-
-    installVMs(vm_list, resource, devices)
+    installVMs(vm_list, resource, devices, autoyast)
 
 def usage():
     print "usage:"
