@@ -47,7 +47,7 @@ def installVMs(vm_list={}, res={}, devices={}, autoyast=""):
                   }
     default_dev = {'disk_dir':"/mnt/vm/sles_ha_auto/"
                   }
-    if autoyast.strip() == '':
+    if (autoyast.strip() == '') or (os.path.exists(autoyast) == False):
         os_settings = '%s/%s' % (os.getcwd(), '../confs/my_ha_inst.xml')
     else:
         os_settings = autoyast
