@@ -91,6 +91,7 @@ echo "modprobe softdog" >> /etc/init.d/boot.local
 #Default disable after installation
 
 #Enable service
+systemctl enable iscsid.service
 systemctl enable csync2.socket
 systemctl enable pacemaker
 
