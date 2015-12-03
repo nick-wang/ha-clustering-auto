@@ -91,13 +91,19 @@ echo "modprobe softdog" >> /etc/init.d/boot.local
 #Default disable after installation
 
 #Enable service
-systemctl enable iscsid.service
+systemctl enable iscsid.socket
+systemctl enable iscsiuio.socket
+systemctl enable iscsi.service
 systemctl enable csync2.socket
 systemctl enable pacemaker
 
 #Start service
 systemctl start csync2.socket
 systemctl start pacemaker
+
+#Enable automatic login to iscsi server
+iscsiadm -m node -I default -T $TARGET_LUN -p $TARGET_IP \
+         --op=update --name=node.conn[0].startup --value=automatic
 
 #config stonith resource and restart pacemaker
 isMaster "$HOSTNAME_NODE1"
