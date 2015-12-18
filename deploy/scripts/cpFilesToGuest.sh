@@ -14,6 +14,8 @@ fi
 CLUSTER_CONF=$1
 CLUSTER_DIR=$2
 
+chmod 0600 ../ssh_keys/id_rsa
+
 for ip in `cat ${CLUSTER_CONF} |grep IP_NODE |cut -d "=" -f 2`
 do
 {
@@ -21,7 +23,7 @@ ssh root@${ip} "mkdir -p ${CLUSTER_DIR}/templete; mkdir -p ${CLUSTER_DIR}/script
 
 scp ${CLUSTER_CONF} root@${ip}:${CLUSTER_DIR}
 scp ../templete/*_templete root@${ip}:${CLUSTER_DIR}/templete/
-scp ../ssh_keys/id_rsa root@${ip}:/root/.ssh/
+scp -p ../ssh_keys/id_rsa root@${ip}:/root/.ssh/
 scp ./configCluster.sh ./functions root@${ip}:${CLUSTER_DIR}/scripts/
 
 ssh root@${ip} "cd ${CLUSTER_DIR}; ${CLUSTER_DIR}/scripts/configCluster.sh "
