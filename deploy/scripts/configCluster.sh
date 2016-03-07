@@ -83,7 +83,7 @@ sleep 20
 sbd -d "/dev/disk/by-path/ip-$TARGET_IP:3260-iscsi-${TARGET_LUN}-lun-0" create
 modprobe softdog
 echo "SBD_DEVICE='/dev/disk/by-path/ip-$TARGET_IP:3260-iscsi-${TARGET_LUN}-lun-0'" > /etc/sysconfig/sbd
-echo "SBD_OPTS ='-W'" >> /etc/sysconfig/sbd
+echo "SBD_OPTS='-W'" >> /etc/sysconfig/sbd
 echo "modprobe softdog" >> /etc/init.d/boot.local
 
 
