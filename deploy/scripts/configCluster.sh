@@ -91,15 +91,25 @@ echo "modprobe softdog" >> /etc/init.d/boot.local
 #Default disable after installation
 
 #Enable service
-systemctl enable iscsid.socket
-systemctl enable iscsiuio.socket
-systemctl enable iscsi.service
-systemctl enable csync2.socket
-systemctl enable pacemaker
+which systemctl
+isSystemctl=$?
+if [ $isSystemctl -eq 0 ]; then
+    systemctl enable iscsid.socket
+    systemctl enable iscsiuio.socket
+    systemctl enable iscsi.service
+    systemctl enable csync2.socket
+    systemctl enable pacemaker
 
-#Start service
-systemctl start csync2.socket
-systemctl start pacemaker
+    #Start service
+    systemctl start csync2.socket
+    systemctl start pacemaker
+else
+    chkconfig open-iscsi on
+    chkconfig csync2 on
+    chkconfig openais on
+
+    service openais start
+fi
 
 #Enable automatic login to iscsi server
 iscsiadm -m node -I default -T $TARGET_LUN -p $TARGET_IP \
@@ -112,6 +122,10 @@ then
     crm configure primitive stonith_sbd stonith:external/sbd
 fi
 sleep 2
-
-systemctl enable sbd
-systemctl restart pacemaker
+if [ $isSystemctl -eq 0 ]; then
+    systemctl enable sbd
+    systemctl restart pacemaker
+else
+    chkconfig sbd on
+    service openais restart
+fi
