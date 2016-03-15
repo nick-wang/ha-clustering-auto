@@ -27,7 +27,7 @@ do
     sed -i "/^nodelist/a\    node {\n\
 	ring0_addr:	$temp_ip\n\
 	}\n" corosync.conf_templete
-
+    sed -i "/^\tinterface/a\ \t\tmember {\n\t\tmemberaddr: $temp_ip\n\t\t}\n" corosync.conf_templete_1.4.7
     temp=$((temp-1))
 done
 
@@ -50,6 +50,8 @@ bindnetaddr=$IP_NODE1
 sed -i "s/bindnetaddr:.*/bindnetaddr:	${bindnetaddr}/" corosync.conf_templete
 sed -i "s/mcastport:.*/mcastport:	${PORT:-5405}/" corosync.conf_templete
 sed -i "s/expected_votes:.*/expected_votes:	${NODES}/" corosync.conf_templete
+sed -i "s/bindnetaddr:.*/bindnetaddr:	${bindnetaddr}/" corosync.conf_templete_1.4.7
+sed -i "s/mcastport:.*/mcastport:	${PORT:-5405}/" corosync.conf_templete_1.4.7
 if [ 2 -eq "$NODES" ]
 then
     sed -i "s/two_node:.*/two_node:	1/" corosync.conf_templete
@@ -107,6 +109,8 @@ else
     chkconfig open-iscsi on
     chkconfig csync2 on
     chkconfig openais on
+    cp -rf corosync.conf_templete_1.4.7 /etc/corosync/corosync.conf
+    cp -rf authkey /etc/corosync/
 
     service openais start
 fi

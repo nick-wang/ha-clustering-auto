@@ -23,6 +23,8 @@ ssh root@${ip} "mkdir -p ${CLUSTER_DIR}/templete; mkdir -p ${CLUSTER_DIR}/script
 
 scp ${CLUSTER_CONF} root@${ip}:${CLUSTER_DIR}
 scp ../templete/*_templete root@${ip}:${CLUSTER_DIR}/templete/
+scp ../templete/*_templete_1.4.7 root@${ip}:${CLUSTER_DIR}/templete/
+scp ../templete/authkey root@${ip}:${CLUSTER_DIR}/templete/
 scp -p ../ssh_keys/id_rsa root@${ip}:/root/.ssh/
 scp ./configCluster.sh ./functions root@${ip}:${CLUSTER_DIR}/scripts/
 
