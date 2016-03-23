@@ -32,13 +32,14 @@ source $CLUSTER_CONF
 scp root@${IP_NODE1}:/tmp/cts-configuration/my.log $4
 echo "scp root@${IP_NODE1}:/tmp/cts-configuration/my.log $4"
 
-for ip in `cat $CLUSTER_CONF |grep IP_NODE |cut -d "=" -f 2`
-do
-{
-	date_str=`date +%s`
-	hb_report="hb_report_${ip}_${date_str}"
-	ssh root@${ip} "systemctl start pacemaker; sleep 3; hb_report -f 0:00 $hb_report"
-        echo "ssh root@${ip}" "systemctl start pacemaker; sleep 3; hb_report -f 0:00 $hb_report"
-	scp ${ip}:/root/$hb_report* $4
-}
-done
+#for ip in `cat $CLUSTER_CONF |grep IP_NODE |cut -d "=" -f 2`
+#do
+#{
+ip=`cat $CLUSTER_CONF | grep IP_NODE |cut -d "=" -f 2 | head -1`
+date_str=`date +%s`
+hb_report="hb_report_${ip}_${date_str}"
+ssh root@${ip} "systemctl restart pacemaker; sleep 3; hb_report -f 0:00 $hb_report"
+echo "ssh root@${ip}" "systemctl start pacemaker; sleep 3; hb_report -f 0:00 $hb_report"
+scp ${ip}:/root/$hb_report* $4
+#}
+#done

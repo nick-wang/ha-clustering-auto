@@ -50,7 +50,7 @@ if [ $stonith_type == "external/libvirt" ];
 then
     zypper in -y libvirt pacemaker-remote
 	#disable sbd
-    if [ isSystemctl -eq 0 ]; then
+    if [ $isSystemctl -eq 0 ]; then
         systemctl disable sbd
         systemctl stop pacemaker
         systemctl start pacemaker
