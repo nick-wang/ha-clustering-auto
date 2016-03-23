@@ -16,6 +16,10 @@ def get_result(args=None):
     logfile = args[2]
 
     tmp = get_result_of_testcase(testcase, logfile)
+
+    if 'calls' not in tmp.keys(): 
+        return {"status":"skip", "message":"Testcase %s skipped" % testcase, "output":"skipped", "skipall": False}
+
     if tmp['calls'] > 0 and tmp['failure'] == 0:
         if tmp['skip'] == 0:
             result["status"] = "pass"
@@ -37,12 +41,12 @@ def get_result_of_testcase(testcase, logfile):
 
     result = {}
     failed = False
-    result["output"] = ""
     for line in f.readlines():
         if testcase not in line:
             continue
         
         pattern=" *%s: *\{'auditfail': (\d), 'failure': (\d), 'skipped': (\d), 'calls': (\d)\}" % testcase
+        result["output"] = ""
         tmp = re.search(pattern, line)
         if tmp is not None:
             result['auditfail'] = int(tmp.groups()[0])
