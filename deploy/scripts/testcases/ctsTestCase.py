@@ -59,7 +59,7 @@ def get_result_of_testcase(testcase, logfile):
     return result
 
 def Run(conf, xmldir):
-    logfile = "%s/my.log" % xmldir
+    logfile = "%s/pacemaker.log" % xmldir
     cluster_env = readClusterConf(conf)
 
     testcases = []

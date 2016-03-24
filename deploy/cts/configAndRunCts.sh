@@ -90,7 +90,7 @@ fi
 #b=`echo $ip_base|awk -F . {'print $2'}`
 #c=`echo $ip_base|awk -F . {'print $3'}`
 #ip_base="$a.$b.$c.220"
-#echo "/usr/share/pacemaker/tests/cts/CTSlab.py --nodes '$new_node_list' --outputfile my.log --populate-resources --test-ip-base $ip_base --stonith 1 --stack corosync --stonith-type $stonith_type $stonith_args"  > run_cts.sh
-echo "/usr/share/pacemaker/tests/cts/CTSlab.py --nodes '$new_node_list' --outputfile my.log --clobber-cib --stonith 1 --once --stack corosync --stonith-type $stonith_type $stonith_args 1"  > run_cts.sh
+#echo "/usr/share/pacemaker/tests/cts/CTSlab.py --nodes '$new_node_list' --outputfile pacemaker.log --populate-resources --test-ip-base $ip_base --stonith 1 --stack corosync --stonith-type $stonith_type $stonith_args"  > run_cts.sh
+echo "/usr/share/pacemaker/tests/cts/CTSlab.py --nodes '$new_node_list' --outputfile pacemaker.log --clobber-cib --stonith 1 --once --stack corosync --stonith-type $stonith_type $stonith_args 1"  > run_cts.sh
 bash run_cts.sh
-#/usr/share/pacemaker/tests/cts/CTSlab.py --nodes '"'$new_node_list'"' --outputfile my.log --populate-resources --test-ip-base $ip_base --stonith 1 --stack corosync --stonith-type $stonith_type $stonith_args
+#/usr/share/pacemaker/tests/cts/CTSlab.py --nodes '"'$new_node_list'"' --outputfile pacemaker.log --populate-resources --test-ip-base $ip_base --stonith 1 --stack corosync --stonith-type $stonith_type $stonith_args
