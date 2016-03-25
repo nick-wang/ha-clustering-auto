@@ -1,0 +1,9 @@
+
+VM Usage Criteria:
+
+a) Deletion: the scripts will directly delete any VM including its attached disks is not used more than 3 months.
+
+b) Expiration: the script will send out weekly email for any VM including its attached disks is not used more than 2 months.
+
+NOTE: feel free to share any concern/suggestion to sles-pek@suse.de to make our life better ^_^ 
+
