@@ -73,12 +73,11 @@ def getVMList():
         if diff >= 7776000:
             delete_list.append(vm)
             for disk in disk_list:
-            #    os.remove(disk.strip().split()[-1])
-            #    print "os.remove(%s)" % disk.strip().split()[-1]
-                pass
+                os.remove(disk.strip().split()[-1])
+                print "os.remove(%s)" % disk.strip().split()[-1]
             cmd = "virsh undefine %s" % vmname
-            #status, output = commands.getstatusoutput(cmd)
-            #print "status, output = commands.getstatusoutput(%s)" % cmd
+            status, output = commands.getstatusoutput(cmd)
+            print "status, output = commands.getstatusoutput(%s)" % cmd
             
         elif diff >= 5184000 and diff < 7776000:
             expired_list.append(vm)
