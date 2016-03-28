@@ -65,6 +65,8 @@ def getVMList():
         vm = VM(vmname)
         for disk in disk_list:
             label, path = disk.strip().split()
+            if os.path.exists(path) == False:
+                continue
             stat_struct = os.stat(path)
             disk1 = Disk(label, path, stat_struct)
             vm.adddisk(disk1)
@@ -73,8 +75,11 @@ def getVMList():
         if diff >= 7776000:
             delete_list.append(vm)
             for disk in disk_list:
-                os.remove(disk.strip().split()[-1])
-                print "os.remove(%s)" % disk.strip().split()[-1]
+                path1 = disk.strip().split()[-1]
+                if os.path.exists(path1) == False:
+                    continue
+                os.remove(path1)
+                print "os.remove(%s)" % path1
             cmd = "virsh undefine %s" % vmname
             status, output = commands.getstatusoutput(cmd)
             print "status, output = commands.getstatusoutput(%s)" % cmd
