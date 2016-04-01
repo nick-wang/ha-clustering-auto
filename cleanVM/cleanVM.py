@@ -33,8 +33,8 @@ class VM:
         return self.lastmodified
 
 def canCleanVMs(pathname="/mnt/vm/"):
-	avail = utils.get_fs_freespace(pathname)
-	return avail < 1 - 0.6
+    avail = utils.get_fs_freespace(pathname)
+    return avail < 1 - 0.6
 
 def formatVMs(vmlist, listname):
     content = '\n\tVMs are %s:' % listname
@@ -61,7 +61,7 @@ def getVMList():
     now = time.time()
     diff = 0
     if canCleanVMs() == False:
-		sys.exit(-1)
+        sys.exit(-1)
     for el in elelist:
         vmname = el[7:][:-8].strip()
         cmd = 'virsh domblklist %s|grep \/' % (vmname)
