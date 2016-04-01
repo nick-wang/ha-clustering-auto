@@ -43,6 +43,10 @@ nodes:
   graphics:
   os_settings:
 
+repos:
+- repo: http://download.suse.de/ibs/SUSE:/SLE-12:/Update/standard/
+- repo: http://download.suse.de/ibs/SUSE:/SLE-12-SP1:/Update/standard/
+
 devices:
   disk_dir: /mnt/vm/sles_ha_auto/
   nic: br0
@@ -55,6 +59,10 @@ iscsi:
 class GET_VM_CONF:
     def __init__(self, url):
         self.ya = self.get_yaml(url)
+        # 'lists' only support the list have one paramater
+        # more than one paramater need to using other function
+        # refer to 'nodes'
+        self.lists = {'repos': 'repo'}
         self.structs = {'iscsi': ('target_ip', 'target_lun'),
                         'devices': ('disk_dir', 'nic'),
                         'resources': ('sle_source', 'ha_source')}
@@ -85,6 +93,27 @@ class GET_VM_CONF:
         # So far, only for 'iscsi', 'devices' and 'resources'
         for ele in self.structs[section]:
             conf[ele] = struct.get(ele)
+
+        return conf
+
+    def get_list_section_conf(self, section):
+        '''
+            Only for list section with only one option.
+        '''
+        if not self.lists.has_key(section):
+            print "Need to config a new list section (%s)." % section
+            sys.exit(4)
+
+        structs = self.ya.get(section)
+
+        if structs is None:
+            print "Lack of '%s' section in yaml file." % section
+            return []
+
+        conf = []
+        for struct in structs:
+            if struct.get(self.lists[section]) is not None:
+                conf.append(struct.get(self.lists[section]))
 
         return conf
 

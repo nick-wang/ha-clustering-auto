@@ -9,6 +9,19 @@ csync2_content=""
 
 cd templete
 
+#Add extra repos
+R_NUM=0
+if [ -z $EXTRA_REPO ]
+then
+  for repo in ${#EXTRA_REPO[@]}
+  do
+    # -G is Disable GPG check
+    # or set repo_gpgcheck=no in /etc/zypp/zypp.conf
+    zypper ar -f -G ${repo} CUSTOM_${R_NUM}
+    R_NUM=$((R_NUM+1))
+  done
+fi
+
 #Modify templete according to cluster configuration
 temp=$NODES
 while [ "$temp" -ge 1 ]

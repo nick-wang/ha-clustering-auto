@@ -173,6 +173,11 @@ def get_cluster_conf(sleep_time="0", configuration="../cluster_conf",
     contents += "TARGET_LUN=%s\n" % target_lun
     contents += "NETADDR=%s\n" % netaddr
     contents += "IPADDR=%s\n" % ipaddr
+
+    repos = dp.get_list_section_conf("repos")
+    if len(repos):
+        contents += "\nEXTRA_REPOS=(%s)\n" % (" ".join(repos))
+
     #Write env file to "../cluster_conf"
     f=open(configuration, 'w')
     f.write(contents)
