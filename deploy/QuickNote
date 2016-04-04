@@ -16,7 +16,8 @@ Q. How to deploy a host server?
   10. Add a virbr0 for NAT.
   11. Install python library junit-xml.
       For sles, need python-setuptools.
-
+  12. Install python library python-psutil.
+      For cleanVM, get cpu/mem usage.
 
 A.To make the cmd 
 "virsh -c qemu+tcp://host_ip/system", we have to modify 
