@@ -35,3 +35,7 @@
 15. an option to reinstall OS, or just upgrade, an operation to autoremove vms if reinstall
 
 16. library to collect hb_report after running test-case
+
+17. Using twopence instead of ssh only.
+
+18. Using salt to configure cluster?
