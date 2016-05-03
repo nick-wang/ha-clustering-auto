@@ -9,6 +9,8 @@ def readClusterConf(conf):
 
     temp = {}
     for line in lines:
+        if line == "":
+            continue
         temp[line.split("=")[0]] = line.split("=")[1]
 
     return temp

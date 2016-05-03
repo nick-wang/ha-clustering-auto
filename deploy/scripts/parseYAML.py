@@ -99,6 +99,7 @@ class GET_VM_CONF:
     def get_list_section_conf(self, section):
         '''
             Only for list section with only one option.
+            list section in yaml file starts with "-"
         '''
         if not self.lists.has_key(section):
             print "Need to config a new list section (%s)." % section
@@ -112,6 +113,8 @@ class GET_VM_CONF:
 
         conf = []
         for struct in structs:
+            # Error fix of AttributeError: 'str' object has no attribute 'get'
+            # Because list option should starts with "-"
             if struct.get(self.lists[section]) is not None:
                 conf.append(struct.get(self.lists[section]))
 
