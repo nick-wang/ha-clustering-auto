@@ -11,9 +11,9 @@ cd templete
 
 #Add extra repos
 R_NUM=0
-if [ -z $EXTRA_REPO ]
+if [ -n $EXTRA_REPOS ]
 then
-  for repo in ${#EXTRA_REPO[@]}
+  for repo in ${EXTRA_REPOS[@]}
   do
     # -G is Disable GPG check
     # or set repo_gpgcheck=no in /etc/zypp/zypp.conf
