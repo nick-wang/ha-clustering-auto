@@ -1,0 +1,7 @@
+global {
+   minor-count	8;
+   dialog-refresh	3;
+   usage-count no;
+}
+common {
+}

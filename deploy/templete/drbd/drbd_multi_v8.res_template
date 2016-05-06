@@ -1,0 +1,22 @@
+resource <RESNAME> {
+   protocol	C;
+   disk {
+      on-io-error	pass_on;
+   }
+   volume 0 {
+      device	<DEVICE_VO0>;
+      disk	<DISK_VO0>;
+      meta-disk	<METADISK_VO0>;
+   }
+   volume 1 {
+      device	<DEVICE_VO1>;
+      disk	<DISK_VO1>;
+      meta-disk	<METADISK_VO1>;
+   }
+   on <NODE1> {
+      address	<NODE1_IP_PORT>;
+   }
+   on <NODE2> {
+      address	<NODE2_IP_PORT>;
+   }
+}

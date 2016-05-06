@@ -9,7 +9,6 @@ function usage()
   echo "  Default <DISK_SIZE> is 500M."
   echo "For example:"
   echo "  ./addVirioDisk.sh /tmp/jenkins-work/nwang/deploy-cluster-v232/10/cluster_conf 3 /mnt/vm/sles_nick 400M"
-  exit
 }
 
 function nconvert()

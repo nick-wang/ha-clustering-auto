@@ -1,0 +1,18 @@
+resource <RESNAME> {
+   protocol	C;
+   disk {
+      on-io-error	pass_on;
+   }
+   on <NODE1> {
+      address	<NODE1_IP_PORT>;
+      device	<DEVICE>;
+      disk	<DISK>;
+      meta-disk	<METADISK>;
+   }
+   on <NODE2> {
+      address	<NODE2_IP_PORT>;
+      device	<DEVICE>;
+      disk	<DISK>;
+      meta-disk	<METADISK>;
+   }
+}
