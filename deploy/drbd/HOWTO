@@ -1,0 +1,10 @@
+#1) Create the virt-io disks, running at 'host' machine
+addVirioDisk.sh ./nodeconf 2 `pwd` 3G
+
+#2) Partitioning the new created disks, running at every working node
+make_part_drbd.sh 2
+
+#3) Continue if want to testing automatically, running at every working node
+#   Need to manually configure the relationships of device/disk/meta-disk
+configDRBD.sh /dev/vdb
+configDRBD.sh /dev/vdc
