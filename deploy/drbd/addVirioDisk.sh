@@ -4,10 +4,11 @@ function usage()
   # Better read disk location from yaml file
   # ./addVirioDisk.sh /tmp/jenkins-work/nwang/deploy-cluster-v232/10/cluster_conf 3 /mnt/vm/sles_nick 400M
   echo "addVirioDisk.sh <CLUSTER_CONF_IN_HOST> <HOW_MANY_DISKS_TO_ADD> <DISK_LOCATION> (<DISK_SIZE>)"
-  echo "Default <DISK_LOCATION> is /mnt/vm."
-  echo "Default <DISK_SIZE> is 500M."
+  echo "  <HOW_MANY_DISKS_TO_ADD> is limited to 9 disks."
+  echo "  Default <DISK_LOCATION> is /mnt/vm, need to use absolute path."
+  echo "  Default <DISK_SIZE> is 500M."
   echo "For example:"
-  echo "./addVirioDisk.sh /tmp/jenkins-work/nwang/deploy-cluster-v232/10/cluster_conf 3 /mnt/vm/sles_nick 400M"
+  echo "  ./addVirioDisk.sh /tmp/jenkins-work/nwang/deploy-cluster-v232/10/cluster_conf 3 /mnt/vm/sles_nick 400M"
   exit
 }
 
