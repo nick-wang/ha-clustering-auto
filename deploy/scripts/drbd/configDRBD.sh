@@ -136,3 +136,9 @@ do
   cur_minor=$((cur_minor+1))
   start_port=$((start_port+4))
 done
+
+# Copy templates to the right location
+# Running multiple times configDRBD.sh can overlap the old drbd.conf successfully
+cp *.res /etc/drbd.d/
+cp drbd_global_common.conf_template /etc/drbd.d/global_common.conf
+cp drbd_drbd.conf_template /etc/drbd.conf
