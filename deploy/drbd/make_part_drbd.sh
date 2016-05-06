@@ -41,7 +41,8 @@ do
 #     meta-disk: /dev/vdb7
 # first-res:
 #   drbd2 - /dev/vdb3,
-#     meta-disk: /dev/vdb8 # second-res:
+#     meta-disk: /dev/vdb8
+# second-res:
 #   drbd3 - /dev/vdb5,
 #     meta-disk: /dev/vdb9
 #
