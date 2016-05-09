@@ -12,13 +12,11 @@ then
     exit -1
 fi
 
+#Import ENV conf
+. scripts/functions
+
 # How many disks need to partition
 NUM=$1
-
-function nconvert()
-{
-echo -n $1 | tr "123456789" "bcdefghij"
-}
 
 # Convert to disk name via numbers
 i=1

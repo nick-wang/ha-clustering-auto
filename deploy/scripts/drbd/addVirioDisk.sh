@@ -11,16 +11,14 @@ function usage()
   echo "  ./addVirioDisk.sh /tmp/jenkins-work/nwang/deploy-cluster-v232/10/cluster_conf 3 /mnt/vm/sles_nick 400M"
 }
 
-function nconvert()
-{
-echo -n $1 | tr "123456789" "bcdefghij"
-}
-
 if [ $# -lt 2 ] || [ $# -gt 4 ]
 then
     usage
     exit -1
 fi
+
+#Import ENV conf
+. scripts/functions
 
 CLUSTER_CONF=$1
 NUM=$2

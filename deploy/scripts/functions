@@ -19,3 +19,18 @@ function isMaster()
         return 1
     fi
 }
+
+function nconvert()
+{
+    # Usage:
+    #     result=`nconvert 3`
+    echo -n $1 | tr "123456789" "bcdefghij"
+}
+
+function logit()
+{
+    # Usage:
+    #     logit ls -l
+    #     logit pwd >> output-file
+    echo -e "== [`hostname`:${USER}@`pwd`]\nCommand: ${*}\nStart  : [`date`] \n`${*} 2>&1`\nStop   : [`date`]\n";
+}

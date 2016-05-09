@@ -142,3 +142,13 @@ done
 cp *.res /etc/drbd.d/
 cp drbd_global_common.conf_template /etc/drbd.d/global_common.conf
 cp drbd_drbd.conf_template /etc/drbd.conf
+
+#Create meta-data on all nodes
+drbdadm create-md all
+sleep 5
+
+#Stop the susefirewall2
+rcSuSEfirewall2 stop
+
+#Start the drbd service for the first sync
+rcdrbd start
