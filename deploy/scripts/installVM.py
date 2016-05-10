@@ -84,14 +84,14 @@ def installVMs(vm_list={}, res={}, devices={}, autoyast=""):
         conf_str = f.readlines()
         f.close()
 
-        f = open(vm, 'w')
+        f = open("../dummy_temp/%s" % vm, 'w')
         for line in conf_str:
             line = _replaceXML(line, "media_url", res['ha_source'])
             line = _replaceXML(line, "hostname", vm)
             f.write(line)
         f.close()
 
-        autoyast = vm
+        autoyast = "../dummy_temp/%s" % vm
         parent_fd, child_fd = multiprocessing.Pipe()
         process["process"] = multiprocessing.Process(target=installVM,
                                 args=(vm, disk, vm_list[vm]["ostype"],
