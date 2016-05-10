@@ -44,7 +44,7 @@ cd templete/drbd
 start_port=7788
 cur_minor=0
 
-# Modify drbd templete according to cluster configuration
+# Modify drbd template according to cluster configuration
 # Configure a multi-volume resource
 i=0
 while [ $i -lt $NUM_MULTI ]
@@ -97,7 +97,7 @@ do
   start_port=$((start_port+4))
 done
 
-# Modify drbd templete according to cluster configuration
+# Modify drbd template according to cluster configuration
 # Configure a single-volume resource
 i=0
 while [ $i -lt $NUM_SINGLE ]

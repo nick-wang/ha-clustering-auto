@@ -18,7 +18,7 @@ then
 fi
 
 #Import ENV conf
-. scripts/functions
+. functions
 
 CLUSTER_CONF=$1
 NUM=$2

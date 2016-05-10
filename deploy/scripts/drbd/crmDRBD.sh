@@ -22,4 +22,3 @@ fi
   
 sleep 5
 echo "reboot"
-reboot

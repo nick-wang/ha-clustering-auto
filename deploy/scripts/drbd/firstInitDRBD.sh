@@ -14,7 +14,7 @@ fi
 sleep 5
 
 #Reboot when all resources finished sync
-if [ $(isDRBD9)=="true" ]
+if [ x"$(isDRBD9)" == x"true" ]
 then
   #TBD:
   # Check sync progress in drbd9

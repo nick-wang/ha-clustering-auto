@@ -26,7 +26,6 @@ do
   disks[${i}]=/dev/vd${temp}
   i=$((i+1))
 done
-echo ${disks[@]}
 
 #Partition
 for disk in ${disks[@]}

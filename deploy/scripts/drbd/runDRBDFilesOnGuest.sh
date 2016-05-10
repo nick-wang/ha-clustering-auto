@@ -12,7 +12,7 @@ then
 fi
 
 #Import ENV conf
-. scripts/functions
+. functions
 
 CLUSTER_CONF=$1
 CLUSTER_DIR=$2
@@ -24,15 +24,16 @@ do
   ssh root@${ip} "mkdir -p ${CLUSTER_DIR}/templete/drbd; mkdir -p ${CLUSTER_DIR}/scripts/drbd"
   
   # Copy the necessary drbd template from host to nodes
-  scp drbd/configDRBD.sh drbd/make_part_drbd.sh root@${ip}:${CLUSTER_DIR}/scripts/drbd/
-  scp ../templete/drbd/drbd_*_templete root@${ip}:${CLUSTER_DIR}/templete/drbd/
+  scp drbd/crmDRBD.sh drbd/firstInitDRBD.sh drbd/make_part_drbd.sh \
+      drbd/configDRBD.sh    drbd/drbd_functions root@${ip}:${CLUSTER_DIR}/scripts/drbd/
+  scp ../templete/drbd/drbd_*_template root@${ip}:${CLUSTER_DIR}/templete/drbd/
   
   # Partitioning all the disks
   ssh root@${ip} "cd ${CLUSTER_DIR}; ${CLUSTER_DIR}/scripts/drbd/make_part_drbd.sh ${DISK_NUM}"
 
   # Configure drbd resources configure and create meta-disk
   i=1
-  while [ i -le ${DISK_NUM} ]
+  while [ $i -le ${DISK_NUM} ]
   do
     temp=$(nconvert ${i})
     disk=/dev/vd${temp}
@@ -42,10 +43,14 @@ do
     else
       ssh root@${ip} "cd ${CLUSTER_DIR}; ${CLUSTER_DIR}/scripts/drbd/configDRBD.sh ${disk}"
     fi
+    i=$((i+1))
   done
 
   # Start the first sync to mark the sync source/target
   ssh root@${ip} "cd ${CLUSTER_DIR}; ${CLUSTER_DIR}/scripts/drbd/firstInitDRBD.sh"
+
+  # Add crm resources
+  ssh root@${ip} "cd ${CLUSTER_DIR}; ${CLUSTER_DIR}/scripts/drbd/crmDRBD.sh"
 } &
 done
 
