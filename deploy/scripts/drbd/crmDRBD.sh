@@ -19,6 +19,7 @@ then
   logit crm configure show
   echo "After configuring CRM"
 fi
+logit crm_mon -1
   
 sleep 5
 echo "reboot"

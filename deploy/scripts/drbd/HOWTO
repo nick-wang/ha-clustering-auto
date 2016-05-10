@@ -13,4 +13,13 @@ configDRBD.sh /dev/vdc
 firstInitDRBD.sh
 
 #5) Add crm resource, running at every working node(isMaster can help to run at host1 only)
-addCrmDRBD.sh
+crmDRBD.sh
+
+########### HOW TO CHANGE #############
+1. No need to change the code of "addVirioDisk.sh",
+  only change the input paras.
+2. Change "make_part_drbd.sh" for the details partitioning layout.
+3. Change the manually change section of "configDRBD.sh" based on the layout setting.
+  Need to dup more scripts if different disks have different layout/resource.
+4. No need to change "firstInitDRBD.sh"
+5. Change "crmDRBD.sh" for custom crm resource.

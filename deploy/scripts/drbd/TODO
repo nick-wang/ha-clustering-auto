@@ -1,0 +1,5 @@
+1. "firstInitDRBD.sh"
+  Need to implement the monitor part of drbd9.
+2. Unitify the location of calling functions.
+2. Need to add more logs and polish the output in screen/log.
+3. Need to add test cases during establish DRBD and after.
