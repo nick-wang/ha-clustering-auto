@@ -24,11 +24,12 @@ do
 {
   mkdir -p ${LOG_DIR}/${ip}_drbd
   ssh root@${ip} "mkdir -p ${TEMP_DIR}"
-  ssh root@${ip} "rpm -qa|grep drbd >${TEMP_DIR}/rpm"
-  ssh root@${ip} "cat /proc/drbd >${TEMP_DIR}/proc; drbd-overview>${TEMP_DIR}/overview"
-  ssh root@${ip} "crm configure show >${TEMP_DIR}/ra; crm_mon -1 >${TEMP_DIR}/crm_mon"
+  ssh root@${ip} "rpm -qa|grep drbd>${TEMP_DIR}/drbdrpm"
+  ssh root@${ip} "cat /proc/drbd>${TEMP_DIR}/drbdproc; drbd-overview>${TEMP_DIR}/drbdoverview"
+  ssh root@${ip} "crm configure show>${TEMP_DIR}/ra; crm_mon -1>${TEMP_DIR}/crm_mon"
 
-  scp root@${ip}:/etc/drbd* ${LOG_DIR}/${ip}_drbd
+  scp root@${ip}:/etc/drbd.conf ${LOG_DIR}/${ip}_drbd
+  scp root@${ip}:/etc/drbd.d/* ${LOG_DIR}/${ip}_drbd
   scp root@${ip}:/var/log/message ${LOG_DIR}/${ip}_drbd
   scp root@${ip}:~/drbdlog/* ${LOG_DIR}/${ip}_drbd
   

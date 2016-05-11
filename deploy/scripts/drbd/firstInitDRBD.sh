@@ -40,10 +40,4 @@ if [ $? -eq 0 ]
 then
   logit drbdadm secondary all
 fi
-sleep 8
-
-#Stop drbd and let pacemaker control it
-rcdrbd stop
-
-logit echo "Stop drbd, should not find drbd."
-logit rcdrbd status
+sleep 5

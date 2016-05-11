@@ -24,8 +24,6 @@ then
                   meta clone-max=2 clone-node-max=1 \
                   meta notify=true target-role=Started
   done
-  logit crm configure show
   echo "After configuring CRM"
+  logit crm configure show
 fi
-sleep 5
-logit crm_mon -1
