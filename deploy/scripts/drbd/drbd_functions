@@ -1,15 +1,19 @@
 #!/bin/bash
 
-function isDRBD9()
+function getDRBDVer()
 {
     # usage:
-    #   tmp=$(isDRBD9)
-    #   tmp maybe "false"/"true"
+    #   case $(getDRBDVer) in
+    #   9)
+    #     ;;
+    #   84)
+    #     ;;
+    #   *)
+    #     ERROR
 
     DRBDADM="drbdadm"
     DRBDSETUP="drbdsetup"
-    DRBD9="false"
-    DRBD8_4="false"
+    DRBD_VERSION="0"
 
     local VERSION DRBD_KERNEL_VERSION_CODE=0 DRBDADM_VERSION_CODE=0
     if VERSION="$($DRBDADM --version 2>/dev/null)"; then
@@ -29,10 +33,10 @@ function isDRBD9()
     fi
 
     if (( $DRBD_KERNEL_VERSION_CODE >= 0x090000 )) ; then
-        DRBD9="true"
+        DRBD_VERSION="9"
     elif (( $DRBD_KERNEL_VERSION_CODE >= 0x080400 )); then
-        DRBD8_4="true"
+        DRBD_VERSION="84"
     fi
 
-    echo $DRBD9
+    echo $DRBD_VERSION
 }
