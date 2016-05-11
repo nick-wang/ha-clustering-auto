@@ -25,7 +25,7 @@ do
   
   # Copy the necessary drbd template from host to nodes
   scp drbd/crmDRBD.sh drbd/firstInitDRBD.sh drbd/make_part_drbd.sh \
-      drbd/configDRBD.sh    drbd/drbd_functions root@${ip}:${CLUSTER_DIR}/scripts/drbd/
+      drbd/configDRBD.sh drbd/drbd_functions root@${ip}:${CLUSTER_DIR}/scripts/drbd/
   scp ../template/drbd/drbd_*_template root@${ip}:${CLUSTER_DIR}/template/drbd/
   
   # Partitioning all the disks

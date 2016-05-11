@@ -43,22 +43,27 @@ do
 	fi
 done
 node_list=`echo ${new_node_list//','/' '}`
-which systemctl
-isSystemctl=$?
+
+sle_ver=$(getSLEVersion)
 #deal with stonith, external/libvirt, external/sbd and external/ssh so far
 if [ $stonith_type == "external/libvirt" ];
 then
     zypper in -y libvirt pacemaker-remote
 	#disable sbd
-    if [ $isSystemctl -eq 0 ]; then
+    case ${sle_ver} in
+      SLE12SP*)
         systemctl disable sbd
         systemctl stop pacemaker
         systemctl start pacemaker
-    else
+        ;;
+      SLE11SP*)
         chkconfig sbd off
         service openais stop
         service openais start
-    fi
+        ;;
+      *)
+        echo "Not support. ${sle_ver}"
+    esac
 
     stonith_args="--stonith-args hypervisor_uri='qemu+tcp://$host_ip/system',hostlist='$node_list $remote_node_list'"
 elif [ $stonith_type == "external/sbd" ];
@@ -80,11 +85,16 @@ then
     exit 0
 fi
 
-if [ $isSystemctl -eq 0 ]; then
+case ${sle_ver} in
+  SLE12SP*)
     systemctl stop pacemaker
-else
+    ;;
+  SLE11SP*)
     service openais stop
-fi
+    ;;
+  *)
+    echo "Not support. ${sle_ver}"
+esac
 
 #a=`echo $ip_base|awk -F . {'print $1'}`
 #b=`echo $ip_base|awk -F . {'print $2'}`

@@ -106,9 +106,9 @@ echo "modprobe softdog" >> /etc/init.d/boot.local
 #Default disable after installation
 
 #Enable service
-which systemctl
-isSystemctl=$?
-if [ $isSystemctl -eq 0 ]; then
+sle_ver=$(getSLEVersion)
+case ${sle_ver} in
+  SLE12SP*)
     systemctl enable iscsid.socket
     systemctl enable iscsiuio.socket
     systemctl enable iscsi.service
@@ -118,7 +118,8 @@ if [ $isSystemctl -eq 0 ]; then
     #Start service
     systemctl start csync2.socket
     systemctl start pacemaker
-else
+    ;;
+  SLE11SP*)
     chkconfig open-iscsi on
     chkconfig csync2 on
     chkconfig openais on
@@ -126,7 +127,10 @@ else
     cp -rf authkey /etc/corosync/
 
     service openais start
-fi
+    ;;
+  *)
+    echo "Not support. ${sle_ver}"
+esac
 
 #Enable automatic login to iscsi server
 iscsiadm -m node -I default -T $TARGET_LUN -p $TARGET_IP \
@@ -139,10 +143,16 @@ then
     crm configure primitive stonith_sbd stonith:external/sbd
 fi
 sleep 2
-if [ $isSystemctl -eq 0 ]; then
+
+case ${sle_ver} in
+  SLE12SP*)
     systemctl enable sbd
     systemctl restart pacemaker
-else
+    ;;
+  SLE11SP*)
     chkconfig sbd on
     service openais restart
-fi
+    ;;
+  *)
+    echo "Not support. ${sle_ver}"
+esac
