@@ -40,7 +40,7 @@ DISK=$1
 # PRE_FIX="" when no $2 para
 PRE_FIX=$2
 
-cd templete/drbd
+cd template/drbd
 start_port=7788
 cur_minor=0
 

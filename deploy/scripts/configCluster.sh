@@ -7,7 +7,7 @@
 hosts_content=""
 csync2_content=""
 
-cd templete
+cd template
 
 #Add extra repos
 R_NUM=0
@@ -22,25 +22,25 @@ then
   done
 fi
 
-#Modify templete according to cluster configuration
+#Modify template according to cluster configuration
 temp=$NODES
 while [ "$temp" -ge 1 ]
 do
     temp_ip=$(eval echo \$IP_NODE${temp})
     temp_hostname=$(eval echo \$HOSTNAME_NODE${temp})
 
-    #Configure hosts_templete
-    sed -i "/^127.0.0.1/a$temp_ip   $temp_hostname" hosts_templete
+    #Configure hosts_template
+    sed -i "/^127.0.0.1/a$temp_ip   $temp_hostname" hosts_template
 
     #Configure csync2 (optional)
-    sed -i "/^{/a\	host $temp_hostname;" csync2.cfg_templete
+    sed -i "/^{/a\	host $temp_hostname;" csync2.cfg_template
 
     #Configure corosync.conf
     #Only support one ring
     sed -i "/^nodelist/a\    node {\n\
 	ring0_addr:	$temp_ip\n\
-	}\n" corosync.conf_templete
-    sed -i "/^\tinterface/a\ \t\tmember {\n\t\tmemberaddr: $temp_ip\n\t\t}\n" corosync.conf_templete_1.4.7
+	}\n" corosync.conf_template
+    sed -i "/^\tinterface/a\ \t\tmember {\n\t\tmemberaddr: $temp_ip\n\t\t}\n" corosync.conf_template_1.4.7
     temp=$((temp-1))
 done
 
@@ -60,16 +60,16 @@ bindnetaddr=$IP_NODE1
 #>   subnet=s[1]"."s[2]"."s[3]"."s[4]; 
 #>   print subnet;
 #> }')
-sed -i "s/bindnetaddr:.*/bindnetaddr:	${bindnetaddr}/" corosync.conf_templete
-sed -i "s/mcastport:.*/mcastport:	${PORT:-5405}/" corosync.conf_templete
-sed -i "s/expected_votes:.*/expected_votes:	${NODES}/" corosync.conf_templete
-sed -i "s/bindnetaddr:.*/bindnetaddr:	${bindnetaddr}/" corosync.conf_templete_1.4.7
-sed -i "s/mcastport:.*/mcastport:	${PORT:-5405}/" corosync.conf_templete_1.4.7
+sed -i "s/bindnetaddr:.*/bindnetaddr:	${bindnetaddr}/" corosync.conf_template
+sed -i "s/mcastport:.*/mcastport:	${PORT:-5405}/" corosync.conf_template
+sed -i "s/expected_votes:.*/expected_votes:	${NODES}/" corosync.conf_template
+sed -i "s/bindnetaddr:.*/bindnetaddr:	${bindnetaddr}/" corosync.conf_template_1.4.7
+sed -i "s/mcastport:.*/mcastport:	${PORT:-5405}/" corosync.conf_template_1.4.7
 if [ 2 -eq "$NODES" ]
 then
-    sed -i "s/two_node:.*/two_node:	1/" corosync.conf_templete
+    sed -i "s/two_node:.*/two_node:	1/" corosync.conf_template
 else
-    sed -i "s/two_node:.*/two_node:	0/" corosync.conf_templete
+    sed -i "s/two_node:.*/two_node:	0/" corosync.conf_template
 fi
 
 #Install configuration files.
@@ -77,10 +77,10 @@ fi
 # /etc/csync2/csync2.cfg
 # /etc/csync2/key_hagroup
 # /etc/corosync/corosync.conf
-cp -rf hosts_templete /etc/hosts
-cp -rf csync2.cfg_templete /etc/csync2/csync2.cfg
-cp -rf key_hagroup_templete /etc/csync2/key_hagroup
-cp -rf corosync.conf_templete /etc/corosync/corosync.conf
+cp -rf hosts_template /etc/hosts
+cp -rf csync2.cfg_template /etc/csync2/csync2.cfg
+cp -rf key_hagroup_template /etc/csync2/key_hagroup
+cp -rf corosync.conf_template /etc/corosync/corosync.conf
 
 #Disable hostkey checking of ssh
 grep "^ *StrictHostKeyChecking" /etc/ssh/ssh_config >/dev/null
@@ -122,7 +122,7 @@ else
     chkconfig open-iscsi on
     chkconfig csync2 on
     chkconfig openais on
-    cp -rf corosync.conf_templete_1.4.7 /etc/corosync/corosync.conf
+    cp -rf corosync.conf_template_1.4.7 /etc/corosync/corosync.conf
     cp -rf authkey /etc/corosync/
 
     service openais start

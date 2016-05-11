@@ -21,12 +21,12 @@ DISK_NUM=$3
 for ip in `cat $CLUSTER_CONF |grep IP_NODE |cut -d "=" -f 2`
 do
 {
-  ssh root@${ip} "mkdir -p ${CLUSTER_DIR}/templete/drbd; mkdir -p ${CLUSTER_DIR}/scripts/drbd"
+  ssh root@${ip} "mkdir -p ${CLUSTER_DIR}/template/drbd; mkdir -p ${CLUSTER_DIR}/scripts/drbd"
   
   # Copy the necessary drbd template from host to nodes
   scp drbd/crmDRBD.sh drbd/firstInitDRBD.sh drbd/make_part_drbd.sh \
       drbd/configDRBD.sh    drbd/drbd_functions root@${ip}:${CLUSTER_DIR}/scripts/drbd/
-  scp ../templete/drbd/drbd_*_template root@${ip}:${CLUSTER_DIR}/templete/drbd/
+  scp ../template/drbd/drbd_*_template root@${ip}:${CLUSTER_DIR}/template/drbd/
   
   # Partitioning all the disks
   ssh root@${ip} "cd ${CLUSTER_DIR}; ${CLUSTER_DIR}/scripts/drbd/make_part_drbd.sh ${DISK_NUM}"

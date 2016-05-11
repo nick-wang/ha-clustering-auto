@@ -7,7 +7,7 @@
 [Done]4. Automatic calc subnet via selected host net device.
 
 [Done]5. Reorder the file name/location. 
-   Split templete for installation/cluster configuration.
+   Split template for installation/cluster configuration.
 
 [Done]6. Change the autoyast xml file more generic and simple.
    Removing unnecessary packages and configurations from autoyast xml
