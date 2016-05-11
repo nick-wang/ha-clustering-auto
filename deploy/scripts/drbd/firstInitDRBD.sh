@@ -11,7 +11,7 @@ if [ $? -eq 0 ]
 then
   drbdadm primary --force all
 fi
-sleep 5
+sleep 10
 
 #Reboot when all resources finished sync
 if [ x"$(isDRBD9)" == x"true" ]
@@ -25,7 +25,7 @@ else
   while [ $? -eq 0 ]
   do
     logit cat /proc/drbd
-    sleep 60
+    sleep 90
   
     cat /proc/drbd |grep "sync'ed:" >/dev/null 2>&1
   done
@@ -33,3 +33,17 @@ else
   logit cat /proc/drbd
 fi
 echo "Finished first sync."
+
+# Downgrade to secondary and stop drbd
+isMaster "$HOSTNAME_NODE1"
+if [ $? -eq 0 ]
+then
+  logit drbdadm secondary all
+fi
+sleep 8
+
+#Stop drbd and let pacemaker control it
+rcdrbd stop
+
+logit echo "Stop drbd, should not find drbd."
+logit rcdrbd status

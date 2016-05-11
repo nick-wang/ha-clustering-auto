@@ -1,5 +1,5 @@
 #1) Create the virt-io disks, running at 'host' machine
-addVirioDisk.sh ./nodeconf 2 `pwd` 3G
+addVirioDisk.sh ./cluster_conf 2 `pwd` 3G
 
 #2) Partitioning the new created disks, running at every working node
 make_part_drbd.sh 2
@@ -15,6 +15,9 @@ firstInitDRBD.sh
 #5) Add crm resource, running at every working node(isMaster can help to run at host1 only)
 crmDRBD.sh
 
+#6) Collect needed log file, running at 'host' machine
+./drbd/collectLogs.sh ./cluster_conf /var/lib/jenkins/workspace/nwang/deploy-on-master-with-drbd/25
+
 ########### HOW TO CHANGE #############
 1. No need to change the code of "addVirioDisk.sh",
   only change the input paras.
@@ -23,3 +26,4 @@ crmDRBD.sh
   Need to dup more scripts if different disks have different layout/resource.
 4. No need to change "firstInitDRBD.sh"
 5. Change "crmDRBD.sh" for custom crm resource.
+6. Collect necessary log.

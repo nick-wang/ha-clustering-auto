@@ -97,5 +97,6 @@ n
 w
 "|fdisk ${disk}
 done
+logit fdisk -l ${disks[@]}
 
 partprobe
