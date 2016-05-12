@@ -7,7 +7,8 @@
 hosts_content=""
 csync2_content=""
 NUM_SHARED_TARGETS=`grep SHARED_TARGET_LUN cluster_conf | wc -l`
-
+TARGET_LUN=$SHARED_TARGET_LUN1
+TARGET_IP=$SHARED_TARGET_IP1
 cd template
 
 #Add extra repos
@@ -138,8 +139,8 @@ iscsiadm -m node -I default -T $TARGET_LUN -p $TARGET_IP \
          --op=update --name=node.conn[0].startup --value=automatic
 
 #login other target for shared storage
-if [ $NUM_SHARED_TARGETS -ne 0 ];then
-    for i in `seq 1 $NUM_SHARED_TARGETS`; do
+if [ $NUM_SHARED_TARGETS -gt 1 ];then
+    for i in `seq 2 $NUM_SHARED_TARGETS`; do
         name=`echo "SHARED_TARGET_IP$i"`
         tgt_ip=`getEnv $name ../cluster_conf`
         name=`echo "SHARED_TARGET_LUN$i"`

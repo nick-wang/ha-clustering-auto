@@ -152,7 +152,7 @@ class GET_VM_CONF:
         return vms
 
     def get_shared_target(self):
-        targets = {}
+        targets = []
         iscsis = self.ya.get('iscsi')
         ip = iscsis.get('target_ip')
         target_luns = iscsis.get('shared_target_luns')
@@ -169,15 +169,16 @@ class GET_VM_CONF:
                 tgt_ip = ip
             target['shared_target_ip'] = tgt_ip
 
-            if not targets.has_key(target['shared_target_lun']):
-                targets[target['shared_target_lun']] = target
+            if target not in targets:
+                targets.append(target)
 
         return targets
 
-def test():
+def test(deployfile=""):
     # vm_list.yaml is for testing only.
     # Should get the yaml configuration file from scheduler(jenkins).
-    deployfile = "%s/%s" % (os.getcwd(), '../confs/vm_list.yaml')
+    if deployfile == '':
+        deployfile = "%s/%s" % (os.getcwd(), '../confs/vm_list.yaml')
 
     dp = GET_VM_CONF(deployfile)
     vm_list = dp.get_vms_conf()
@@ -194,4 +195,6 @@ if __name__ == "__main__":
     '''
         This is a library to parse yaml file, should not running via itself.
     '''
-    test()
+    if len(sys.argv) != 2:
+       test()
+    test(sys.argv[1])

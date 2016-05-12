@@ -165,19 +165,18 @@ def get_cluster_conf(sleep_time="0", configuration="../cluster_conf",
     iscsi = dp.get_single_section_conf("iscsi")
 
     target_ip = iscsi["target_ip"]
-    target_lun = iscsi["target_lun"]
+    #target_lun = iscsi["target_lun"]
     if target_ip is None:
         target_ip = "147.2.207.237"
-    if target_lun is None:
-        target_lun = "iqn.2015-08.suse.bej.bliu:441a202b-6aa3-479f-b56f-374e2f38ba20"
-    contents += "TARGET_IP=%s\n" % target_ip
-    contents += "TARGET_LUN=%s\n" % target_lun
+    #if target_lun is None:
+    #    target_lun = "iqn.2015-08.suse.bej.bliu:441a202b-6aa3-479f-b56f-374e2f38ba20"
+    #contents += "TARGET_IP=%s\n" % target_ip
+    #contents += "TARGET_LUN=%s\n" % target_lun
     contents += "NETADDR=%s\n" % netaddr
     contents += "IPADDR=%s\n" % ipaddr
 
     i = 1
-    for targetname in target_list.keys():
-        target = target_list[targetname]
+    for target in target_list:
         contents += "SHARED_TARGET_LUN%d=%s\n" % (i, target['shared_target_lun'])
         contents += "SHARED_TARGET_IP%d=%s\n" % (i, target['shared_target_ip'])
         i += 1
