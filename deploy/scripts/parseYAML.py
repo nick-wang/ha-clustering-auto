@@ -126,7 +126,7 @@ class GET_VM_CONF:
         return conf
 
     def get_vms_conf(self):
-        vms = {}
+        vms = []
         nodes = self.ya.get('nodes')
         vm_elements = ('name', 'mac', 'ostype', 'disk', 'vcpus', 'memory',
                        'disk_size', 'nic', 'graphics', 'os_settings' )
@@ -144,8 +144,8 @@ class GET_VM_CONF:
             for ele in vm_elements:
                 vm[ele] = node.get(ele)
 
-            if not vms.has_key(vm['name']):
-                vms[vm['name']] = vm
+            if vm not in vms:
+                vms.append(vm)
             else:
                 print "Error! Duplicate node name(%s) detected." % vm['name']
                 sys.exit(2)
