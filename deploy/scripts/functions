@@ -52,3 +52,19 @@ function getEnv()
     value=`grep $key $file|cut -d'=' -f2`
     echo $value
 }
+
+function get_hb_report()
+{
+    if [ $# -ne 2 ];then
+        echo "usage: get_hb_report $CLUSTER_CONF $DIR_TO_PUT_FILE"
+    fi
+    cluster_conf=$1
+    dest=$2
+    #get the ip of 1st node, and try to run hb_report on it, then return to the jenkins server
+    ip=`cat $cluster_conf | grep IP_NODE |cut -d "=" -f 2 | head -1`
+    date_str=`date +%s`
+    hb_report="hb_report_${ip}_${date_str}"
+    ssh root@${ip} "systemctl restart pacemaker; sleep 3; hb_report -f 0:00 $hb_report"
+    echo "ssh root@${ip}" "systemctl start pacemaker; sleep 3; hb_report -f 0:00 $hb_report"
+    scp ${ip}:/root/$hb_report* $dest
+}
