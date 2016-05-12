@@ -54,6 +54,11 @@ devices:
 iscsi:
   target_ip: 147.2.207.237
   target_lun: iqn.2015-08.suse.bej.bliu:441a202b-6aa3-479f-b56f-374e2f38ba20
+  shared_target_luns:
+  - shared_target_lun:
+    shared_target_ip:
+  - shared_target_lun:
+    shared_target_ip:
 '''
 
 class GET_VM_CONF:
@@ -146,6 +151,29 @@ class GET_VM_CONF:
                 sys.exit(2)
         return vms
 
+    def get_shared_target(self):
+        targets = {}
+        iscsis = self.ya.get('iscsi')
+        ip = iscsis.get('target_ip')
+        target_luns = iscsis.get('shared_target_luns')
+        if target_luns is None:
+            return targets
+        for iscsi in target_luns:
+            tgt = iscsi.get('shared_target_lun')
+            if tgt is None:
+                continue
+            target = {}
+            target['shared_target_lun'] = tgt
+            tgt_ip = iscsi.get('shared_target_ip')
+            if tgt_ip is None:
+                tgt_ip = ip
+            target['shared_target_ip'] = tgt_ip
+
+            if not targets.has_key(target['shared_target_lun']):
+                targets[target['shared_target_lun']] = target
+
+        return targets
+
 def test():
     # vm_list.yaml is for testing only.
     # Should get the yaml configuration file from scheduler(jenkins).
@@ -153,11 +181,13 @@ def test():
 
     dp = GET_VM_CONF(deployfile)
     vm_list = dp.get_vms_conf()
+    target_list = dp.get_shared_target()
 
     for i in dp.structs.keys():
         print dp.get_single_section_conf(i)
 
     print vm_list
+    print target_list
 
 
 if __name__ == "__main__":

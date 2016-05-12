@@ -111,6 +111,7 @@ def get_cluster_conf(sleep_time="0", configuration="../cluster_conf",
 
     vm_list = dp.get_vms_conf()
     devices = dp.get_single_section_conf("devices")
+    target_list = dp.get_shared_target()
 
     if devices is not None and devices.has_key("nic"):
         interface = devices["nic"]
@@ -173,6 +174,13 @@ def get_cluster_conf(sleep_time="0", configuration="../cluster_conf",
     contents += "TARGET_LUN=%s\n" % target_lun
     contents += "NETADDR=%s\n" % netaddr
     contents += "IPADDR=%s\n" % ipaddr
+
+    i = 1
+    for targetname in target_list.keys():
+        target = target_list[targetname]
+        contents += "SHARED_TARGET_LUN%d=%s\n" % (i, target['shared_target_lun'])
+        contents += "SHARED_TARGET_IP%d=%s\n" % (i, target['shared_target_ip'])
+        i += 1
 
     repos = dp.get_list_section_conf("repos")
     if len(repos):

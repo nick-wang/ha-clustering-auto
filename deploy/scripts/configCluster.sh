@@ -6,6 +6,7 @@
 
 hosts_content=""
 csync2_content=""
+NUM_SHARED_TARGETS=`grep SHARED_TARGET_LUN cluster_conf | wc -l`
 
 cd template
 
@@ -90,7 +91,7 @@ then
         /etc/ssh/ssh_config
 fi
 
-#login iscsi target
+#login iscsi target for sbd
 #and create sbd
 iscsiadm -m discovery -t st -p $TARGET_IP >/dev/null
 iscsiadm -m node -T $TARGET_LUN -p $TARGET_IP -l
@@ -136,6 +137,21 @@ esac
 iscsiadm -m node -I default -T $TARGET_LUN -p $TARGET_IP \
          --op=update --name=node.conn[0].startup --value=automatic
 
+#login other target for shared storage
+if [ $NUM_SHARED_TARGETS -ne 0 ];then
+    for i in `seq 1 $NUM_SHARED_TARGETS`; do
+        name=`echo "SHARED_TARGET_IP$i"`
+        tgt_ip=`getEnv $name ../cluster_conf`
+        name=`echo "SHARED_TARGET_LUN$i"`
+        tgt_lun=`getEnv $name ../cluster_conf`
+
+        iscsiadm -m discovery -t st -p $tgt_ip >/dev/null
+        iscsiadm -m node -T $tgt_lun -p $tgt_ip -l
+        #Enable automatic login to iscsi server
+        iscsiadm -m node -I default -T $tgt_lun -p $tgt_ip \
+             --op=update --name=node.conn[0].startup --value=automatic
+    done
+fi
 #config stonith resource and restart pacemaker
 isMaster "$HOSTNAME_NODE1"
 if [ $? -eq 0 ]

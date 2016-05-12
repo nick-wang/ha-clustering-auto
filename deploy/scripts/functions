@@ -41,3 +41,14 @@ function logit()
     #     logit pwd >> output-file
     echo -e "== [`hostname`:${USER}@`pwd`]\nCommand: ${*}\nStart  : [`date`] \n`${*} 2>&1`\nStop   : [`date`]\n";
 }
+
+function getEnv()
+{
+    key=$1
+    file="../cluster_conf"
+    if [ $# -eq 2 ];then
+        file=$2
+    fi
+    value=`grep $key $file|cut -d'=' -f2`
+    echo $value
+}
