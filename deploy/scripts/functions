@@ -68,3 +68,11 @@ function get_hb_report()
     echo "ssh root@${ip}" "systemctl start pacemaker; sleep 3; hb_report -f 0:00 $hb_report"
     scp ${ip}:/root/$hb_report* $dest
 }
+
+function nextPhase()
+{
+    # Usage:
+    #     nextPhase "Add some comments"
+    echo -e "\n***** $(hostname): Mailstone - ${1}"
+
+}
