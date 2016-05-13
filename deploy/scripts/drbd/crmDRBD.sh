@@ -47,8 +47,11 @@ then
 
   nextPhase "After configuring DRBD" | tee -a ${DRBD_LOGFILE}
   logit crm configure show | tee -a ${DRBD_LOGFILE}
+  sleep 3
+else
+  #Waiting Node1 to configure resources
+  sleep 8
 fi
-sleep 3
 
 logit crm_mon -1 | tee -a ${DRBD_LOGFILE}
 case $(getDRBDVer) in

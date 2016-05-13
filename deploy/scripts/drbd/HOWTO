@@ -27,3 +27,15 @@ crmDRBD.sh
 4. No need to change "firstInitDRBD.sh"
 5. Change "crmDRBD.sh" for custom crm resource.
 6. Collect necessary log.
+
+##### Jenkins configure example ########
+#Add virtio disk for drbd
+#This feature is not committed yet
+cd ${LIB_DIR}
+sleep 3
+./drbd/addVirioDisk.sh ${CLUSTER_FILE} 1 "/mnt/vm/sles_nick" 3G
+sleep 3
+./drbd/runDRBDFilesOnGuest.sh ${CLUSTER_FILE} ${CONFIG_CLUSTER_DIR} 1
+#Rebooting
+sleep 2
+./drbd/collectLogs.sh ${CLUSTER_FILE} ${BUILD_LOG_DIR}

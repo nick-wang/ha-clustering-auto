@@ -13,7 +13,7 @@ if [ $? -eq 0 ]
 then
   drbdadm primary --force all
 fi
-sleep 10
+sleep 3
 
 #Reboot when all resources finished sync
 case $(getDRBDVer) in
