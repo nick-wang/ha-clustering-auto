@@ -186,7 +186,9 @@ def test(deployfile=""):
 
     for i in dp.structs.keys():
         print dp.get_single_section_conf(i)
-
+    repos=dp.get_list_section_conf("repos")
+    if len(repos) > 0:
+        print " ".join(repos)
     print vm_list
     print target_list
 
