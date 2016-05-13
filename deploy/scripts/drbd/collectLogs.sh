@@ -18,7 +18,6 @@ TEMP_DIR="/root/drbdlog/"
 CLUSTER_CONF=$1
 LOG_DIR=$2
 
-
 for ip in `cat $CLUSTER_CONF |grep IP_NODE |cut -d "=" -f 2`
 do
 {
@@ -32,6 +31,7 @@ do
   scp root@${ip}:/etc/drbd.d/* ${LOG_DIR}/${ip}_drbd
   scp root@${ip}:/var/log/messages ${LOG_DIR}/${ip}_drbd
   scp root@${ip}:~/drbdlog/* ${LOG_DIR}/${ip}_drbd
+  scp root@${ip}:/tmp/drbd-log-* ${LOG_DIR}/${ip}_drbd
   
 } &
 done

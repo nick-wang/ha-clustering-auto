@@ -31,7 +31,8 @@ case $(getDRBDVer) in
       cat /proc/drbd |grep "sync'ed:" >/dev/null 2>&1
     done
 
-    logit cat /proc/drbd
+    nextPhast "Finished the first sync." | tee -a ${DRBD_LOGFILE}
+    logit cat /proc/drbd | tee -a ${DRBD_LOGFILE}
     ;;
   *)
     echo "Error! Wrong DRBD version."

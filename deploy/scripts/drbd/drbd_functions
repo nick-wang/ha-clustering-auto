@@ -1,5 +1,8 @@
 #!/bin/bash
 
+LOCAL_HOST=$(hostname)
+DRBD_LOGFILE="/tmp/drbd-log-${LOCAL_HOST}"
+
 function getDRBDVer()
 {
     # usage:

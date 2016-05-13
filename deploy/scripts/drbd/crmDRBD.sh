@@ -10,8 +10,8 @@
 isMaster "$HOSTNAME_NODE1"
 if [ $? -eq 0 ]
 then
-  echo "Before configuring CRM"
-  logit crm configure show
+  nextPhase "Before configuring DRBD" | tee -a ${DRBD_LOGFILE}
+  logit crm configure show | tee -a ${DRBD_LOGFILE}
 
   #Disable stonith, in case error happened, one always fence the other
   crm configure property stonith-enabled="false"
@@ -39,17 +39,18 @@ then
     fi
   done
 
-  echo "After configuring CRM"
-  logit crm configure show
+  nextPhase "After configuring DRBD" | tee -a ${DRBD_LOGFILE}
+  logit crm configure show | tee -a ${DRBD_LOGFILE}
 fi
-logit crm_mon -1
+sleep 3
 
+logit crm_mon -1 | tee -a ${DRBD_LOGFILE}
 case $(getDRBDVer) in
   9)
-    logit drbdadm status all
+    logit drbdadm status all | tee -a ${DRBD_LOGFILE}
     ;;
   84)
-    logit cat /proc/drbd
+    logit cat /proc/drbd | tee -a ${DRBD_LOGFILE}
     ;;
   *)
     echo "Error! Wrong DRBD version."

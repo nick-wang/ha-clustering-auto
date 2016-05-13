@@ -14,6 +14,7 @@ fi
 
 #Import ENV conf
 . scripts/functions
+. scripts/drbd/drbd_functions
 
 # How many disks need to partition
 NUM=$1
@@ -97,6 +98,8 @@ n
 w
 "|fdisk ${disk}
 done
-logit fdisk -l ${disks[@]}
+
+nextPhase "Finished partitioning ${disks[@]}" | tee -a ${DRBD_LOGFILE}
+logit fdisk -l ${disks[@]} | tee -a ${DRBD_LOGFILE}
 
 partprobe
