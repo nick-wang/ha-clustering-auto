@@ -39,7 +39,6 @@ case $(getDRBDVer) in
   *)
     echo "Error! Wrong DRBD version."
 esac
-echo "Finished first sync."
 
 # Downgrade to secondary and stop drbd
 isMaster "$HOSTNAME_NODE1"
@@ -47,4 +46,4 @@ if [ $? -eq 0 ]
 then
   drbdadm secondary all
 fi
-sleep 5
+sleep 3

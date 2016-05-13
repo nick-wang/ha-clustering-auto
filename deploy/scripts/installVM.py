@@ -85,6 +85,9 @@ def installVMs(vm_list=[], res={}, devices={}, autoyast=""):
         conf_str = f.readlines()
         f.close()
 
+        if not os.path.isdir("../dummy_temp"):
+            os.mkdir("../dummy_temp")
+
         f = open("../dummy_temp/%s" % vm_name, 'w')
         for line in conf_str:
             line = _replaceXML(line, "media_url", res['ha_source'])

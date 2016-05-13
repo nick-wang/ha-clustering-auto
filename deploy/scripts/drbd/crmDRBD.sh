@@ -18,27 +18,31 @@ then
   #Disable stonith, in case error happened, one always fence the other
   crm configure property stonith-enabled="false"
 
+  tempfile=drbd-tempfile
   for resname in `drbdadm dump all |grep -P "^resource .+ {" | cut -d " " -f 2`
   do
-    crm configure primitive res-${resname} ocf:linbit:drbd \
-                  params drbd_resource=${resname} \
-                  op start timeout=240 \
-                  op stop timeout=100
-    crm configure ms ms_${resname} res-${resname} \
-                  meta master-max=1 master-node-max=1 \
-                  meta clone-max=2 clone-node-max=1 \
-                  meta notify=true target-role=Started
+    echo "configure
+          primitive res-${resname} ocf:linbit:drbd \
+                    params drbd_resource=${resname} \
+                    op start timeout=240 \
+                    op stop timeout=100
+          ms ms_${resname} res-${resname} \
+             meta master-max=1 master-node-max=1 \
+             meta clone-max=2 clone-node-max=1 \
+             meta notify=true target-role=Started" > $tempfile
     if [ ${NODES} -gt 2 ]
     then
       i=3
       while [ ${i} -le ${NODES} ]
       do
         temp=HOSTNAME_NODE${i}
-        crm configure location l-${resname}-${i} ms_${resname} \
-                      -inf: $(eval echo \$${temp})
+        echo "
+        location l-${resname}-${i} ms_${resname} \
+                      -inf: $(eval echo \$${temp})" >>$tempfile
         i=$((i+1))
       done
     fi
+    crm -f ${tempfile}
   done
 
   nextPhase "After configuring DRBD" | tee -a ${DRBD_LOGFILE}

@@ -48,10 +48,16 @@ do
 
   # Start the first sync to mark the sync source/target
   ssh root@${ip} "cd ${CLUSTER_DIR}; ${CLUSTER_DIR}/scripts/drbd/firstInitDRBD.sh"
+} &
+done
+wait
 
+# Waiting for all nodes finished first init
+for ip in `cat $CLUSTER_CONF |grep IP_NODE |cut -d "=" -f 2`
+do
+{
   # Add crm resources
   ssh root@${ip} "cd ${CLUSTER_DIR}; ${CLUSTER_DIR}/scripts/drbd/crmDRBD.sh"
 } &
 done
-
 wait
