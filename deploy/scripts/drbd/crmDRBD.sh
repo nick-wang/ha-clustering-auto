@@ -5,6 +5,8 @@
 . scripts/functions
 . scripts/drbd/drbd_functions
 
+nextPhase "Launch $0"
+
 #Configure crm resources
 #Echo should configure crm resources
 isMaster "$HOSTNAME_NODE1"

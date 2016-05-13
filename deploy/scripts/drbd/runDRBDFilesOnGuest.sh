@@ -29,7 +29,6 @@ do
   scp ../template/drbd/drbd_*_template root@${ip}:${CLUSTER_DIR}/template/drbd/
   
   # Partitioning all the disks
-  nextPhase "Run 'drbd/make_part_drbd.sh' on each nodes:"
   ssh root@${ip} "cd ${CLUSTER_DIR}; ${CLUSTER_DIR}/scripts/drbd/make_part_drbd.sh ${DISK_NUM}"
 
   # Configure drbd resources configure and create meta-disk
@@ -38,7 +37,6 @@ do
   do
     temp=$(nconvert ${i})
     disk=/dev/vd${temp}
-    nextPhase "Run 'drbd/configDRBD.sh' on each nodes:"
     if [ ${DISK_NUM} -ne 1 ]
     then
       ssh root@${ip} "cd ${CLUSTER_DIR}; ${CLUSTER_DIR}/scripts/drbd/configDRBD.sh ${disk} ${DISK_NUM}-"
@@ -49,11 +47,9 @@ do
   done
 
   # Start the first sync to mark the sync source/target
-  nextPhase "Run 'drbd/firstInitDRBD.sh' on each nodes:"
   ssh root@${ip} "cd ${CLUSTER_DIR}; ${CLUSTER_DIR}/scripts/drbd/firstInitDRBD.sh"
 
   # Add crm resources
-  nextPhase "Run 'drbd/crmDRBD.sh' on each nodes:"
   ssh root@${ip} "cd ${CLUSTER_DIR}; ${CLUSTER_DIR}/scripts/drbd/crmDRBD.sh"
 } &
 done

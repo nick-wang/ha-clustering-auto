@@ -35,6 +35,8 @@ fi
 . cluster_conf
 . scripts/functions
 
+nextPhase "Launch $0"
+
 # Get disk like /dev/vdb
 DISK=$1
 # PRE_FIX="" when no $2 para

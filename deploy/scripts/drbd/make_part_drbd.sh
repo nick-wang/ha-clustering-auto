@@ -16,6 +16,8 @@ fi
 . scripts/functions
 . scripts/drbd/drbd_functions
 
+nextPhase "Launch $0"
+
 # How many disks need to partition
 NUM=$1
 

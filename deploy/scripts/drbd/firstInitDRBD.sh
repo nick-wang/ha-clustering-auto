@@ -5,6 +5,8 @@
 . scripts/functions
 . scripts/drbd/drbd_functions
 
+nextPhase "Launch $0"
+
 #Go primary for the initial sync
 isMaster "$HOSTNAME_NODE1"
 if [ $? -eq 0 ]
@@ -31,7 +33,7 @@ case $(getDRBDVer) in
       cat /proc/drbd |grep "sync'ed:" >/dev/null 2>&1
     done
 
-    nextPhast "Finished the first sync." | tee -a ${DRBD_LOGFILE}
+    nextPhase "Finished the first sync." | tee -a ${DRBD_LOGFILE}
     logit cat /proc/drbd | tee -a ${DRBD_LOGFILE}
     ;;
   *)
