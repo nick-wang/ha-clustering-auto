@@ -13,11 +13,11 @@ def getCtsConf(stonith_type="external/libvirt", interface1='br1', configuration=
     
     vm_list = dp.get_vms_conf()
     node_list=""
-    for vm in vm_list.keys():
+    for vm in vm_list:
         if node_list == '':
-            node_list = vm
+            node_list = vm['name']
         else:
-            node_list += ',' + vm
+            node_list += ',' + vm['name']
     f = open(configuration, 'w')
     host_ip=get_ipaddr_by_interface(interface = interface1)
     content += "NODE_LIST=%s\n" % node_list
