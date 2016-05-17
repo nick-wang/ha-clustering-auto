@@ -25,23 +25,41 @@ then
           primitive res-${resname} ocf:linbit:drbd \
                     params drbd_resource=${resname} \
                     op start timeout=240 \
-                    op stop timeout=100
-          ms ms_${resname} res-${resname} \
-             meta master-max=1 master-node-max=1 \
-             meta clone-max=2 clone-node-max=1 \
-             meta notify=true target-role=Started" > $tempfile
-    if [ ${NODES} -gt 2 ]
-    then
-      i=3
-      while [ ${i} -le ${NODES} ]
-      do
-        temp=HOSTNAME_NODE${i}
+                    op stop timeout=100" > $tempfile
+
+    case $(getDRBDVer) in
+      9)
         echo "
-        location l-${resname}-${i} ms_${resname} \
-                      -inf: $(eval echo \$${temp})" >>$tempfile
-        i=$((i+1))
-      done
-    fi
+        ms ms_${resname} res-${resname} \
+           meta master-max=1 master-node-max=1 \
+           meta clone-max=${NODES} clone-node-max=1 \
+           meta notify=true target-role=Started" >> $tempfile
+        ;;
+      84)
+        echo "
+        ms ms_${resname} res-${resname} \
+           meta master-max=1 master-node-max=1 \
+           meta clone-max=2 clone-node-max=1 \
+           meta notify=true target-role=Started" >> $tempfile
+
+        if [ ${NODES} -gt 2 ]
+        then
+          i=3
+          while [ ${i} -le ${NODES} ]
+          do
+            temp=HOSTNAME_NODE${i}
+            echo "
+            location l-${resname}-${i} ms_${resname} \
+                          -inf: $(eval echo \$${temp})" >>$tempfile
+            i=$((i+1))
+          done
+        fi
+        ;;
+
+      *)
+        echo "Error! Wrong DRBD version."
+    esac
+
     crm -f ${tempfile}
   done
 
