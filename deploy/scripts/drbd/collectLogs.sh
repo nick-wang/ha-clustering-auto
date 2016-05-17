@@ -26,6 +26,7 @@ do
   ssh root@${ip} "rpm -qa|grep drbd>${TEMP_DIR}/drbd-rpm"
   ssh root@${ip} "cat /proc/drbd>${TEMP_DIR}/drbd-proc; drbd-overview>${TEMP_DIR}/drbd-overview"
   ssh root@${ip} "crm configure show>${TEMP_DIR}/crm-ra; crm_mon -1>${TEMP_DIR}/crm_mon"
+  ssh root@${ip} "drbdadm status all>${TEMP_DIR}/drbd9-status 2>&1"
 
   scp root@${ip}:/etc/drbd.conf ${LOG_DIR}/${ip}_drbd
   scp root@${ip}:/etc/drbd.d/* ${LOG_DIR}/${ip}_drbd

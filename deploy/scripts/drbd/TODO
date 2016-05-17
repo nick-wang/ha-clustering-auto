@@ -1,4 +1,2 @@
-1. "firstInitDRBD.sh"
-  Need to implement the monitor/all part of drbd9.
-2. Need to add test cases during establish DRBD and after.
-3. Create more scenario like more nodes.
+1. Need to add test cases during establish DRBD and after.
+2. Create more scenario like more nodes.
