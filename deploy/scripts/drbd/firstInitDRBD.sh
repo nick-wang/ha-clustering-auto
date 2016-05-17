@@ -18,9 +18,20 @@ sleep 3
 #Reboot when all resources finished sync
 case $(getDRBDVer) in
   9)
-    #TBD:
-    # Check sync progress in drbd9
-    drbdadm status all
+    # Log the drbd9 version
+    logit cat /proc/drbd | tee -a ${DRBD_LOGFILE}
+
+    drbdadm status all |grep "done:" >/dev/null 2>&1
+    while [ $? -eq 0 ]
+    do
+      logit drbdadm status all
+      sleep 90
+
+      drbdadm status all |grep "done:" >/dev/null 2>&1
+    done
+
+    nextPhase "Finished the first sync." | tee -a ${DRBD_LOGFILE}
+    logit drbdadm status all | tee -a ${DRBD_LOGFILE}
     ;;
   84)
     # Check sync progress in drbd8
@@ -40,7 +51,7 @@ case $(getDRBDVer) in
     echo "Error! Wrong DRBD version."
 esac
 
-# Downgrade to secondary and stop drbd
+# Downgrade to secondary
 isMaster "$HOSTNAME_NODE1"
 if [ $? -eq 0 ]
 then
