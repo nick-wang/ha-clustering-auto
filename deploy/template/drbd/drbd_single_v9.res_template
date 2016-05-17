@@ -1,0 +1,11 @@
+resource <RESNAME> {
+   net {
+      protocol	C;
+   }
+   disk {
+      on-io-error	pass_on;
+   }
+   connection-mesh {
+      hosts	<ALL_NODES>;
+   }<ON>
+}

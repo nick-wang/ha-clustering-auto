@@ -34,6 +34,7 @@ fi
 #Import ENV conf
 . cluster_conf
 . scripts/functions
+. scripts/drbd/drbd_functions
 
 nextPhase "Launch $0"
 
@@ -48,6 +49,7 @@ cur_minor=0
 
 # Modify drbd template according to cluster configuration
 # Configure a multi-volume resource
+# Same paras of drbd8/9
 i=0
 while [ $i -lt $NUM_MULTI ]
 do
@@ -74,24 +76,68 @@ do
     cur_minor=$((minor+1))
     m=$((m+1))
   done
+  #echo ${minor[@]}
+  #echo ${disk[@]}
+  #echo ${metadisk[@]}
 
-#  echo ${minor[@]}
-#  echo ${disk[@]}
-#  echo ${metadisk[@]}
+  case $(getDRBDVer) in
+    9)
+      echo "Configuring DRBD9 multi-res..."
 
-  sed "s#<RESNAME>#${PRE_FIX}multi-${i}#g;
-       s#<DEVICE_VO0>#/dev/drbd${minor[0]}#g;
-       s#<DISK_VO0>#${disk[0]}#g;
-       s#<METADISK_VO0>#${metadisk[0]}#g;
-       s#<DEVICE_VO1>#/dev/drbd${minor[1]}#g;
-       s#<DISK_VO1>#${disk[1]}#g;
-       s#<METADISK_VO1>#${metadisk[1]}#g;
-       s#<NODE1>#${HOSTNAME_NODE1}#g;
-       s#<NODE1_IP_PORT>#${IP_NODE1}:${start_port}#g;
-       s#<NODE2>#${HOSTNAME_NODE2}#g;
-       s#<NODE2_IP_PORT>#${IP_NODE2}:${start_port}#g;
-  " drbd_multi_v8.res_template > ${PRE_FIX}multi-${i}.res
+      # Configuring "on" and connection-mesh sections for multiple nodes
+      # ON section:
+      # on="   on <name> {\n\
+      #     address   <IP_ADDR>;\n\
+      #     node-id   <NODEID>;\n\
+      #  }"
+      nodeid=1
+      on_section=""
+      all_nodes=()
+      while [ $nodeid -le $NODES ]
+      do
+        nodename=$(eval echo \$HOSTNAME_NODE${nodeid})
+        nodeaddr=$(eval echo \$IP_NODE${nodeid})
+        on_section=${on_section}"\n   on ${nodename} {\n\
+      address   ${nodeaddr}:${start_port};\n\
+      node-id   ${nodeid};\n\
+   }"
+        all_nodes[${nodeid}]=${nodename}
+        nodeid=$((nodeid+1))
+      done
+      #echo "$on_section"
+      #echo "${all_nodes[*]}"
 
+      sed "s#<RESNAME>#${PRE_FIX}multi-${i}#g;
+           s#<DEVICE_VO0>#/dev/drbd${minor[0]}#g;
+           s#<DISK_VO0>#${disk[0]}#g;
+           s#<METADISK_VO0>#${metadisk[0]}#g;
+           s#<DEVICE_VO1>#/dev/drbd${minor[1]}#g;
+           s#<DISK_VO1>#${disk[1]}#g;
+           s#<METADISK_VO1>#${metadisk[1]}#g;
+           s#<ON>#${on_section}#g;
+           s#<ALL_NODES>#${all_nodes[*]}#g;
+      " drbd_multi_v9.res_template > ${PRE_FIX}multi-${i}.res
+
+      ;;
+    84)
+      echo "Configuring DRBD8 multi-res..."
+      sed "s#<RESNAME>#${PRE_FIX}multi-${i}#g;
+           s#<DEVICE_VO0>#/dev/drbd${minor[0]}#g;
+           s#<DISK_VO0>#${disk[0]}#g;
+           s#<METADISK_VO0>#${metadisk[0]}#g;
+           s#<DEVICE_VO1>#/dev/drbd${minor[1]}#g;
+           s#<DISK_VO1>#${disk[1]}#g;
+           s#<METADISK_VO1>#${metadisk[1]}#g;
+           s#<NODE1>#${HOSTNAME_NODE1}#g;
+           s#<NODE1_IP_PORT>#${IP_NODE1}:${start_port}#g;
+           s#<NODE2>#${HOSTNAME_NODE2}#g;
+           s#<NODE2_IP_PORT>#${IP_NODE2}:${start_port}#g;
+      " drbd_multi_v8.res_template > ${PRE_FIX}multi-${i}.res
+      ;;
+
+    *)
+      echo "Error! Wrong DRBD version."
+  esac
   echo "include \"/etc/drbd.d/${PRE_FIX}multi-${i}.res\";" >> drbd_drbd.conf_template
 
   i=$((i+1))
@@ -101,6 +147,7 @@ done
 
 # Modify drbd template according to cluster configuration
 # Configure a single-volume resource
+# Same paras of drbd8/9
 i=0
 while [ $i -lt $NUM_SINGLE ]
 do
@@ -118,20 +165,60 @@ do
     echo "Error input of disk/metadisk: ${MINORS[$cur_minor]}"
     exit -1
   fi
-#  echo ${minor}
-#  echo ${disk}
-#  echo ${metadisk}
+  #echo ${minor}
+  #echo ${disk}
+  #echo ${metadisk}
 
-  sed "s#<RESNAME>#${PRE_FIX}single-${i}#g;
-       s#<DEVICE>#/dev/drbd${minor}#g;
-       s#<DISK>#${disk}#g;
-       s#<METADISK>#${metadisk}#g;
-       s#<NODE1>#${HOSTNAME_NODE1}#g;
-       s#<NODE1_IP_PORT>#${IP_NODE1}:${start_port}#g;
-       s#<NODE2>#${HOSTNAME_NODE2}#g;
-       s#<NODE2_IP_PORT>#${IP_NODE2}:${start_port}#g;
-  " drbd_single_v8.res_template > ${PRE_FIX}single-${i}.res
+  case $(getDRBDVer) in
+    9)
+      echo "Configuring DRBD9 single-res..."
+      # Configuring "on" and connection-mesh sections for multiple nodes
+      # ON section:
+      # on="   on <name> {\n\
+      #     address   <IP_ADDR>;\n\
+      #     node-id   <NODEID>;\n\
+      #  }"
+      nodeid=1
+      on_section=""
+      all_nodes=()
+      while [ $nodeid -le $NODES ]
+      do
+        nodename=$(eval echo \$HOSTNAME_NODE${nodeid})
+        nodeaddr=$(eval echo \$IP_NODE${nodeid})
+        on_section=${on_section}"\n   on ${nodename} {\n\
+      address   ${nodeaddr}:${start_port};\n\
+      device    /dev/drbd${minor};\n\
+      disk      ${disk};\n\
+      meta-disk ${metadisk};\n\
+      node-id   ${nodeid};\n\
+   }"
+        all_nodes[${nodeid}]=${nodename}
+        nodeid=$((nodeid+1))
+      done
 
+      sed "s#<RESNAME>#${PRE_FIX}single-${i}#g;
+           s#<ON>#${on_section}#g;
+           s#<ALL_NODES>#${all_nodes[*]}#g;
+      " drbd_single_v9.res_template > ${PRE_FIX}single-${i}.res
+
+      ;;
+    84)
+      echo "Configuring DRBD8 single-res..."
+
+      sed "s#<RESNAME>#${PRE_FIX}single-${i}#g;
+           s#<DEVICE>#/dev/drbd${minor}#g;
+           s#<DISK>#${disk}#g;
+           s#<METADISK>#${metadisk}#g;
+           s#<NODE1>#${HOSTNAME_NODE1}#g;
+           s#<NODE1_IP_PORT>#${IP_NODE1}:${start_port}#g;
+           s#<NODE2>#${HOSTNAME_NODE2}#g;
+           s#<NODE2_IP_PORT>#${IP_NODE2}:${start_port}#g;
+      " drbd_single_v8.res_template > ${PRE_FIX}single-${i}.res
+      ;;
+
+    *)
+      echo "Error! Wrong DRBD version."
+  esac
   echo "include \"/etc/drbd.d/${PRE_FIX}single-${i}.res\";" >> drbd_drbd.conf_template
 
   i=$((i+1))
@@ -154,3 +241,6 @@ rcSuSEfirewall2 stop
 
 #Start the drbd service for the first sync
 rcdrbd start
+
+#Sometimes it need time to wait peer node to showup
+sleep 15
