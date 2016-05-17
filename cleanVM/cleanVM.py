@@ -7,12 +7,28 @@ import time
 import socket
 import smtplib
 import utils
+import getopt
+
+import smtplib
+from email.mime.text import MIMEText
+mailto_list=["bliu@suse.com"]#, "zzhou@suse.com"]
+mail_host="smtp.gmail.com"
+mail_port='587'
+mail_user="slehapek"
+mail_pass="susenovell"
+mail_postfix="gmail.com"
 
 class Disk:
     def __init__(self, label, path, stat):
         self.label = label
         self.path = path
         self.stat = stat
+    
+    def get_label(self):
+        return self.label
+
+    def get_path(self):
+        return self.path
 
 class VM:
     def __init__(self, name, disks=[]):
@@ -31,6 +47,12 @@ class VM:
             if self.lastmodified < disk.stat.st_mtime:
                 self.lastmodified = disk.stat.st_mtime
         return self.lastmodified
+
+    def get_vmname(self):
+        return self.name
+
+    def get_disks(self):
+        return self.disks
 
 def canCleanVMs(pathname="/mnt/vm/"):
     avail = utils.get_fs_freespace(pathname)
@@ -51,7 +73,46 @@ def printVMs(vmlist, listname):
         print '\t\t%s:' % vm.name
         for disk in vm.disks:
             print '\t\t\t%s\t%s\t\t\t%s' % (disk.label, disk.path, time.asctime(time.localtime(disk.stat.st_mtime)))
-    
+
+def getVMByName(vmname):
+    cmd = 'virsh domblklist %s|grep \/' % (vmname)
+    status, output = commands.getstatusoutput(cmd)
+    if status:
+        sys.exit(-1)
+    disk_list = output.split('\n')
+    expired = False
+    delete = False
+    vm = VM(vmname)
+    for disk in disk_list:
+        label, path = disk.strip().split()
+        if os.path.exists(path) == False:
+            continue
+        stat_struct = os.stat(path)
+        disk1 = Disk(label, path, stat_struct)
+        vm.adddisk(disk1)
+    return vm
+
+def remove_vm(vm):
+    vmname = vm.get_vmname()
+    disk_list = vm.get_disks()
+    cmd = 'virsh destroy %s' % vmname
+    status, output = commands.getstatusoutput(cmd)
+    print "destroying vm %s" % vmname
+    for disk in disk_list:
+        path = disk.get_path()
+        if os.path.exists(path) == False:
+            continue
+        stat_struct = os.stat(path)
+        os.remove(path)
+        print "os.remove(%s)" % path
+    cmd = "virsh undefine %s" % vmname
+    status, output = commands.getstatusoutput(cmd)
+    print "status, output = commands.getstatusoutput(%s)" % cmd
+
+def removeVMByName(vmname):
+    vm = getVMByName(vmname)
+    remove_vm(vm)
+
 def getVMList():
     cmd='virsh list --all|grep "shut off"'
     status, output=commands.getstatusoutput(cmd)
@@ -64,34 +125,11 @@ def getVMList():
         sys.exit(-1)
     for el in elelist:
         vmname = el[7:][:-8].strip()
-        cmd = 'virsh domblklist %s|grep \/' % (vmname)
-        status, output = commands.getstatusoutput(cmd)
-        if status:
-            sys.exit(-1)
-        disk_list = output.split('\n')
-        expired = False
-        delete = False
-        vm = VM(vmname)
-        for disk in disk_list:
-            label, path = disk.strip().split()
-            if os.path.exists(path) == False:
-                continue
-            stat_struct = os.stat(path)
-            disk1 = Disk(label, path, stat_struct)
-            vm.adddisk(disk1)
+        vm = getVMByName(vmname)
         diff = now - vm.vm_mtime()
-        #print vm.name, time.asctime(time.localtime(vm.lastmodified))
         if diff >= 7776000:
             delete_list.append(vm)
-            for disk in disk_list:
-                path1 = disk.strip().split()[-1]
-                if os.path.exists(path1) == False:
-                    continue
-                os.remove(path1)
-                print "os.remove(%s)" % path1
-            cmd = "virsh undefine %s" % vmname
-            status, output = commands.getstatusoutput(cmd)
-            print "status, output = commands.getstatusoutput(%s)" % cmd
+            remove_vm(vm)
             
         elif diff >= 5184000 and diff < 7776000:
             expired_list.append(vm)
@@ -112,23 +150,16 @@ def get_ip_first_ip():
     ipList=output.split('\n')
     return ipList[0].strip().split()[1]
 
-content = getHostInfo()
-ip = get_ip_first_ip()
-title = 'SLEX Lab - VM garbage collector - %s(%s) ' % (socket.gethostname(), ip)
-content = content + "("+ ip + ")\n" + getVMList()
-if os.path.exists('notice.txt'):
-    f = open('notice.txt')
-    content = content + f.read()
-print content
-
-import smtplib
-from email.mime.text import MIMEText
-mailto_list=["bliu@suse.com"]#, "zzhou@suse.com"]
-mail_host="smtp.gmail.com"
-mail_port='587'
-mail_user="slehapek"
-mail_pass="susenovell"
-mail_postfix="gmail.com"
+def get_content():
+    content = getHostInfo()
+    ip = get_ip_first_ip()
+    title = 'SLEX Lab - VM garbage collector - %s(%s) ' % (socket.gethostname(), ip)
+    content = content + "("+ ip + ")\n" + getVMList()
+    if os.path.exists('notice.txt'):
+        f = open('notice.txt')
+        content = content + f.read()
+        print content
+    return title, content
  
 def send_mail(to_list,sub,content):
     me="slehapek"+"<"+mail_user+"@"+mail_postfix+">"
@@ -148,8 +179,27 @@ def send_mail(to_list,sub,content):
         print str(e)
         return False
 
+def usage():
+    print '''Usage:
+        To clean old vms and sendmail: ./cleanVM.py -m
+        To remove specified vms: ./cleanVM.py -c "vm1 vm2"
+    '''
+    sys.exit(-2)
 if __name__ == '__main__':
-    if send_mail(mailto_list,title,content):
-        print "success"
-    else: 
-        print "failed"
+    opts, args = getopt.getopt(sys.argv[1:], "c:m")
+    for opt, value in opts:
+       if opt == '-m':
+           title, content = get_content()
+           print content
+           if send_mail(mailto_list,title,content):
+               print "success"
+               sys.exit(0)
+           else:
+               print "failed"
+               sys.exit(-3)
+       elif opt == '-c':
+           vm_list = value.split()
+           for vmname in vm_list:
+               removeVMByName(value)
+           sys.exit(0)
+    usage()
