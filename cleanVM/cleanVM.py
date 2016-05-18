@@ -8,6 +8,7 @@ import socket
 import smtplib
 import utils
 import getopt
+import yaml
 
 import smtplib
 from email.mime.text import MIMEText
@@ -138,6 +139,13 @@ def getVMList():
     content = content + '\n' + formatVMs(expired_list, "expired") + '\n\n' 
     return content
 
+def removeVMViaYaml(yamlfile):
+    with open(yamlfile,'r') as f:
+        ya = yaml.load(f)
+    vms = ya.get('nodes')
+    for vm in vms:
+        removeVMByName(vmname)
+
 def getHostInfo():
     hostname = socket.gethostname()
     #ip = socket.gethostbyname(hostname)
@@ -183,10 +191,17 @@ def usage():
     print '''Usage:
         To clean old vms and sendmail: ./cleanVM.py -m
         To remove specified vms: ./cleanVM.py -c "vm1 vm2"
+        To remove specified vms via yaml: ./cleanVM.py -f file.yaml
+          example of yaml file:
+            nodes:
+              - name: node-1
+              - name: node-2
+              - name: node-3
     '''
     sys.exit(-2)
+
 if __name__ == '__main__':
-    opts, args = getopt.getopt(sys.argv[1:], "c:m")
+    opts, args = getopt.getopt(sys.argv[1:], "c:mf:")
     for opt, value in opts:
        if opt == '-m':
            title, content = get_content()
@@ -200,6 +215,16 @@ if __name__ == '__main__':
        elif opt == '-c':
            vm_list = value.split()
            for vmname in vm_list:
-               removeVMByName(value)
+               removeVMByName(vmname)
            sys.exit(0)
+       elif opt == '-f':
+           if os.path.exists(value) and os.path.isfile(value):
+              removeVMViaYaml(value)
+              sys.exit(0)
+           else:
+              print "%s is not exist or not a file." % value
+              sys.exit(-3)
+       else:
+           print "Wrong input. opt %s, value %s" % (opt, value)
+
     usage()
