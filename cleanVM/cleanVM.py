@@ -110,6 +110,13 @@ def remove_vm(vm):
     status, output = commands.getstatusoutput(cmd)
     print "status, output = commands.getstatusoutput(%s)" % cmd
 
+def checkVMExists(vmname):
+    status,_=commands.getstatusoutput("virsh domid %s" % vmname)
+    if status==0:
+        return True
+    else:
+        return False
+
 def removeVMByName(vmname):
     vm = getVMByName(vmname)
     remove_vm(vm)
@@ -144,7 +151,8 @@ def removeVMViaYaml(yamlfile):
         ya = yaml.load(f)
     vms = ya.get('nodes')
     for vm in vms:
-        removeVMByName(vmname)
+        if checkVMExists(vm["name"]):
+            removeVMByName(vm["name"])
 
 def getHostInfo():
     hostname = socket.gethostname()
@@ -215,7 +223,8 @@ if __name__ == '__main__':
        elif opt == '-c':
            vm_list = value.split()
            for vmname in vm_list:
-               removeVMByName(vmname)
+               if checkVMExists(vmname):
+                   removeVMByName(vmname)
            sys.exit(0)
        elif opt == '-f':
            if os.path.exists(value) and os.path.isfile(value):
