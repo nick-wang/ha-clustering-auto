@@ -4,6 +4,7 @@ resource <RESNAME> {
    }
    disk {
       on-io-error	pass_on;
+      resync-rate 24M;
    }
    connection-mesh {
       hosts	<ALL_NODES>;

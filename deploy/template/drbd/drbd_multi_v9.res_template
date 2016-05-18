@@ -4,6 +4,9 @@ resource <RESNAME> {
    }
    disk {
       on-io-error	pass_on;
+      c-plan-ahead 5;
+      c-max-rate 10M;
+      c-fill-target 2M;
    }
    volume 0 {
       device	<DEVICE_VO0>;

@@ -39,3 +39,23 @@ sleep 3
 #Rebooting
 sleep 2
 ./drbd/collectLogs.sh ${CLUSTER_FILE} ${BUILD_LOG_DIR}
+
+# By default, the first sync will pretty slow.
+# http://www.drbd.org/en/doc/users-guide-90/s-configure-sync-rate#s-configure-sync-rate-variable
+1). Variable sync rate configuration
+resource <resource> {
+  disk {
+    c-plan-ahead 5;
+    c-max-rate 10M;
+    c-fill-target 2M;
+  }
+}
+
+2). Permanent fixed sync rate configuration
+resource <resource>
+  disk {
+    resync-rate 24M;
+    ...
+  }
+  ...
+}
