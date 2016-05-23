@@ -3,11 +3,11 @@ global {
    dialog-refresh	3;
    usage-count no;
 }
-startup {
-   # wfc-timeout degr-wfc-timeout outdated-wfc-timeout
-   # wait-after-sb;
-   wfc-timeout 100;
-   degr-wfc-timeout 120;
-}
 common {
+  startup {
+     # wfc-timeout degr-wfc-timeout outdated-wfc-timeout
+     # wait-after-sb;
+     wfc-timeout 100;
+     degr-wfc-timeout 120;
+  }
 }
