@@ -160,15 +160,21 @@ then
     crm configure primitive stonith_sbd stonith:external/sbd
 fi
 sleep 2
+#add user hauser to group haclient to let hauser login hawk
+usermod -G haclient hauser
 
 case ${sle_ver} in
   SLE12SP*)
     systemctl enable sbd
     systemctl restart pacemaker
+    systemctl enable hawk
+    systemctl start hawk
     ;;
   SLE11SP*)
     chkconfig sbd on
     service openais restart
+    chkconfig hawk on
+    rchawk start
     ;;
   *)
     echo "Not support. ${sle_ver}"
