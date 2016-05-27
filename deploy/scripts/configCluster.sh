@@ -160,7 +160,7 @@ then
     crm configure primitive stonith_sbd stonith:external/sbd
 fi
 sleep 2
-
+zypper up -y -l -t pattern ha_sles
 case ${sle_ver} in
   SLE12SP*)
     systemctl enable sbd
