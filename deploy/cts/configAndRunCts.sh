@@ -6,8 +6,6 @@
 #########################################################################
 #!/bin/bash
 
-zypper in -y pacemaker-cts
-
 #we can get these args by ENV later
 . cluster_conf
 . cts_conf
@@ -88,9 +86,11 @@ fi
 case ${sle_ver} in
   SLE12SP*)
     systemctl stop pacemaker
+    zypper in -y pacemaker-cts
     ;;
   SLE11SP*)
     service openais stop
+    zypper in -y libpacemaker-devel
     ;;
   *)
     echo "Not support. ${sle_ver}"
