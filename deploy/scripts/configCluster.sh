@@ -177,3 +177,9 @@ case ${sle_ver} in
   *)
     echo "Not support. ${sle_ver}"
 esac
+
+#update password for hacluster
+passwd hacluster > /dev/null 2>&1 <<EOF
+linux
+linux
+EOF
