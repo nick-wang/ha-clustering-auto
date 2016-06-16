@@ -51,13 +51,17 @@ then
     case ${sle_ver} in
       SLE12SP*)
         systemctl disable sbd
+        #systemctl disable pacemaker
         systemctl stop pacemaker
         systemctl start pacemaker
+        zypper in -y pacemaker-cts
         ;;
       SLE11SP*)
         chkconfig sbd off
+        #chkconfig openais off
         service openais stop
         service openais start
+        zypper in -y libpacemaker-devel
         ;;
       *)
         echo "Not support. ${sle_ver}"
@@ -86,16 +90,13 @@ fi
 case ${sle_ver} in
   SLE12SP*)
     systemctl stop pacemaker
-    zypper in -y pacemaker-cts
     ;;
   SLE11SP*)
     service openais stop
-    zypper in -y libpacemaker-devel
     ;;
   *)
     echo "Not support. ${sle_ver}"
 esac
-
 #a=`echo $ip_base|awk -F . {'print $1'}`
 #b=`echo $ip_base|awk -F . {'print $2'}`
 #c=`echo $ip_base|awk -F . {'print $3'}`
