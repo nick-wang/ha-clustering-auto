@@ -50,6 +50,9 @@ repos:
 devices:
   disk_dir: /mnt/vm/sles_ha_auto/
   nic: br0
+  vcpus:
+  memory:
+  disk_size:
 
 iscsi:
   target_ip: 147.2.207.237
@@ -69,7 +72,7 @@ class GET_VM_CONF:
         # refer to 'nodes'
         self.lists = {'repos': 'repo'}
         self.structs = {'iscsi': ('target_ip', 'target_lun'),
-                        'devices': ('disk_dir', 'nic'),
+                        'devices': ('disk_dir', 'nic', 'vcpus', 'memory', 'disk_size'),
                         'resources': ('sle_source', 'ha_source')}
 
     def get_yaml(self, url):

@@ -68,14 +68,17 @@ def installVMs(vm_list=[], res={}, devices={}, autoyast=""):
         else:
             disk = disk_pattern % (default_dev["disk_dir"], vm_name)
 
+        # Should exactly the same with devices in parseYAML.py
+        devices_keys=('disk_dir', 'nic', 'vcpus', 'memory', 'disk_size'),
+
         for key in default_vm_instll.keys():
-            if key == "nic":
-                if vm["nic"] is not None:
-                    vm["nic"] = nic_pattern % vm["nic"]
-                elif devices.has_key("nic") and devices["nic"] is not None:
-                    vm["nic"] = nic_pattern % devices["nic"]
+            if key in devices_keys:
+                if vm[key] is not None:
+                    vm[key] = nic_pattern % vm[key]
+                elif devices.has_key(key) and devices[key] is not None:
+                    vm[key] = nic_pattern % devices[key]
                 else:
-                    vm["nic"] = nic_pattern % default_vm_instll["nic"]
+                    vm[key] = nic_pattern % default_vm_instll[key]
                 continue
 
             if vm[key] is None:
