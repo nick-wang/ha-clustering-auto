@@ -68,7 +68,7 @@ def installVMs(vm_list=[], res={}, devices={}, autoyast=""):
             disk = disk_pattern % (default_dev["disk_dir"], vm_name)
 
         # Should exactly the same with devices in parseYAML.py
-        devices_keys=('disk_dir', 'nic', 'vcpus', 'memory', 'disk_size'),
+        devices_keys=('nic', 'vcpus', 'memory', 'disk_size')
 
         for key in default_vm_instll.keys():
             if key in devices_keys:
