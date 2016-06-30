@@ -18,7 +18,7 @@ def _replaceXML(line, key, value):
         return line
 
 def installVM(VMName, disk, OSType, vcpus, memory, disk_size, source, nic, graphics, autoyast, child_fd):
-    options = "--debug --os-type %s --name %s --vcpus %d --memory %d --disk %s,vda,disk,w,%d,sparse=0, --source %s --nic %s --graphics %s --os-settings=%s" \
+    options = "--debug --os-type %s --name %s --vcpus %d --memory %d --disk %s,vda,disk,w,%d,sparse=0, --source %s --nic bridge=%s,model=virtio --graphics %s --os-settings=%s" \
               %(OSType, VMName, vcpus, memory, disk, disk_size, source, nic, graphics, autoyast)
     cmd = "echo << EOF| vm-install %s%s%s" % (options, "\n\n\n\n\n\n\n", "EOF")
     print "Install command is: %s" % cmd
@@ -31,7 +31,6 @@ def installVM(VMName, disk, OSType, vcpus, memory, disk_size, source, nic, graph
     #print p.wait()
 
 def installVMs(vm_list=[], res={}, devices={}, autoyast=""):
-    nic_pattern = "bridge=%s,model=virtio"
     disk_pattern = "qcow2:%s/sles12sp1-HA-%s.qcow2"
 
     processes = {}
@@ -74,11 +73,11 @@ def installVMs(vm_list=[], res={}, devices={}, autoyast=""):
         for key in default_vm_instll.keys():
             if key in devices_keys:
                 if vm[key] is not None:
-                    vm[key] = nic_pattern % vm[key]
+                    vm[key] = vm[key]
                 elif devices.has_key(key) and devices[key] is not None:
-                    vm[key] = nic_pattern % devices[key]
+                    vm[key] = devices[key]
                 else:
-                    vm[key] = nic_pattern % default_vm_instll[key]
+                    vm[key] = default_vm_instll[key]
                 continue
 
             if vm[key] is None:
