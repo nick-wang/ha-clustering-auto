@@ -20,6 +20,7 @@ def _replaceXML(line, key, value):
 def installVM(VMName, disk, OSType, vcpus, memory, disk_size, source, nic, graphics, autoyast, child_fd):
     options = "--debug --os-type %s --name %s --vcpus %d --memory %d --disk %s,vda,disk,w,%d,sparse=0, --source %s --nic bridge=%s,model=virtio --graphics %s --os-settings=%s" \
               %(OSType, VMName, vcpus, memory, disk, disk_size, source, nic, graphics, autoyast)
+    # TODO: Detect host OS, using virt-install in SLE12 or later
     cmd = "echo << EOF| vm-install %s%s%s" % (options, "\n\n\n\n\n\n\n", "EOF")
     print "Install command is: %s" % cmd
     os.system(cmd)
