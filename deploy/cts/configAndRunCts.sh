@@ -80,6 +80,8 @@ new_node_list=`echo ${new_node_list//','/' '}`
 #"Value '/var/lib/pacemaker/notify.sh' for cluster option 'notification-agent' is invalid.  Defaulting to /dev/null"
 echo "exit 0" > /var/lib/pacemaker/notify.sh
 chmod +x /var/lib/pacemaker/notify.sh
+#update cprpsync and pacemaker
+zypper up -y pacemaker libpacemaker-devel libpacemaker3 pacemaker-cli pacemaker-cts pacemaker-remote corosync libcorosync-devel libcorosync4
 
 isMaster "$HOSTNAME_NODE1"
 if [ $? -ne 0 ]
@@ -102,6 +104,6 @@ esac
 #c=`echo $ip_base|awk -F . {'print $3'}`
 #ip_base="$a.$b.$c.220"
 #echo "/usr/share/pacemaker/tests/cts/CTSlab.py --nodes '$new_node_list' --outputfile pacemaker.log --populate-resources --test-ip-base $ip_base --stonith 1 --stack corosync --stonith-type $stonith_type $stonith_args"  > run_cts.sh
+echo "/usr/share/pacemaker/tests/cts/CTSlab.py --nodes '$new_node_list' --outputfile pacemaker.log --clobber-cib --stonith 1 --once --stack corosync --stonith-type $stonith_type $stonith_args 1"
 echo "/usr/share/pacemaker/tests/cts/CTSlab.py --nodes '$new_node_list' --outputfile pacemaker.log --clobber-cib --stonith 1 --once --stack corosync --stonith-type $stonith_type $stonith_args 1"  > run_cts.sh
 bash run_cts.sh
-#/usr/share/pacemaker/tests/cts/CTSlab.py --nodes '"'$new_node_list'"' --outputfile pacemaker.log --populate-resources --test-ip-base $ip_base --stonith 1 --stack corosync --stonith-type $stonith_type $stonith_args
