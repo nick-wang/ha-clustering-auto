@@ -137,7 +137,10 @@ esac
 #Enable automatic login to iscsi server
 iscsiadm -m node -I default -T $TARGET_LUN -p $TARGET_IP \
          --op=update --name=node.conn[0].startup --value=automatic
-
+if [ $? -ne 0 ]; then
+	echo "failed to login $TARGET_LUN on $TARGET_IP"
+	exit -1
+fi
 #login other target for shared storage
 if [ $NUM_SHARED_TARGETS -gt 1 ];then
     for i in `seq 2 $NUM_SHARED_TARGETS`; do
