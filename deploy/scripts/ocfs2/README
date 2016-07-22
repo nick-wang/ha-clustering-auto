@@ -1,0 +1,22 @@
+OCFS2 CTS scripts
+=================
+
+1. prepareInHost.sh
+
+  o Make passwordless SSH for ocfs2 test uers among nodes
+
+2. cpCtsFilesToGuest.sh
+
+  o Copy and invoke scripts to guest
+
+3. runInGuest.sh
+
+  o Prepare test environment and start running test
+
+4. runCts.sh
+
+  o Run OCFS2 CTS
+
+5. sshkeys
+
+  o RSA keys for #1
