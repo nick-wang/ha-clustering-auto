@@ -1,8 +1,8 @@
 #!/bin/bash
 #
-# runInGuest.sh
+# prepTestEnv.sh
 # 
-# Prepare and run ocfs2 CTS	
+# Prepare Env for running ocfs2 test
 
 master_node="ocfs2cts1"
 KERNEL_PATH="/mnt/vm/eric"
@@ -26,6 +26,11 @@ f_log()
 
 # __MAIN__
 
+# 0. Preparation
+
+# save log messages after reboot
+sed -i '/#Storage/a Storage=persistent' /etc/systemd/journald.conf
+
 # 1. My own repo for ocfs2-test has been added, now refresh and install
 # ocfs2-test package
 f_info "Install ocfs2-test packages"
@@ -36,7 +41,7 @@ zypper --non-interactive refresh
 f_log "zypper --non-interactive install  ocfs2-test ocfs2-test-debuginfo ocfs2-test-debugsource"
 zypper --non-interactive install  ocfs2-test ocfs2-test-debuginfo ocfs2-test-debugsource 
 
-# it's time to complete the tricky
+# it's time to complete the tricky started in sshTestUsr.sh
 f_log "chown -R ocfs2test:users /home/ocfs2test/.ssh"
 chown -R ocfs2test:users /home/ocfs2test/.ssh
 
@@ -75,7 +80,7 @@ sed -i '/%wheel ALL=(ALL) NOPASSWD: ALL/a ocfs2test ALL=(ALL) NOPASSWD: ALL' /et
 
 # 4. Create mount point
 f_info "Create mount point"
-mkdir /mnt/ocfs2
+mkdir -p /mnt/ocfs2
 chmod 777 /mnt/ocfs2
 
 # 5. Prepare kernel-source used by ocfs2 CTS
@@ -86,21 +91,3 @@ chown -R ocfs2test:users /usr/local/ocfs2-test/tmp/${KERNEL_SOURCE}
 
 # 6. blkid, refer to "man blkid"
 sed -i '/^EVALUATE=udev/ s/$/,scan/' /etc/blkid.conf
-
-# 7. Run CTS
-
-# This script should be run by ocfs2test user
-
-f_log "chown ocfs2test:users /var/lib/ocfs2test/runCts.sh"
-chown ocfs2test:users /var/lib/ocfs2test/runCts.sh
-
-sudo -u ocfs2test bash << EOF
-source ~/.bash_profile
-
-if [ x"`hostname`" == x"ocfs2cts1" ]
-then 
-	echo "/var/lib/ocfs2test/runCts.sh ..."
-	/var/lib/ocfs2test/runCts.sh
-fi
-
-EOF
