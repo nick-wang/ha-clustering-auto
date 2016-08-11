@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# runCts.sh   <CTS_CONF>
+# runCts.sh   <CTS_CONF> <NODE_LIST>
 # 
 # Run ocfs2 CTS	
 
@@ -8,7 +8,7 @@ source ~/.bash_profile
 
 f_usage()
 { 
-	echo "Usage: `basename ${0}` <CTS_CONF>" 
+	echo "Usage: `basename ${0}` <CTS_CONF> <NODE_LIST>"
 	exit 1
 }
 
@@ -32,12 +32,13 @@ f_umount()
 	fi
 }
 
-if [ $# -ne "1" ];then
+if [ $# -lt "2" ];then
 	f_usage
 	exit 1
 fi
 
 CTS_CONF="$1"
+NODE_LIST="$2"
 
 f_info "Dump configuration file for ocfs2 test:"
 cat ${CTS_CONF}	
@@ -90,9 +91,9 @@ if [ X"$TESTMODE" == X"multiple" -o X"$TESTMODE" == X"all" ];then
 	echo -e "\n\n\n"
 	f_info "Start multiple nodes testing..."
 
-	f_log "multiple_run.sh -k /usr/local/ocfs2-test/tmp/linux-2.6.39.tar.gz -n ocfs2cts1,ocfs2cts2 -d ${SHARED_DISK} -b ${BLOCKSIZE} -c ${CLUSTERSIZE}  -s ${CLUSTER_STACK} -C ${CLUSTER_NAME} -t ${MULTIPLE_CASES}  /mnt/ocfs2"
+	f_log "multiple_run.sh -k /usr/local/ocfs2-test/tmp/linux-2.6.39.tar.gz -n ${NODE_LIST} -d ${SHARED_DISK} -b ${BLOCKSIZE} -c ${CLUSTERSIZE}  -s ${CLUSTER_STACK} -C ${CLUSTER_NAME} -t ${MULTIPLE_CASES}  /mnt/ocfs2"
 
-	multiple_run.sh -k /usr/local/ocfs2-test/tmp/linux-2.6.39.tar.gz -n ocfs2cts1,ocfs2cts2 -d ${SHARED_DISK} -b ${BLOCKSIZE} -c ${CLUSTERSIZE} -t ${MULTIPLE_CASES}  -s ${CLUSTER_STACK} -C ${CLUSTER_NAME}  /mnt/ocfs2 &
+	multiple_run.sh -k /usr/local/ocfs2-test/tmp/linux-2.6.39.tar.gz -n ${NODE_LIST} -d ${SHARED_DISK} -b ${BLOCKSIZE} -c ${CLUSTERSIZE} -t ${MULTIPLE_CASES}  -s ${CLUSTER_STACK} -C ${CLUSTER_NAME}  /mnt/ocfs2 &
 
 	wait
 	f_info "DONE: multiple nodes testing"

@@ -1,15 +1,15 @@
 #!/bin/bash
 #
 # prepTestEnv.sh <MASTER_NODE>
-# 
+#
 # Prepare Env for running ocfs2 test
 
 KERNEL_PATH="/mnt/vm/eric"
 KERNEL_SOURCE="linux-2.6.39.tar.gz"
 
 f_usage()
-{ 
-	echo "Usage: `basename ${0}`" 
+{
+	echo "Usage: `basename ${0}` <MASTER_NODE>"
 	exit 1
 }
 
@@ -23,8 +23,8 @@ f_log()
 	echo [LOG]@{`hostname`} $*
 }
 
-if [ $# -lt 2 ];then
-	echo "Usage: `basename ${0}` <MASTER_NODE>"
+if [ $# -lt 1 ];then
+	f_usage
 	exit 1
 fi
 
@@ -46,7 +46,7 @@ f_log "zypper --non-interactive refresh"
 zypper --non-interactive refresh
 
 f_log "zypper --non-interactive install  ocfs2-test ocfs2-test-debuginfo ocfs2-test-debugsource"
-zypper --non-interactive install  ocfs2-test ocfs2-test-debuginfo ocfs2-test-debugsource 
+zypper --non-interactive install  ocfs2-test ocfs2-test-debuginfo ocfs2-test-debugsource
 
 # it's time to complete the tricky started in sshTestUsr.sh
 f_log "chown -R ocfs2test:users /home/ocfs2test/.ssh"

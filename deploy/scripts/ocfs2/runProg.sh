@@ -38,8 +38,19 @@ if [ -n "$THIS_NODE" ];then
 	echo "ssh root@${THIS_NODE} chown ocfs2test:users ${PROGRAM}"
 	ssh root@${THIS_NODE} chown ocfs2test:users ${PROGRAM}
 
-	echo "ssh root@${THIS_NODE} sudo -u ocfs2test ${PROGRAM} ${CTS_CONF}"
-	ssh root@${THIS_NODE} sudo -u ocfs2test ${PROGRAM} ${CTS_CONF}
+	NODES="`cat $CLUSTER_CONF |grep NODES |cut -d "=" -f 2`"
+	for id in `seq ${NODES}`
+	do
+		name="`cat $CLUSTER_CONF |grep HOSTNAME_NODE${id} |cut -d "=" -f 2`"
+		if [ ${id} == "1" ];then
+			NODE_LIST="${name}"
+		else
+			NODE_LIST="${NODE_LIST},${name}"
+		fi
+	done
+
+	echo "ssh root@${THIS_NODE} sudo -u ocfs2test ${PROGRAM} ${CTS_CONF} ${NODE_LIST}"
+	ssh root@${THIS_NODE} sudo -u ocfs2test ${PROGRAM} ${CTS_CONF} ${NODE_LIST}
 else
 	MASTER_NODE="`cat $CLUSTER_CONF |grep HOSTNAME_NODE1 |cut -d "=" -f 2`"
 
