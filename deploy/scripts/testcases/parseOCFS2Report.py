@@ -72,25 +72,25 @@ def parseSingleLog(testreport_dir, cluster_env):
 
     #Define testcases
     #testcases = [(TestcaseName, TestcaseClass, TestcaseFunction)]
-    cases_def = [("create_and_open", "create_and_open.SingleNode.ocfs2test", get_result),
-                 ("direct-aio", "directaio.SingleNode.ocfs2test", get_result),
-                 ("fill_verify_holes", "fillverifyholes.SingleNode.ocfs2test", get_result),
-                 ("rename_write_race", "renamewriterace.SingleNode.ocfs2test", get_result),
-                 ("aio-stress", "aiostress.SingleNode.ocfs2test", get_result),
-                 ("check_file_size_limits", "filesizelimits.SingleNode.ocfs2test", get_result),
-                 ("mmaptruncate", "mmaptruncate.SingleNode.ocfs2test", get_result),
-                 ("buildkernel", "buildkernel.SingleNode.ocfs2test", get_result),
-                 ("splice", "splice.SingleNode.ocfs2test", get_result),
-                 ("sendfile", "sendfile.SingleNode.ocfs2test", get_result),
-                 ("mmap", "mmap.SingleNode.ocfs2test", get_result),
-                 ("reserve_space", "reserve_space.SingleNode.ocfs2test", get_result),
-                 ("inline_data_test", "inline.SingleNode.ocfs2test", get_result),
-                 ("xattr_test", "xattr.SingleNode.ocfs2test", get_result),
-                 ("reflink_test", "reflink.SingleNode.ocfs2test", get_result),
-                 ("mkfs_test", "mkfs.SingleNode.ocfs2test", get_result),
-                 ("tunefs_test", "tunefs.SingleNode.ocfs2test", get_result),
-                 ("backup_super_test", "backup_super.SingleNode.ocfs2test", get_result),
-                 ("filecheck", "filecheck.SingleNode.ocfs2test", get_result)]
+    cases_def = [("create_and_open", "SingleNode.create_and_open", get_result),
+                 ("direct-aio", "SingleNode.directaio", get_result),
+                 ("fill_verify_holes", "SingleNode.fillverifyholes", get_result),
+                 ("rename_write_race", "SingleNode.renamewriterace", get_result),
+                 ("aio-stress", "SingleNode.aiostress", get_result),
+                 ("check_file_size_limits", "SingleNode.filesizelimits", get_result),
+                 ("mmaptruncate", "SingleNode.mmaptruncate", get_result),
+                 ("buildkernel", "SingleNode.buildkernel", get_result),
+                 ("splice", "SingleNode.splice", get_result),
+                 ("sendfile", "SingleNode.sendfile", get_result),
+                 ("mmap", "SingleNode.mmap", get_result),
+                 ("reserve_space", "SingleNode.reserve_space", get_result),
+                 ("inline_data_test", "SingleNode.inline", get_result),
+                 ("xattr_test", "SingleNode.xattr", get_result),
+                 ("reflink_test", "SingleNode.reflink", get_result),
+                 ("mkfs_test", "SingleNode.mkfs", get_result),
+                 ("tunefs_test", "SingleNode.tunefs", get_result),
+                 ("backup_super_test", "SingleNode.backup_super", get_result),
+                 ("filecheck", "SingleNode.filecheck", get_result)]
 
     parseLog(TestSuiteName, JunitXML, cases_def, logfile, cluster_env)
 
@@ -104,16 +104,16 @@ def parseMultipleLog(testreport_dir, cluster_env):
 
     #Define testcases
     #testcases = [(TestcaseName, TestcaseClass, TestcaseFunction)]
-    cases_def = [("xattr-test", "xattr.MultipleNodes.ocfs2test", get_result),
-                 ("inline-test", "inline.MultipleNodes.ocfs2test", get_result),
-                 ("reflink-test", "reflink.MultipleNodes.ocfs2test", get_result),
-                 ("write_append_truncate", "write_append_truncate.MultipleNodes.ocfs2test", get_result),
-                 ("multi_mmap", "multi_mmap.MultipleNodes.ocfs2test", get_result),
-                 ("create_racer", "create_racer.MultipleNodes.ocfs2test", get_result),
-                 ("flock_unit", "flock_unit.MultipleNodes.ocfs2test", get_result),
-                 ("cross_delete", "cross_delete.MultipleNodes.ocfs2test", get_result),
-                 ("open_delete", "open_delete.MultipleNodes.ocfs2test", get_result),
-                 ("lvb_torture", "lvb_torture.MultipleNodes.ocfs2test", get_result)]
+    cases_def = [("xattr-test", "MultipleNodes.xattr", get_result),
+                 ("inline-test", "MultipleNodes.inline", get_result),
+                 ("reflink-test", "MultipleNodes.reflink", get_result),
+                 ("write_append_truncate", "MultipleNodes.write_append_truncate", get_result),
+                 ("multi_mmap", "MultipleNodes.multi_mmap", get_result),
+                 ("create_racer", "MultipleNodes.create_racer", get_result),
+                 ("flock_unit", "MultipleNodes.flock_unit", get_result),
+                 ("cross_delete", "MultipleNodes.cross_delete", get_result),
+                 ("open_delete", "MultipleNodes.open_delete", get_result),
+                 ("lvb_torture", "MultipleNodes.lvb_torture", get_result)]
     parseLog(TestSuiteName, JunitXML, cases_def, logfile, cluster_env)
 
 
