@@ -46,6 +46,9 @@ f_log "chown -R ocfs2test:users /home/ocfs2test/.ssh"
 chown -R ocfs2test:users /home/ocfs2test/.ssh
 
 # 2. Configure dlm RA
+f_info "Start pacemaker..."
+systemctl start pacemaker.service
+
 f_info "Configure RAs"
 if [ x"`hostname`" == x"$master_node" ];then
 	f_log "\
