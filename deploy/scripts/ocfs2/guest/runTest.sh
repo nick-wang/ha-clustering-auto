@@ -24,12 +24,11 @@ f_log()
 
 f_umount()
 {
-	dev=`mount -t ocfs2`
-
-	if [ -n "$dev" ];then
-		f_log "sudo umount /mnt/ocfs2"
-		sudo umount /mnt/ocfs2
-	fi
+	for node in `echo ${NODE_LIST} | sed "s:,: :g"`
+	do
+		echo "ssh ${node} sudo umount /mnt/ocfs2 > /dev/null 2>&1"
+		ssh ${node} "sudo umount /mnt/ocfs2 > /dev/null 2>&1"
+	done
 }
 
 if [ $# -lt "2" ];then
@@ -82,9 +81,9 @@ if [ X"$TESTMODE" == X"single" -o X"$TESTMODE" == X"all" ];then
 	f_info "DONE: single node testing"
 fi
 
+sleep 3
 f_umount
-
-sleep 5
+sleep 3
 
 
 if [ X"$TESTMODE" == X"multiple" -o X"$TESTMODE" == X"all" ];then
