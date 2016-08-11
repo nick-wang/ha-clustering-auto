@@ -41,11 +41,13 @@ if [ -n "$THIS_NODE" ];then
 	echo "ssh root@${THIS_NODE} sudo -u ocfs2test ${PROGRAM} ${CTS_CONF}"
 	ssh root@${THIS_NODE} sudo -u ocfs2test ${PROGRAM} ${CTS_CONF}
 else
+	MASTER_NODE="`cat $CLUSTER_CONF |grep HOSTNAME_NODE1 |cut -d "=" -f 2`"
+
 	for ip in `cat $CLUSTER_CONF |grep IP_NODE |cut -d "=" -f 2`
 	do
 	{
-		echo "ssh root@${ip} ${PROGRAM}"
-		ssh root@${ip} ${PROGRAM}	
+		echo "ssh root@${ip} ${PROGRAM} ${MASTER_NODE}"
+		ssh root@${ip} ${PROGRAM} ${MASTER_NODE}
 	} &
 	done
 	wait

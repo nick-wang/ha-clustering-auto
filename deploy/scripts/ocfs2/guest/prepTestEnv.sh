@@ -1,10 +1,9 @@
 #!/bin/bash
 #
-# prepTestEnv.sh
+# prepTestEnv.sh <MASTER_NODE>
 # 
 # Prepare Env for running ocfs2 test
 
-master_node="ocfs2cts1"
 KERNEL_PATH="/mnt/vm/eric"
 KERNEL_SOURCE="linux-2.6.39.tar.gz"
 
@@ -23,6 +22,14 @@ f_log()
 {
 	echo [LOG]@{`hostname`} $*
 }
+
+if [ $# -lt 2 ];then
+	echo "Usage: `basename ${0}` <MASTER_NODE>"
+	exit 1
+fi
+
+# some commands just need to run on any one of the nodes
+MASTER_NODE="$1"
 
 # __MAIN__
 
@@ -50,7 +57,7 @@ f_info "Start pacemaker..."
 systemctl start pacemaker.service
 
 f_info "Configure RAs"
-if [ x"`hostname`" == x"$master_node" ];then
+if [ x"`hostname`" == x"$MASTER_NODE" ];then
 	f_log "\
 	crm configure primitive dlm ocf:pacemaker:controld \
 		op start interval=0 timeout=90 \
