@@ -100,4 +100,4 @@ scp root@147.2.207.234:${KERNEL_PATH}/${KERNEL_SOURCE} /usr/local/ocfs2-test/tmp
 chown -R ocfs2test:users /usr/local/ocfs2-test/tmp/${KERNEL_SOURCE}
 
 # 6. blkid, refer to "man blkid"
-sed -i '/^EVALUATE=udev/ s/$/,scan/' /etc/blkid.conf
+sed -i '/^EVALUATE=udev$/ s/$/,scan/' /etc/blkid.conf
