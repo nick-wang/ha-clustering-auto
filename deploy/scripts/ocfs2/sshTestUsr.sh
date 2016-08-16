@@ -6,8 +6,8 @@
 
 f_usage()
 {
-	echo "`basename ${0}` <CLUSTER_CONF_IN_HOST>"
-	echo "	CLUSTER_CONF_IN_HOST:	cluster configuration"
+	echo "`basename ${0}` <CLUSTER_CONF>"
+	echo "	CLUSTER_CONF:	cluster configuration"
 	exit 1
 }
 
