@@ -136,7 +136,7 @@ esac
 
 #Enable automatic login to iscsi server
 iscsiadm -m node -I default -T $TARGET_LUN -p $TARGET_IP \
-         --op=update --name=node.conn[0].startup --value=automatic
+         --op=update --name=node.startup --value=automatic
 if [ $? -ne 0 ]; then
 	echo "failed to login $TARGET_LUN on $TARGET_IP"
 	exit -1
@@ -153,7 +153,7 @@ if [ $NUM_SHARED_TARGETS -gt 1 ];then
         iscsiadm -m node -T $tgt_lun -p $tgt_ip -l
         #Enable automatic login to iscsi server
         iscsiadm -m node -I default -T $tgt_lun -p $tgt_ip \
-             --op=update --name=node.conn[0].startup --value=automatic
+             --op=update --name=node.startup --value=automatic
     done
 fi
 #config stonith resource and restart pacemaker
