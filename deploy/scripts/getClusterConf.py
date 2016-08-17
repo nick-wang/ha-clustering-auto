@@ -157,7 +157,9 @@ def get_cluster_conf(sleep_time="0", configuration="../cluster_conf",
         vm_info_list = get_ip_list_by_mac(vm_names, ip_range)
 
     i = 1
-    for vm in vm_info_list.keys():
+    vms = vm_info_list.keys()
+    vms.sort()
+    for vm in vms:
         contents += "HOSTNAME_NODE%d=%s\n" % (i, vm)
         contents += "IP_NODE%d=%s\n" % (i, vm_info_list[vm][0])
         i += 1
