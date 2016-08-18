@@ -102,6 +102,6 @@ w
 done
 
 nextPhase "Finished partitioning ${disks[@]}" | tee -a ${DRBD_LOGFILE}
-logit fdisk -l ${disks[@]} | tee -a ${DRBD_LOGFILE}
+infoRun fdisk -l ${disks[@]} | tee -a ${DRBD_LOGFILE}
 
 partprobe

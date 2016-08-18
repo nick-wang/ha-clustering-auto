@@ -1,5 +1,8 @@
 #!/bin/bash
 
+info_level=1
+debug_level=2
+
 function isMaster()
 {
     # Usage:
@@ -38,12 +41,60 @@ function nconvert()
     echo -n $1 | tr "123456789" "bcdefghij"
 }
 
-function logit()
+function _logRun()
 {
     # Usage:
-    #     logit ls -l
-    #     logit pwd >> output-file
+    #     Should not call it directly!!
     echo -e "== [`hostname`:${USER}@`pwd`]\nCommand: ${*}\nStart  : [`date`] \n`${*} 2>&1`\nStop   : [`date`]\n";
+}
+
+function infoRun()
+{
+    # Usage:
+    #     infoRun ls -l
+    #   To show log, need log_level great equal ${info_level}
+    if [ ${log_level:-0} -ge ${info_level} ]
+    then
+        _logRun ${*}
+    else
+        ${*} >/dev/null 2>&1
+    fi
+}
+
+function debugRun()
+{
+    # Usage:
+    #     infoRun ls -l
+    #   To show log, need log_level great equal ${debug_level}
+    if [ ${log_level:-0} -ge ${debug_level} ]
+    then
+        _logRun ${*}
+    else
+        ${*} >/dev/null 2>&1
+    fi
+}
+
+function _log()
+{
+    # Usage:
+    #     Should not call it directly!!
+    echo -e "${1}:  ${*}"
+}
+
+function infoLog()
+{
+    if [ ${log_level:-0} -ge ${info_level} ]
+    then
+        _log "INFO" "${*}"
+    fi
+}
+
+function debugLog()
+{
+    if [ ${log_level:-0} -ge ${debug_level} ]
+    then
+        _log "DEBUG" "${*}"
+    fi
 }
 
 function getEnv()
