@@ -2,53 +2,28 @@ This project is used to deploy a cluster, with some cases such as pacemaker-cts,
 clustermd and so on. It is mainly writen by python and shell, and there something
 you should notice to run this project.
 
-Q. How to deploy a host server?
+Overview of the projects. The project has the following directories:
 
-  1. Configure ntp-client: 
-     server address: "clock.via.net"
-  2. Install package "java".
-  3. Add to jenkins server slave.
-  4. Install package "zypper in python-PyYAML".
-  5. Copy running scripts to host (Or maybe update via rpm?git).
-     Copy ssh private key to host, mode 0600
-  6. Install package "nmap"
-  7. Modify /etc/ssh/ssh_config, add one line:
-     StrictHostKeyChecking no
-  8. Create a directory for storing vm images.
-     Like /mnt/vm/xxxxx
-  9. Modify libvirtd to support TCP.
-  10. Add a virbr0 for NAT.
-  11. Install python library junit-xml.
-      For sles, need python-setuptools.
-  12. Install python library python-psutil.
-      For cleanVM, get cpu/mem usage.
-
-A.To make the cmd 
-"virsh -c qemu+tcp://host_ip/system", we have to modify 
-
-listen_tls = 0
-listen_tcp = 1
-tcp_port = "16509"
-listen_addr = "0.0.0.0"
-auth_tcp = "none"
-
-Overview of the project. The project has the following directories:
-
+Projects:
 cleanVM/  deploy/  examples/  jenkins-monitor/
 
-The cleanVM directory has scripts to clean vms and utils to get cpu usage, memory usage
-ans disk usage. 
-The deploy directory is the main part of this project, we deploy cluster
-and run testcases based on the directory.
+=========================================================================
+cleanVM/ : scripts to clean vms and utils to get cpu usage, memory and disk usage.
+
+deploy/  : the main part of this project, we deploy cluster and run testcases based
+           on the directory.
   -conf: the vm configuration files, and autoyast files.
   -cts: the scripts to configure and run pacemaker-cts
   -scripts: the scripts to install vms, configure cluster and so on.
-  -ssh_keys: the ssh keys to make host login vm without password, and interaction between 
-   vms without password
+  -ssh_keys: the ssh keys to make host login vm without password, and interaction
+             between vms without password
   -templete: stores template of configuration for the cluster
 
-The jenkins-monitor directory stores scripts and monitor a url, and download the newest ISO
-to local server.
+  This is just for the project configuration and description, we run it in jenkins so
+  far, you need some configurations in jenkins, for configure example of jenkins,
+  you can visit http://147.2.207.237:8080
+  If you need access of this server, please contact bliu@suse.com or nwang@suse.com
 
-This is just for the project configuration and description, we run it in jenkins so far, you need some
-confiration in jenkins, for the configuration of jenkins, you can visit 147.2.207.237:8080.
+jenkins-monitor/: script to  monitor a url, and download the latest ISO to local server.
+
+examples/: Individual scripts.

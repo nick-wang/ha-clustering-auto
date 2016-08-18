@@ -22,9 +22,13 @@ function isMaster()
 
 function getSLEVersion()
 {
+    # Usage:
+    #     INFO=($(echo $(getSLEVersion)))
+    #     INFO[0] is Version
+    #     INFO[1] is PatchLevel
     vals=`cat /etc/SuSE-release|grep -P "PATCHLEVEL|VERSION" | sed "s/ //g"`
     eval ${vals}
-    echo SLE${VERSION}SP${PATCHLEVEL}
+    echo ${VERSION} ${PATCHLEVEL}
 }
 
 function nconvert()

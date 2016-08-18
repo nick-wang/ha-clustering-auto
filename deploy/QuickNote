@@ -19,9 +19,10 @@ Q. How to deploy a host server?
   12. Install python library python-psutil.
       For cleanVM, get cpu/mem usage.
 
-A.To make the cmd 
+A.To make the cmd on the guest
 "virsh -c qemu+tcp://host_ip/system", we have to modify 
 
+On host /etc/libvirt/libvirtd.conf
 listen_tls = 0
 listen_tcp = 1
 tcp_port = "16509"
