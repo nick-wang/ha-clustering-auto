@@ -149,7 +149,6 @@ if [ $NUM_SHARED_TARGETS -gt 1 ];then
         name=`echo "SHARED_TARGET_LUN$i"`
         tgt_lun=`getEnv $name ../cluster_conf`
 
-        iscsiadm -m discovery -t st -p $tgt_ip >/dev/null
         iscsiadm -m node -T $tgt_lun -p $tgt_ip -l
         #Enable automatic login to iscsi server
         iscsiadm -m node -I default -T $tgt_lun -p $tgt_ip \
