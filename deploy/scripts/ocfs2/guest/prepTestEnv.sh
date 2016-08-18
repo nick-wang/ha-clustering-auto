@@ -49,8 +49,8 @@ f_log "zypper --non-interactive install  ocfs2-test ocfs2-test-debuginfo ocfs2-t
 zypper --non-interactive install  ocfs2-test ocfs2-test-debuginfo ocfs2-test-debugsource
 
 # it's time to complete the tricky started in sshTestUsr.sh
-f_log "chown -R ocfs2test:users /home/ocfs2test/.ssh"
-chown -R ocfs2test:users /home/ocfs2test/.ssh
+f_log "chown -R ocfs2test:users /home/ocfs2test/"
+chown -R ocfs2test:users /home/ocfs2test/
 
 # 2. Configure dlm RA
 f_info "Start pacemaker..."
