@@ -108,9 +108,9 @@ echo "modprobe softdog" >> /etc/init.d/boot.local
 #Default disable after installation
 
 #Enable service
-sle_ver=$(getSLEVersion)
-case ${sle_ver} in
-  SLE12SP*)
+sle_ver=($(echo $(getSLEVersion)))
+case ${sle_ver[0]} in
+  12)
     systemctl enable iscsid.socket
     systemctl enable iscsiuio.socket
     systemctl enable iscsi.service
@@ -121,7 +121,7 @@ case ${sle_ver} in
     systemctl start csync2.socket
     systemctl start pacemaker
     ;;
-  SLE11SP*)
+  11)
     chkconfig open-iscsi on
     chkconfig csync2 on
     chkconfig openais on
@@ -131,7 +131,7 @@ case ${sle_ver} in
     service openais start
     ;;
   *)
-    echo "Not support. ${sle_ver}"
+    echo "Not support. SLE${sle_ver[0]} SP${sle_ver[1]}"
 esac
 
 #Enable automatic login to iscsi server
@@ -164,20 +164,20 @@ fi
 sleep 2
 zypper up -y -l -t pattern ha_sles
 case ${sle_ver} in
-  SLE12SP*)
+  12)
     systemctl enable sbd
     systemctl restart pacemaker
     systemctl enable hawk
     systemctl start hawk
     ;;
-  SLE11SP*)
+  11)
     chkconfig sbd on
     service openais restart
     chkconfig hawk on
     rchawk start
     ;;
   *)
-    echo "Not support. ${sle_ver}"
+    echo "Not support. SLE${sle_ver[0]} SP${sle_ver[1]}"
 esac
 
 #update password for hacluster
