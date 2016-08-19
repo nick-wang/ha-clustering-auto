@@ -171,7 +171,7 @@ function runOnAllNodes()
     for ip in `cat ${CLUSTER_CONF} |grep IP_NODE |cut -d "=" -f 2`
     do
     {
-        ssh root@${ip} "${COMMANDS}" 2>/dev/null
+        ssh root@${ip} "${COMMANDS}"
     } &
     done
     wait
