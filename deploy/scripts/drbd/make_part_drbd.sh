@@ -2,8 +2,9 @@
 
 function usage()
 {
-  echo "make_part_drbd.sh <HOW_MANY_DISKS_TO_PATITION>"
-  echo "<HOW_MANY_DISKS_TO_PARTITION> should equal <HOW_MANY_DISKS_TO_ADD> of addVirioDisk.sh"
+  echo "make_part_drbd.sh <WHICH_DISK_TO_PARTITION>"
+  echo "<WHICH_DISK_TO_PARTITION> should a number like 1, 2, 3, etc..."
+  echo "Should call this script multiple times for multiple disks."
 }
 
 if [ $# -ne 1 ]
@@ -18,21 +19,14 @@ fi
 
 nextPhase "Launch $0"
 
-# How many disks need to partition
+# which disk need to partition
 NUM=$1
 
 # Convert to disk name via numbers
-i=1
-while [ $i -le $NUM ]
-do
-  temp=$(nconvert ${i})
-  disks[${i}]=/dev/vd${temp}
-  i=$((i+1))
-done
+temp=$(nconvert ${NUM})
+disk=/dev/vd${temp}
 
 #Partition
-for disk in ${disks[@]}
-do
 # Plan to create 3 resources.
 # multi-res:
 #   drbd0 - /dev/vdb1,
@@ -99,9 +93,8 @@ n
 
 w
 "|fdisk ${disk}
-done
 
-nextPhase "Finished partitioning ${disks[@]}" | tee -a ${DRBD_LOGFILE}
-infoRun fdisk -l ${disks[@]} | tee -a ${DRBD_LOGFILE}
+nextPhase "Finished partitioning ${disk}" | tee -a ${DRBD_LOGFILE}
+infoRun fdisk -l ${disk} | tee -a ${DRBD_LOGFILE}
 
 partprobe
