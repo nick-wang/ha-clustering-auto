@@ -33,6 +33,7 @@ do
 	echo -n "`basename ${0}` ${1} : configure passwordless ssh for ${O2TESTOR} ....... "
 	ssh root@${ip} "mkdir -p /home/${O2TESTOR}/.ssh"
 	scp sshkeys/* root@${ip}:/home/${O2TESTOR}/.ssh/
+	ssh root@${ip} "chmod 0600 /home/${O2TESTOR}/.ssh/id_rsa"
 	cat sshkeys/id_rsa.pub | ssh root@${ip} "cat >> /home/${O2TESTOR}/.ssh/authorized_keys"
 	if [ "$?" == "0" ];then
 		echo "[OK]";
