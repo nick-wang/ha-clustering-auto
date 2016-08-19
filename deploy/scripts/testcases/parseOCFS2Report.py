@@ -78,7 +78,7 @@ def parseSingleLog(testreport_dir, cluster_env):
                  ("rename_write_race", "SingleNode.renamewriterace", get_result),
                  ("aio-stress", "SingleNode.aiostress", get_result),
                  ("check_file_size_limits", "SingleNode.filesizelimits", get_result),
-                 ("mmaptruncate", "SingleNode.mmaptruncate", get_result),
+                 ("mmap_truncate", "SingleNode.mmaptruncate", get_result),
                  ("buildkernel", "SingleNode.buildkernel", get_result),
                  ("splice", "SingleNode.splice", get_result),
                  ("sendfile", "SingleNode.sendfile", get_result),
