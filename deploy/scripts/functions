@@ -131,3 +131,66 @@ function nextPhase()
     echo -e "\n***** $(hostname): Mailstone - ${1}"
 
 }
+
+#Replaced by twopence? Needs extra pkgs
+function cpToNodes()
+{
+    if [ $# -ne 3 ]
+    then
+        echo "Error! Need three parameters, cpToNodes <CLUSTER_CONF_IN_HOST> <FILES> <DIR_IN_GUEST>"
+        echo "Error command: cpToNodes $*"
+        return
+    fi
+
+    CLUSTER_CONF=$1
+    FILES=$2
+    DIR=$3
+
+    for ip in `cat ${CLUSTER_CONF} |grep IP_NODE |cut -d "=" -f 2`
+    do
+    {
+        ssh root@${ip} "mkdir -p ${DIR}" 2>/dev/null
+        scp ${FILES} root@${ip}:${DIR} 2>/dev/null
+    } &
+    done
+    wait
+}
+
+function runOnAllNodes()
+{
+    if [ $# -ne 2 ]
+    then
+        echo "Error! Need two parameters, runOnAllNodes <CLUSTER_CONF_IN_HOST> <COMMANDS>"
+        echo "Error command: runOnAllNodes $*"
+        return
+    fi
+
+    CLUSTER_CONF=$1
+    COMMANDS=$2
+
+    for ip in `cat ${CLUSTER_CONF} |grep IP_NODE |cut -d "=" -f 2`
+    do
+    {
+        ssh root@${ip} "${COMMANDS}" 2>/dev/null
+    } &
+    done
+    wait
+}
+
+function runOnMasterNodes()
+{
+    if [ $# -ne 3 ]
+    then
+        echo "Error! Need three parameters, runOnMasterNodes <CLUSTER_CONF_IN_HOST> <NODE> <COMMANDS>"
+        echo "Error command: runOnMasterNodes $*"
+        return
+    fi
+
+    CLUSTER_CONF=$1
+    NODENAME=$2
+    COMMANDS=$3
+
+    num=`cat ${CLUSTER_CONF} |grep ${NODENAME} |cut -d "=" -f 1|sed "s/HOSTNAME_NODE//g"`
+    ip=`cat ${CLUSTER_CONF} |grep IP_NODE${num} |cut -d "=" -f 2`
+    ssh root@${ip} "${COMMANDS}"
+}
