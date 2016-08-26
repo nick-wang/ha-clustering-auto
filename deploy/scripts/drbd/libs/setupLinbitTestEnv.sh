@@ -12,6 +12,26 @@ then
     exit -1
 fi
 
+function patch_the_code()
+{
+    # Patch0: fix-resync-never-connected.KNOWN.patch
+    patches=(fix-resync-never-connected.KNOWN.patch)
+    for c_dir in `ls`
+    do
+        if [ -d ${c_dir} ]
+        then
+            pushd ${c_dir} >/dev/null
+            break
+        fi
+    done
+
+    for patch in ${patches[@]}
+    do
+        debugRun patch -p1 <../${patch}
+    done
+    popd >/dev/null
+}
+
 ins_packages=(exxe fio logscan drbd-test)
 ins_src_packages=(drbd-test)
 
@@ -47,7 +67,8 @@ debugRun vgcreate ${vgname} ${disk}
 infoRun zypper --non-interactive install -t srcpackage ${ins_src_packages[*]}
 
 # Change to working dir
-debugRun cp /usr/src/packages/SOURCES/drbd-test-*.tar.bz2 /drbdtest
+debugRun cp /usr/src/packages/SOURCES/* /drbdtest
 pushd /drbdtest >/dev/null
 debugRun tar xvf drbd-test-*.tar.bz2
+patch_the_code
 popd >/dev/null
