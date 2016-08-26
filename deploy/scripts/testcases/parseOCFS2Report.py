@@ -36,7 +36,7 @@ def get_result(args=None):
         status = "skip"
         message = "%s: not scheduled." % casename
         output = "%s: skip." % casename
-    
+
     result["status"] = status
     result["message"] = message
     result["output"] = output
@@ -63,8 +63,11 @@ def parseLog(TestSuiteName, xmlfile, caseset, logfile, cluster_env):
         ts.to_file(f, [ts])
 
 def parseSingleLog(testreport_dir, cluster_env):
-
     logfile = "%s/single_report.txt" % testreport_dir
+    if not os.path.isfile(logfile):
+        print "WARN: %s not found!" % logfile
+        sys.exit(0)
+
     #Name of Test Suite
     TestSuiteName = "ocfs2 single node test"
     #Name of junit xml file
@@ -97,6 +100,10 @@ def parseSingleLog(testreport_dir, cluster_env):
 def parseMultipleLog(testreport_dir, cluster_env):
 
     logfile = "%s/multiple_report.txt" % testreport_dir
+    if not os.path.isfile(logfile):
+        print "WARN: %s not found!" % logfile
+        sys.exit(0)
+
     #Name of Test Suite
     TestSuiteName = "ocfs2 Multiple nodes test"
     #Name of junit xml file
