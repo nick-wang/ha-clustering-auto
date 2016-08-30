@@ -1,0 +1,91 @@
+#! /usr/bin/python
+
+import os, sys, re
+from junit_xml import TestSuite, TestCase
+
+from library.libJunitXml import assertCase, skipCase
+from library.libReadConf import readClusterConf
+
+def case_function1(args=None):
+    message = ""
+    output = ""
+    result = {"status":"fail", "message":"", "output":"", "skipall": False}
+
+    cluster_env = args[0]
+
+    result["status"]=<status>
+    result["message"]=<message>
+    result["output"]=<output>
+    result["skipall"]=<skipall>
+
+    return result
+
+def case_function2(args=None):
+    message = ""
+    output = ""
+    result = {"status":"fail", "message":"", "output":"", "skipall": False}
+
+    cluster_env = args[0]
+    testcase = args[1]
+    logfile = args[2]
+
+    result["status"]=<status>
+    result["message"]=<message>
+    result["output"]=<output>
+    result["skipall"]=<skipall>
+
+    return result
+
+def case_function3(args=None):
+    message = ""
+    output = ""
+    result = {"status":"fail", "message":"", "output":"", "skipall": False}
+
+    cluster_env = args[0]
+    testcase = args[1]
+    logfile = args[2]
+
+    result["status"]=<status>
+    result["message"]=<message>
+    result["output"]=<output>
+    result["skipall"]=<skipall>
+
+    return result
+
+def Run(conf, xmldir):
+    cluster_env = readClusterConf(conf)
+
+    testcases = []
+    #Name of Test Suite
+    TestSuiteName = "<testsuite name>"
+    #Name of junit xml file
+    JunitXML = "junit-<junit file name>.xml"
+
+    #Define testcases
+    #testcases = [(TestcaseName, TestcaseClass, TestcaseFunction)]
+    #eg.
+    # ('PacemakerService', 'SetupCluster.service', runPackmakerService)
+    #Define function runPackmakerService before using
+    cases_def = [("<case name1>", "<case class1>", <case_function1>),
+                 ("<case name2>", "<case class2>", <case_function2>),
+                 ("<case name3>", "<case class3>", <case_function3>)]
+
+    #Not necessary to modify the lines below!
+    #Unless need to add <skip reason> 
+    skip_flag = False
+    for a_case in cases_def:
+        case = TestCase(a_case[0], a_case[1])
+        testcases.append(case)
+
+        if skip_flag:
+            skipCase(case, "<skip reason>")
+            continue
+        skip_flag = assertCase(case, a_case[2], cluster_env)
+
+    ts = TestSuite(TestSuiteName, testcases)
+
+    with open(xmldir+"/"+JunitXML, "w") as f:
+        ts.to_file(f, [ts])
+
+if __name__ == "__main__":
+    Run(sys.argv[1], sys.argv[2])
