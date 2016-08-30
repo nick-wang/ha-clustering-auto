@@ -9,21 +9,21 @@ from pprint import pprint
 
 TESTCASES = ({"name":"connect", "nodes": 0},
             {"name":"initial-resync", "nodes":0},
-            #{"name":"latency", "nodes":2},
-            #{"name":"misaligned-bio", "nodes":2},
-            #{"name":"switch-primaries", "nodes":2},
-            #{"name":"ref-count", "nodes":2},
-            #{"name":"add-connect-delete", "nodes":2},
-            #{"name":"add-path-multiple-times", "nodes":2},
-            #{"name":"ahead-behind.KNOWN", "nodes":2},
-            #{"name":"resize.KNOWN", "nodes":2},
-            #{"name":"resync-never-connected.KNOWN", "nodes":0},
+            {"name":"latency", "nodes":2},
+            {"name":"misaligned-bio", "nodes":2},
+            {"name":"switch-primaries", "nodes":2},
+            {"name":"ref-count", "nodes":2},
+            {"name":"add-connect-delete", "nodes":2},
+            {"name":"add-path-multiple-times", "nodes":2},
+            {"name":"ahead-behind.KNOWN", "nodes":2},
+            {"name":"resize.KNOWN", "nodes":2},
+            {"name":"resync-never-connected.KNOWN", "nodes":0},
             # "diskless": can't finish resource.skip_initial_sync()
             #            because one of them is diskless...
-            {"name":"diskless", "nodes":0},
+            #{"name":"diskless", "nodes":0},
             #
             # "attach-detach.KNOWN": Attach/detach will hang... 
-            {"name":"attach-detach.KNOWN", "nodes":0},
+            #{"name":"attach-detach.KNOWN", "nodes":0},
             #
             # "multi-path": Need the other path "eth0:1"
             #{"name":"multi-path", "nodes":2},
