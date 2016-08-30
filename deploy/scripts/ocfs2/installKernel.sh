@@ -32,6 +32,12 @@ do
 	echo "ssh root@${ip} zypper --non-interactive install kernel-vanilla"
         ssh root@${ip} "zypper --non-interactive install kernel-vanilla"
 
+	# install kernel debuginfo, debugsource and vanilla source on 1st node, etc.
+	if [ "$id" == "1" ];then
+	    echo "ssh root@${ip} zypper --non-interactive install --detail kernel-vanilla-debuginfo kernel-vanilla-debugsource kernel-source-vanilla kernel-vanilla-devel"
+	    ssh root@${ip} zypper --non-interactive install --detail kernel-vanilla-debuginfo kernel-vanilla-debugsource kernel-source-vanilla kernel-vanilla-devel
+	fi
+
 	# set default kernel
 	echo ssh root@${ip} "grub2-once --list | grep \"with Linux vanilla$\" | xargs -I% grub2-set-default \"%\""
 	ssh root@${ip} "grub2-once --list | grep \"with Linux vanilla$\" | xargs -I% grub2-set-default \"%\""
