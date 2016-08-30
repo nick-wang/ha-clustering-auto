@@ -20,3 +20,6 @@ cpToNodes ${CLUSTER_CONF} "drbd/drbd_functions" "${CLUSTER_DIR}/scripts/drbd/"
 cpToNodes ${CLUSTER_CONF} "drbd/libs/setupLinbitTestEnv.sh" "${CLUSTER_DIR}/scripts/drbd/libs/"
 
 runOnAllNodes ${CLUSTER_CONF} "cd ${CLUSTER_DIR}; ${CLUSTER_DIR}/scripts/drbd/libs/setupLinbitTestEnv.sh 1"
+
+## Notice: comment the command below and put to jenkins scheduler.
+runOnMasterNodes ${CLUSTER_CONF} "HOSTNAME_NODE1" "cd ${CLUSTER_DIR}; ${CLUSTER_DIR}/scripts/drbd/libs/LinbitTest.py"
