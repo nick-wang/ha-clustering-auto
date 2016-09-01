@@ -194,3 +194,52 @@ function runOnMasterNodes()
     ip=`cat ${CLUSTER_CONF} |grep IP_NODE${num} |cut -d "=" -f 2`
     ssh root@${ip} "${COMMANDS}"
 }
+
+function retrieveLogsFromAll()
+{
+    if [ $# -ne 3 ]
+    then
+        echo "Error! Need two parameters, retrieveLogsFromAll <CLUSTER_CONF_IN_HOST> <LOG_DIR_IN_HOST> <LOGS_LIST>"
+        echo "Error command: retrieveLogsFromAll $*"
+        return
+    fi
+
+    CLUSTER_CONF=$1
+    LOG_DIR=$2
+    LOGS_LIST=$3
+
+    for ip in `cat $CLUSTER_CONF |grep IP_NODE |cut -d "=" -f 2`
+    do
+    {
+        for log in ${LOGS_LIST[@]}
+        do
+            rsync -az root@${ip}:${log} ${LOG_DIR}
+        done
+    } &
+    done
+
+    wait
+}
+
+function retrieveLogsFromNode()
+{
+    if [ $# -ne 4 ]
+    then
+        echo "Error! Need two parameters, retrieveLogsFromAll <CLUSTER_CONF_IN_HOST> <NODE> <LOG_DIR_IN_HOST> <LOGS_LIST>"
+        echo "Error command: retrieveLogsFromAll $*"
+        return
+    fi
+
+    CLUSTER_CONF=$1
+    NODENAME=$2
+    LOG_DIR=$3
+    LOGS_LIST=$4
+
+    num=`cat ${CLUSTER_CONF} |grep ${NODENAME} |cut -d "=" -f 1|sed "s/HOSTNAME_NODE//g"`
+    ip=`cat ${CLUSTER_CONF} |grep IP_NODE${num} |cut -d "=" -f 2`
+
+    for log in ${LOGS_LIST[@]}
+    do
+        rsync -az root@${ip}:${log} ${LOG_DIR}
+    done
+}
