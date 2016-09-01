@@ -24,5 +24,3 @@ runOnAllNodes ${CLUSTER_CONF} "cd ${CLUSTER_DIR}; ${CLUSTER_DIR}/scripts/drbd/li
 
 nextPhase "Launch LinbitTest.py on HOSTNAME_NODE1 (${CLUSTER_CONF})"
 runOnMasterNodes ${CLUSTER_CONF} "HOSTNAME_NODE1" "cd ${CLUSTER_DIR}; ${CLUSTER_DIR}/scripts/drbd/libs/LinbitTest.py"
-
-nextPhase "Log collection (${CLUSTER_CONF})"

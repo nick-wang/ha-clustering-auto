@@ -1,9 +1,10 @@
 #!/usr/bin/env python2
 
-import sys, getopt, os
-import re
+import sys, os
+import re, shutil
 import subprocess
 import yaml
+import getopt
 
 from glob import glob
 from pprint import pprint
@@ -262,6 +263,8 @@ def main():
             aTest.run()
 
     generate_yaml_result(testsuite)
+
+    log_collection()
 
 if __name__ == "__main__":
     main()
