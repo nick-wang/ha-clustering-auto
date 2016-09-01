@@ -3,6 +3,7 @@
 import sys, getopt, os
 import re
 import subprocess
+import yaml
 
 from glob import glob
 from pprint import pprint
@@ -116,11 +117,51 @@ def check_res_exist(show=False):
 
     return 1
 
-def log_collection():
-    pass
+def log_collection(srcdir=s_dir, output_dir="/drbdtest/log"):
+    logs=("Linbit-drbd-test.yml", "log", "output.log")
 
-def generate_junit_report():
-    pass
+    if not os.path.exists(output_dir):
+        os.mkdir(output_dir)
+
+    src=find_dir(srcdir)+os.path.sep
+    dst=output_dir+os.path.sep
+
+    for log in logs:
+        if os.path.isdir(src+log):
+            shutil.copytree(src+log, dst+log)
+        else:
+            shutil.copyfile(src+log, dst+log)
+
+def generate_yaml_result(testsuite, output='Linbit-drbd-test.yml'):
+    # Using "testsuite" as data directly, will output like:
+    # - !!python/object:__main__.Testcase
+    #   error: false
+    #   isdirty: false
+    #   message: null
+    #   name: resync-never-connected.KNOWN
+    #   need_clean: true
+    #   nodes: 0
+    #   output: null
+    #   result: PASSED
+    #   srcdir: /drbdtest/drbd-test-*
+    data = {}
+    for test in testsuite:
+        tmp_test = {"error": test.error,
+                    "isdirty": test.isdirty,
+                    "message": test.message,
+                    "nodes": test.nodes,
+                    # No need to include output, all in output.log/*
+                    # "output": test.output,
+                    "result": test.result,
+                   }
+
+        data[test.name] = tmp_test
+
+    # All test should have same srcdir
+    yaml_dir = find_dir(test.srcdir)
+
+    with open(yaml_dir+os.path.sep+output, 'w') as fd:
+        yaml.dump(data, fd, default_flow_style=False)
     
 class Testcase(object):
     ''' Tstcase to run Linbit drbd-test '''
@@ -128,12 +169,10 @@ class Testcase(object):
     number = 0
 
     def __init__(self, name=None, nodes=0, 
-                 srcdir=s_dir, need_clean=True, 
-                 record=True):
+                 srcdir=s_dir, need_clean=True):
         self.name = name
         self.nodes = nodes
         self.need_clean = need_clean
-        self.record = record
         self.srcdir = srcdir
 
         # Is Env clean before running test case?
@@ -183,9 +222,8 @@ class Testcase(object):
         os.chdir(find_dir(self.srcdir))
         if not os.path.exists("output.log"):
             os.mkdir("output.log")
-        fd = open("output.log/%s" % self.name, "w")
-        fd.writelines(self.output)
-        fd.close()
+        with open("output.log/%s" % self.name, "w") as fd:
+            fd.writelines(self.output)
 
     def check_result(self):
         self.record_output()
@@ -223,8 +261,7 @@ def main():
             testsuite.append(aTest)
             aTest.run()
 
-    for test in testsuite:
-        print test.name, test.result, test.isdirty
+    generate_yaml_result(testsuite)
 
 if __name__ == "__main__":
     main()
