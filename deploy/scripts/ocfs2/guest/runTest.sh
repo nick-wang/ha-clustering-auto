@@ -1,13 +1,13 @@
 #!/bin/bash
 #
 # runCts.sh   <CTS_CONF> <NODE_LIST>
-# 
+#
 # Run ocfs2 CTS	
 
 source ~/.bash_profile
 
 f_usage()
-{ 
+{
 	echo "Usage: `basename ${0}` <CTS_CONF> <NODE_LIST>"
 	exit 1
 }

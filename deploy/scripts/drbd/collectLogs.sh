@@ -33,7 +33,7 @@ do
   scp root@${ip}:/var/log/messages ${LOG_DIR}/${ip}_drbd
   scp root@${ip}:~/drbdlog/* ${LOG_DIR}/${ip}_drbd
   scp root@${ip}:/tmp/drbd-log-* ${LOG_DIR}/${ip}_drbd
-  
+
 } &
 done
 

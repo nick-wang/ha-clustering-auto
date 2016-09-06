@@ -24,7 +24,7 @@ TESTCASES = ({"name":"connect", "nodes": 0},
             #            because one of them is diskless...
             #{"name":"diskless", "nodes":0},
             #
-            # "attach-detach.KNOWN": Attach/detach will hang... 
+            # "attach-detach.KNOWN": Attach/detach will hang...
             #{"name":"attach-detach.KNOWN", "nodes":0},
             #
             # "multi-path": Need the other path "eth0:1"
@@ -40,7 +40,7 @@ TESTCASES = ({"name":"connect", "nodes": 0},
             # "tl_restart-stress.KNOWN": enable an already enabled connection
             # Should add disks in the same time and connect only once
             #{"name":"tl_restart-stress.KNOWN", "nodes":2},
-            ) 
+            )
 
 error_logs = ["Traceback", "Timeout waiting"]
 s_dir = "/drbdtest/drbd-test-*"
@@ -73,7 +73,7 @@ def get_option():
     return options
 
 def get_node_list_from_conf(conf="/tmp/cluster-configuration/cluster_conf"):
-    fd = open(conf,"r") 
+    fd = open(conf,"r")
     lines = [ line.strip() for line in fd.readlines() ]
     fd.close()
 
@@ -83,7 +83,7 @@ def get_node_list_from_conf(conf="/tmp/cluster-configuration/cluster_conf"):
         tmp = re.match(pattern, line)
         if tmp is not None:
             nodes.append(tmp.groups()[0])
- 
+
     return nodes
 
 def find_dir(path):
@@ -163,13 +163,13 @@ def generate_yaml_result(testsuite, output='Linbit-drbd-test.yml'):
 
     with open(yaml_dir+os.path.sep+output, 'w') as fd:
         yaml.dump(data, fd, default_flow_style=False)
-    
+
 class Testcase(object):
     ''' Tstcase to run Linbit drbd-test '''
 
     number = 0
 
-    def __init__(self, name=None, nodes=0, 
+    def __init__(self, name=None, nodes=0,
                  srcdir=s_dir, need_clean=True):
         self.name = name
         self.nodes = nodes
@@ -190,7 +190,7 @@ class Testcase(object):
         self.__class__.number += 1;
 
     def __str__(self):
-        return ("%s: Test result is %s." % 
+        return ("%s: Test result is %s." %
             (self.name, self.result))
 
     def run(self):
@@ -206,9 +206,9 @@ class Testcase(object):
 
         arg = ["./tests/%s" % self.name]
         arg.extend(working_node_list(self.nodes))
- 
+
         # call/check_output euqal Popen+wait
-        worker = subprocess.Popen(args=arg, 
+        worker = subprocess.Popen(args=arg,
             stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         self.output = worker.stdout.readlines()
         worker.wait()

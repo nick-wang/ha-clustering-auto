@@ -5,7 +5,7 @@
 #               On small systems, this file can be used instead of a
 #               "named" name server.
 # Syntax:
-#    
+#
 # IP-Address  Full-Qualified-Hostname  Short-Hostname
 #
 

@@ -11,7 +11,7 @@ nodes:
   disk_size: 8192
   nic:
   graphics:
-  
+
 - name: node02
   disk: qcow2:/mnt/vm/sles_liub/sles12sp1-HA-node02.qcow2
   ostype: sles11

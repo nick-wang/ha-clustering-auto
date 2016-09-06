@@ -57,7 +57,7 @@
         <device>eth0</device>
         <startmode>auto</startmode>
         </interface>
-    </interfaces> 
+    </interfaces>
     <ipv6 config:type="boolean">true</ipv6>
     <keep_install_network config:type="boolean">false</keep_install_network>
     <managed config:type="boolean">false</managed>

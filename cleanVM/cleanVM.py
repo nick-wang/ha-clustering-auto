@@ -24,7 +24,7 @@ class Disk:
         self.label = label
         self.path = path
         self.stat = stat
-    
+
     def get_label(self):
         return self.label
 
@@ -138,12 +138,12 @@ def getVMList():
         if diff >= 7776000:
             delete_list.append(vm)
             remove_vm(vm)
-            
+
         elif diff >= 5184000 and diff < 7776000:
             expired_list.append(vm)
 
     content = formatVMs(delete_list, "deleted")
-    content = content + '\n' + formatVMs(expired_list, "expired") + '\n\n' 
+    content = content + '\n' + formatVMs(expired_list, "expired") + '\n\n'
     return content
 
 def removeVMViaYaml(yamlfile):
@@ -176,7 +176,7 @@ def get_content():
         content = content + f.read()
         print content
     return title, content
- 
+
 def send_mail(to_list,sub,content):
     me="slehapek"+"<"+mail_user+"@"+mail_postfix+">"
     msg = MIMEText(content,_subtype='plain',_charset='gb2312')

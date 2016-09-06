@@ -71,7 +71,7 @@ def Run(conf, xmldir):
                  ("<case name3>", "<case class3>", <case_function3>)]
 
     #Not necessary to modify the lines below!
-    #Unless need to add <skip reason> 
+    #Unless need to add <skip reason>
     skip_flag = False
     for a_case in cases_def:
         case = TestCase(a_case[0], a_case[1])

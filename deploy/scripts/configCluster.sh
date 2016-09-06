@@ -59,7 +59,7 @@ bindnetaddr=$IP_NODE1
 #>   split(mask,b,".");
 #>   for(i=1;i<=4;i++)
 #>     s[i]=and(a[i],b[i]);
-#>   subnet=s[1]"."s[2]"."s[3]"."s[4]; 
+#>   subnet=s[1]"."s[2]"."s[3]"."s[4];
 #>   print subnet;
 #> }')
 sed -i "s/bindnetaddr:.*/bindnetaddr:	${bindnetaddr}/" corosync.conf_template

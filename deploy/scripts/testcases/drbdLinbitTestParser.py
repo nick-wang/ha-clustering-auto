@@ -95,7 +95,7 @@ def Run(conf, xmldir):
     #Define function runPackmakerService before using
     cases_def = []
     for c_name in results.keys():
-        cases_def.append( (c_name, TESTCASES.get(c_name, CLASSIFY[0]), 
+        cases_def.append( (c_name, TESTCASES.get(c_name, CLASSIFY[0]),
                            parseResult) )
 
     #Not necessary to modify the lines below!

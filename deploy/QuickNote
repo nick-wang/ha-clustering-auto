@@ -1,6 +1,6 @@
 Q. How to deploy a host server?
 
-  1. Configure ntp-client: 
+  1. Configure ntp-client:
      server address: "clock.via.net"
   2. Install package "java".
   3. Add to jenkins server slave.
@@ -20,7 +20,7 @@ Q. How to deploy a host server?
       For cleanVM, get cpu/mem usage.
 
 A.To make the cmd on the guest
-"virsh -c qemu+tcp://host_ip/system", we have to modify 
+"virsh -c qemu+tcp://host_ip/system", we have to modify
 
 On host /etc/libvirt/libvirtd.conf
 listen_tls = 0

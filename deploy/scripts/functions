@@ -8,7 +8,7 @@ function isMaster()
     # Usage:
     #     isMaster <nodename>
     if [ $# -ne 1 ]
-    then 
+    then
         return 1
     fi
 

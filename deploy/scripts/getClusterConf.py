@@ -102,7 +102,7 @@ def restartNoIpNodes(vm_info_list):
 
 def get_cluster_conf(sleep_time="0", configuration="../cluster_conf",
                      yaml="../confs/vm_list.yaml", recursive=False):
-    
+
     vm_names = []
     if sleep_time != "0":
         time.sleep(int(sleep_time))

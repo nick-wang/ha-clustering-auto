@@ -6,7 +6,7 @@ import time
 vg_name = "scratch"
 
 def remove_lvm():
-    lvs = [ line.strip() for line in 
+    lvs = [ line.strip() for line in
         os.popen('lvs |grep %s' % vg_name) ]
 
     for lv in lvs:
@@ -26,7 +26,7 @@ def check_res_exist(show=False):
             print "No resource defined."
             print "Remove lvs of scratch."
         return None
-   
+
     # If multiple res exist, previous test case is not clean
     return res
 

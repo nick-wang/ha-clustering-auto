@@ -69,22 +69,22 @@ LinbitTest.py:
 ============ Jenkins configuration ==============
     # Prepare env of testing upstream drbd test
     cd ${LIB_DIR}
-    
+
     ./drbd/addVirioDisk.sh ${CLUSTER_FILE} 1 "/mnt/vm/sles_nick" 1G
     sleep 2
     ./drbd/runLinbitTest.sh ${CLUSTER_FILE} ${CONFIG_CLUSTER_DIR}
-    
+
     # Get logs from master
     sleep 2
     mkdir -p ${BUILD_LOG_DIR}
     # "/drbdtest/log/*" can be replaced by "/drbdtest/log/output.log /drbdtest/log/log /drbdtest/log/Linbit-drbd-test.yml"
     ./drbd/libs/retrieveLinbitTestLog.sh ${CLUSTER_FILE} ${BUILD_LOG_DIR} "/drbdtest/log/*"
     cp ${YAML_FILE} ${CLUSTER_FILE} ${BUILD_LOG_DIR}
-    
+
     # Draw the junit pic
     TESTSUITES="drbdLinbitTestParser.py"
     ./runCases.py -f ${CLUSTER_FILE} -d ${BUILD_LOG_DIR} -r "$TESTSUITES"
-    
+
     #Copy all logs to up project
     if [ ${isCallByOther} -eq 1 ]
     then
@@ -93,7 +93,7 @@ LinbitTest.py:
     cp -rf ${BUILD_LOG_DIR}/* ${UP_BUILD_LOG_DIR}
     fi
 ============ Jenkins configuration ==============
-    
+
 C. Configuring in upstream project
 isCallByOther=1
 UP_BUILD_LOG_DIR=$BUILD_LOG_DIR

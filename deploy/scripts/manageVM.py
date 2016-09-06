@@ -17,21 +17,21 @@ class managerVM:
             return -1
         self.dom.destroy()
         return 0
-    
+
     def undefine_vm(self):
         if self.dom is None:
             return -1
         self.dom.undefine()
         return 0
-    
+
     def removefiles(self):
         path = self.path
         if os.path.exists(path) == False:
             return -1
         for file1 in os.listdir(path):
-             os.remove("%s/%s" % (path, file1)) 
+             os.remove("%s/%s" % (path, file1))
         return 0
-    
+
     def reboot_vm(self, force=False):
         if self.dom is None:
             return -1
@@ -40,7 +40,7 @@ class managerVM:
         else:
             self.dom.reboot(1)
         return 0
-    
+
     def start_vm(self):
         if self.dom is None:
             return -1
@@ -89,7 +89,7 @@ class managerVM:
         return 0
 
     def setVcpus(self, vcpus):
-        if self.dom is None:        
+        if self.dom is None:
             return -1
         self.dom.setVcpus(vcpus)
         return 0
@@ -113,7 +113,7 @@ class managerVM:
         conn = libvirt.open("qemu:///system")
         dom = conn.lookupByName(vmname)
         if dom is None:
-            print '%s does not exist' %vmname 
+            print '%s does not exist' %vmname
             return None
         return dom
 #************the utils library********************

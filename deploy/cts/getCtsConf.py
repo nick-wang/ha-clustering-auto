@@ -10,7 +10,7 @@ sys.path.append('../')
 def getCtsConf(stonith_type="external/libvirt", interface1='br1', configuration="../cts_conf", yamlfile='../confs/vm_list.yaml'):
     dp = GET_VM_CONF(yamlfile)
     content=""
-    
+
     vm_list = dp.get_vms_conf()
     node_list=""
     for vm in vm_list:

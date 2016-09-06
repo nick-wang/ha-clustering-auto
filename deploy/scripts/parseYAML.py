@@ -30,7 +30,7 @@ nodes:
   disk_size: 8192
   nic:
   graphics:
-  os_settings:  
+  os_settings:
 
 - name: node03
   mac: 00:0C:29:D7:4C:31
@@ -84,8 +84,8 @@ class GET_VM_CONF:
         return ya
 
     def get_single_section_conf(self, section):
-        ''' 
-            Only for single section, can not use for list. 
+        '''
+            Only for single section, can not use for list.
         '''
         if not self.structs.has_key(section):
             print "Need to config a new section (%s)." % section
