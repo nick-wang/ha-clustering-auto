@@ -2,6 +2,7 @@
 
 LOCAL_HOST=$(hostname)
 DRBD_LOGFILE="/tmp/drbd-log-${LOCAL_HOST}"
+log_level=2
 
 function getDRBDVer()
 {

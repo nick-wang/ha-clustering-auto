@@ -1,5 +1,8 @@
 #!/bin/bash
 
+info_level=1
+debug_level=2
+
 function isMaster()
 {
     # Usage:
@@ -38,12 +41,60 @@ function nconvert()
     echo -n $1 | tr "123456789" "bcdefghij"
 }
 
-function logit()
+function _logRun()
 {
     # Usage:
-    #     logit ls -l
-    #     logit pwd >> output-file
+    #     Should not call it directly!!
     echo -e "== [`hostname`:${USER}@`pwd`]\nCommand: ${*}\nStart  : [`date`] \n`${*} 2>&1`\nStop   : [`date`]\n";
+}
+
+function infoRun()
+{
+    # Usage:
+    #     infoRun ls -l
+    #   To show log, need log_level great equal ${info_level}
+    if [ ${log_level:-0} -ge ${info_level} ]
+    then
+        _logRun ${*}
+    else
+        ${*} >/dev/null 2>&1
+    fi
+}
+
+function debugRun()
+{
+    # Usage:
+    #     infoRun ls -l
+    #   To show log, need log_level great equal ${debug_level}
+    if [ ${log_level:-0} -ge ${debug_level} ]
+    then
+        _logRun ${*}
+    else
+        ${*} >/dev/null 2>&1
+    fi
+}
+
+function _log()
+{
+    # Usage:
+    #     Should not call it directly!!
+    echo -e "${1}:  ${*}"
+}
+
+function infoLog()
+{
+    if [ ${log_level:-0} -ge ${info_level} ]
+    then
+        _log "INFO" "${*}"
+    fi
+}
+
+function debugLog()
+{
+    if [ ${log_level:-0} -ge ${debug_level} ]
+    then
+        _log "DEBUG" "${*}"
+    fi
 }
 
 function getEnv()
@@ -79,4 +130,116 @@ function nextPhase()
     #     nextPhase "Add some comments"
     echo -e "\n***** $(hostname): Mailstone - ${1}"
 
+}
+
+#Replaced by twopence? Needs extra pkgs
+function cpToNodes()
+{
+    if [ $# -ne 3 ]
+    then
+        echo "Error! Need three parameters, cpToNodes <CLUSTER_CONF_IN_HOST> <FILES> <DIR_IN_GUEST>"
+        echo "Error command: cpToNodes $*"
+        return
+    fi
+
+    CLUSTER_CONF=$1
+    FILES=$2
+    DIR=$3
+
+    for ip in `cat ${CLUSTER_CONF} |grep IP_NODE |cut -d "=" -f 2`
+    do
+    {
+        ssh root@${ip} "mkdir -p ${DIR}" 2>/dev/null
+        scp ${FILES} root@${ip}:${DIR} 2>/dev/null
+    } &
+    done
+    wait
+}
+
+function runOnAllNodes()
+{
+    if [ $# -ne 2 ]
+    then
+        echo "Error! Need two parameters, runOnAllNodes <CLUSTER_CONF_IN_HOST> <COMMANDS>"
+        echo "Error command: runOnAllNodes $*"
+        return
+    fi
+
+    CLUSTER_CONF=$1
+    COMMANDS=$2
+
+    for ip in `cat ${CLUSTER_CONF} |grep IP_NODE |cut -d "=" -f 2`
+    do
+    {
+        ssh root@${ip} "${COMMANDS}"
+    } &
+    done
+    wait
+}
+
+function runOnMasterNodes()
+{
+    if [ $# -ne 3 ]
+    then
+        echo "Error! Need three parameters, runOnMasterNodes <CLUSTER_CONF_IN_HOST> <NODE> <COMMANDS>"
+        echo "Error command: runOnMasterNodes $*"
+        return
+    fi
+
+    CLUSTER_CONF=$1
+    NODENAME=$2
+    COMMANDS=$3
+
+    num=`cat ${CLUSTER_CONF} |grep ${NODENAME} |cut -d "=" -f 1|sed "s/HOSTNAME_NODE//g"`
+    ip=`cat ${CLUSTER_CONF} |grep IP_NODE${num} |cut -d "=" -f 2`
+    ssh root@${ip} "${COMMANDS}"
+}
+
+function retrieveLogsFromAll()
+{
+    if [ $# -ne 3 ]
+    then
+        echo "Error! Need two parameters, retrieveLogsFromAll <CLUSTER_CONF_IN_HOST> <LOG_DIR_IN_HOST> <LOGS_LIST>"
+        echo "Error command: retrieveLogsFromAll $*"
+        return
+    fi
+
+    CLUSTER_CONF=$1
+    LOG_DIR=$2
+    LOGS_LIST=$3
+
+    for ip in `cat $CLUSTER_CONF |grep IP_NODE |cut -d "=" -f 2`
+    do
+    {
+        for log in ${LOGS_LIST[@]}
+        do
+            rsync -az root@${ip}:${log} ${LOG_DIR}
+        done
+    } &
+    done
+
+    wait
+}
+
+function retrieveLogsFromNode()
+{
+    if [ $# -ne 4 ]
+    then
+        echo "Error! Need two parameters, retrieveLogsFromAll <CLUSTER_CONF_IN_HOST> <NODE> <LOG_DIR_IN_HOST> <LOGS_LIST>"
+        echo "Error command: retrieveLogsFromAll $*"
+        return
+    fi
+
+    CLUSTER_CONF=$1
+    NODENAME=$2
+    LOG_DIR=$3
+    LOGS_LIST=$4
+
+    num=`cat ${CLUSTER_CONF} |grep ${NODENAME} |cut -d "=" -f 1|sed "s/HOSTNAME_NODE//g"`
+    ip=`cat ${CLUSTER_CONF} |grep IP_NODE${num} |cut -d "=" -f 2`
+
+    for log in ${LOGS_LIST[@]}
+    do
+        rsync -az root@${ip}:${log} ${LOG_DIR}
+    done
 }

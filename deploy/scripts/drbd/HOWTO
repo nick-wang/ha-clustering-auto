@@ -1,61 +1,104 @@
-#1) Create the virt-io disks, running at 'host' machine
-addVirioDisk.sh ./cluster_conf 2 `pwd` 3G
+A. Steps to setup drbd environment via raw disk:
+    #1) Create the virt-io disks, running at 'host' machine
+    addVirioDisk.sh ./cluster_conf 2 `pwd` 3G
 
-#2) Partitioning the new created disks, running at every working node
-make_part_drbd.sh 2
+    #2) Partitioning the new created disks, running at every working node
+    make_part_drbd.sh 2
 
-#3) Continue if want to testing automatically, running at every working node
-#   Need to manually configure the relationships of device/disk/meta-disk
-configDRBD.sh /dev/vdb
-configDRBD.sh /dev/vdc
+    #3) Continue if want to testing automatically, running at every working node
+    #   Need to manually configure the relationships of device/disk/meta-disk
+    #   This scripts is configuring via raw disk, not LVM.
+    configDRBD.sh /dev/vdb
+    configDRBD.sh /dev/vdc
 
-#4) Start the first sync, running at every working node
-firstInitDRBD.sh
+    #4) Start the first sync, running at every working node
+    firstInitDRBD.sh
 
-#5) Add crm resource, running at every working node(isMaster can help to run at host1 only)
-crmDRBD.sh
+    #5) Add crm resource, running at every working node(isMaster can help to run at host1 only)
+    crmDRBD.sh
 
-#6) Collect needed log file, running at 'host' machine
-./drbd/collectLogs.sh ./cluster_conf /var/lib/jenkins/workspace/nwang/deploy-on-master-with-drbd/25
+    #6) Collect needed log file, running at 'host' machine
+    ./drbd/collectLogs.sh ./cluster_conf /var/lib/jenkins/workspace/nwang/deploy-on-master-with-drbd/25
 
-########### HOW TO CHANGE #############
-1. No need to change the code of "addVirioDisk.sh",
-  only change the input paras.
-2. Change "make_part_drbd.sh" for the details partitioning layout.
-3. Change the manually change section of "configDRBD.sh" based on the layout setting.
-  Need to dup more scripts if different disks have different layout/resource.
-4. No need to change "firstInitDRBD.sh"
-5. Change "crmDRBD.sh" for custom crm resource.
-6. Collect necessary log.
+    ########### HOW TO CHANGE #############
+    1. No need to change the code of "addVirioDisk.sh",
+      only change the input paras.
+    2. Change "make_part_drbd.sh" for the details partitioning layout.
+    3. Change the manually change section of "configDRBD.sh" based on the layout setting.
+      Need to dup more scripts if different disks have different layout/resource.
+    4. No need to change "firstInitDRBD.sh"
+    5. Change "crmDRBD.sh" for custom crm resource.
+    6. Collect necessary log.
 
-##### Jenkins configure example ########
-#Add virtio disk for drbd
-#This feature is not committed yet
-cd ${LIB_DIR}
-sleep 3
-./drbd/addVirioDisk.sh ${CLUSTER_FILE} 1 "/mnt/vm/sles_nick" 3G
-sleep 3
-./drbd/runDRBDFilesOnGuest.sh ${CLUSTER_FILE} ${CONFIG_CLUSTER_DIR} 1
-#Rebooting
-sleep 2
-./drbd/collectLogs.sh ${CLUSTER_FILE} ${BUILD_LOG_DIR}
+    ##### Jenkins configure example ########
+    #Add virtio disk for drbd
+    #This feature is not committed yet
+    cd ${LIB_DIR}
+    sleep 3
+    ./drbd/addVirioDisk.sh ${CLUSTER_FILE} 1 "/mnt/vm/sles_nick" 3G
+    sleep 3
+    ./drbd/runDRBDFilesOnGuest.sh ${CLUSTER_FILE} ${CONFIG_CLUSTER_DIR} 1
+    #Rebooting
+    sleep 2
+    ./drbd/collectLogs.sh ${CLUSTER_FILE} ${BUILD_LOG_DIR}
 
-# By default, the first sync will pretty slow.
-# http://www.drbd.org/en/doc/users-guide-90/s-configure-sync-rate#s-configure-sync-rate-variable
-1). Variable sync rate configuration
-resource <resource> {
-  disk {
-    c-plan-ahead 5;
-    c-max-rate 10M;
-    c-fill-target 2M;
-  }
-}
+    # By default, the first sync will pretty slow.
+    # http://www.drbd.org/en/doc/users-guide-90/s-configure-sync-rate#s-configure-sync-rate-variable
+    1). Variable sync rate configuration
+    resource <resource> {
+      disk {
+        c-plan-ahead 5;
+        c-max-rate 10M;
+        c-fill-target 2M;
+      }
+    }
 
-2). Permanent fixed sync rate configuration
-resource <resource>
-  disk {
-    resync-rate 24M;
-    ...
-  }
-  ...
-}
+    2). Permanent fixed sync rate configuration
+    resource <resource>
+      disk {
+        resync-rate 24M;
+        ...
+      }
+      ...
+    }
+
+B. Using (LVM) to run drbd-test and collect test result:
+LinbitTest.py:
+    Run LinbitTest, also can run individual case.
+
+============ Jenkins configuration ==============
+    # Prepare env of testing upstream drbd test
+    cd ${LIB_DIR}
+    
+    ./drbd/addVirioDisk.sh ${CLUSTER_FILE} 1 "/mnt/vm/sles_nick" 1G
+    sleep 2
+    ./drbd/runLinbitTest.sh ${CLUSTER_FILE} ${CONFIG_CLUSTER_DIR}
+    
+    # Get logs from master
+    sleep 2
+    mkdir -p ${BUILD_LOG_DIR}
+    # "/drbdtest/log/*" can be replaced by "/drbdtest/log/output.log /drbdtest/log/log /drbdtest/log/Linbit-drbd-test.yml"
+    ./drbd/libs/retrieveLinbitTestLog.sh ${CLUSTER_FILE} ${BUILD_LOG_DIR} "/drbdtest/log/*"
+    cp ${YAML_FILE} ${CLUSTER_FILE} ${BUILD_LOG_DIR}
+    
+    # Draw the junit pic
+    TESTSUITES="drbdLinbitTestParser.py"
+    ./runCases.py -f ${CLUSTER_FILE} -d ${BUILD_LOG_DIR} -r "$TESTSUITES"
+    
+    #Copy all logs to up project
+    if [ ${isCallByOther} -eq 1 ]
+    then
+    echo "Copy logs to up project."
+    mkdir -p ${UP_BUILD_LOG_DIR}
+    cp -rf ${BUILD_LOG_DIR}/* ${UP_BUILD_LOG_DIR}
+    fi
+============ Jenkins configuration ==============
+    
+C. Configuring in upstream project
+isCallByOther=1
+UP_BUILD_LOG_DIR=$BUILD_LOG_DIR
+LIB_DIR=$LIB_DIR
+WORK_DIR=$WORK_DIR
+CONFIG_CLUSTER_DIR=$CONFIG_CLUSTER_DIR
+CLUSTER_FILE=$CLUSTER_FILE
+YAML_FILE=$YAML_FILE

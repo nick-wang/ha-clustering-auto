@@ -11,6 +11,7 @@ nextPhase "Launch $0"
 isMaster "$HOSTNAME_NODE1"
 if [ $? -eq 0 ]
 then
+  infoLog "Make Primary on $HOSTNAME_NODE1"
   drbdadm primary --force all
 fi
 sleep 3
@@ -19,33 +20,33 @@ sleep 3
 case $(getDRBDVer) in
   9)
     # Log the drbd9 version
-    logit cat /proc/drbd | tee -a ${DRBD_LOGFILE}
+    infoRun cat /proc/drbd | tee -a ${DRBD_LOGFILE}
 
     drbdadm status all |grep "done:" >/dev/null 2>&1
     while [ $? -eq 0 ]
     do
-      logit drbdadm status all
+      debugRun drbdadm status all
       sleep 90
 
       drbdadm status all |grep "done:" >/dev/null 2>&1
     done
 
     nextPhase "Finished the first sync." | tee -a ${DRBD_LOGFILE}
-    logit drbdadm status all | tee -a ${DRBD_LOGFILE}
+    infoRun drbdadm status all | tee -a ${DRBD_LOGFILE}
     ;;
   84)
     # Check sync progress in drbd8
     cat /proc/drbd |grep "sync'ed:" >/dev/null 2>&1
     while [ $? -eq 0 ]
     do
-      logit cat /proc/drbd
+      debugRun cat /proc/drbd
       sleep 90
 
       cat /proc/drbd |grep "sync'ed:" >/dev/null 2>&1
     done
 
     nextPhase "Finished the first sync." | tee -a ${DRBD_LOGFILE}
-    logit cat /proc/drbd | tee -a ${DRBD_LOGFILE}
+    infoRun cat /proc/drbd | tee -a ${DRBD_LOGFILE}
     ;;
   *)
     echo "Error! Wrong DRBD version."

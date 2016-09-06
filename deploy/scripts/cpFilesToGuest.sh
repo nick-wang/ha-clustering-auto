@@ -1,11 +1,12 @@
 #!/bin/bash
 function usage()
 {
-  echo "cpFilesToGuest.sh <CLUSTER_CONF_IN_HOST> <WORKING_DIR_IN_GUEST>"
+  echo "cpFilesToGuest.sh <CLUSTER_CONF_IN_HOST> <WORKING_DIR_IN_GUEST> <SKIP_CONFIGURE>"
+  echo "Skip configuring cluster if <SKIP_CONGIGURE> is 1"
   exit
 }
 
-if [ $# -ne 2 ]
+if [ $# -lt 2 ] || [ $# -gt 3 ]
 then
     usage
     exit -1
@@ -13,6 +14,7 @@ fi
 
 CLUSTER_CONF=$1
 CLUSTER_DIR=$2
+SKIP_CLUSTER=${3:-0}
 
 chmod 0600 ../ssh_keys/id_rsa
 
@@ -28,7 +30,10 @@ scp ../template/authkey root@${ip}:${CLUSTER_DIR}/template/
 scp -p ../ssh_keys/id_rsa root@${ip}:/root/.ssh/
 scp ./configCluster.sh ./functions root@${ip}:${CLUSTER_DIR}/scripts/
 
-ssh root@${ip} "cd ${CLUSTER_DIR}; ${CLUSTER_DIR}/scripts/configCluster.sh "
+if [ ${SKIP_CLUSTER} -ne 1 ]
+then
+    ssh root@${ip} "cd ${CLUSTER_DIR}; ${CLUSTER_DIR}/scripts/configCluster.sh "
+fi
 } &
 done
 
