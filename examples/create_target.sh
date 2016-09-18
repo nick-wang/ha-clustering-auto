@@ -10,24 +10,41 @@ function usage()
 opt_name=""
 opt_vg=""
 opt_net=""
+opt_create_lvm="no"
 
-GETOPT_ARGS=`getopt -o i:v:n: -al iblock:,vg:,net: -- "$@"`
+GETOPT_ARGS=`getopt -o i:v:n:l -al iblock:,vg:,net:,lvm: -- "$@"`
 eval set -- "$GETOPT_ARGS"
+
+function create_lvm()
+{
+    echo "Creating lvm...  lvcreate $1 -n $2 -L 128M" 
+    lvcreate $1 -n $2 -L 128M
+}
 
 while [ -n "$1" ]
 do
-	case "$1" in
-		-i|--iblock) opt_name=$2; shift 2;;
-		-v|--vg) opt_vg=$2; shift 2;;
-		-n|--net) opt_net=$2; shift 2;;
-		--) break ;;
-	esac
+    case "$1" in
+        -i|--iblock) opt_name=$2; shift 2;;
+        -v|--vg) opt_vg=$2; shift 2;;
+        -n|--net) opt_net=$2; shift 2;;
+        -l|--lvm) opt_create_lvm="yes"; shift 1;;
+        --) break ;;
+    esac
 done
 
 if [ -z $opt_name ] || [ -z $opt_vg ]
 then 
-   usage
-   exit -1
+    usage
+    exit -1
+fi
+
+echo "--vg: $opt_vg"
+echo "--iblock_name: $opt_name"
+echo "--net: $opt_net"
+
+if [ "yes" == $opt_create_lvm ]
+then
+    create_lvm $opt_vg $opt_name
 fi
 
 iblock_name=${opt_name}
