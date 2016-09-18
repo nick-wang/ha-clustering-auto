@@ -75,7 +75,7 @@ portals/ create ${portals_ip}
 set attribute authentication=0 demo_mode_write_protect=0 generate_node_acls=1 cache_dynamic_acls=1
 cd /
 saveconfig
-exit
+yes
 exit"|targetcli
 echo ""
 
