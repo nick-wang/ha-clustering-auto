@@ -2,9 +2,10 @@
 
 function usage()
 {
-  echo "create_target.sh -i <ISCSI_BLOCK_NAME> -v <VOLUME_GROUP> -n <NET_CARD>"
-  echo "  args: [-i, -v, -n ] [--iblock=, --vg=, --net=]"
-  echo "  example: create_target.sh -i <iblock> -v <volumegroup> (-n <netcard>)"
+  echo "create_target.sh -i <ISCSI_BLOCK_NAME> -v <VOLUME_GROUP> -n <NET_CARD> -l"
+  echo "  args: [-i, -v, -n, -l] [--iblock=, --vg=, --net=, --lvm=]"
+  echo "  -l: need to create lv before creating target."
+  echo "  example: create_target.sh -i <iblock> -v <volumegroup> (-n <netcard> -l)"
 }
 
 opt_name=""
@@ -12,7 +13,7 @@ opt_vg=""
 opt_net=""
 opt_create_lvm="no"
 
-GETOPT_ARGS=`getopt -o i:v:n:l -al iblock:,vg:,net:,lvm: -- "$@"`
+GETOPT_ARGS=`getopt -o i:v:n:l -al iblock:,vg:,net:,lvm -- "$@"`
 eval set -- "$GETOPT_ARGS"
 
 function create_lvm()
