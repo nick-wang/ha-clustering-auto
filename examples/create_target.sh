@@ -2,10 +2,11 @@
 
 function usage()
 {
-  echo "create_target.sh -i <ISCSI_BLOCK_NAME> -v <VOLUME_GROUP> -n <NET_CARD> -l"
-  echo "  args: [-i, -v, -n, -l] [--iblock=, --vg=, --net=, --lvm=]"
-  echo "  -l: need to create lv before creating target."
-  echo "  example: create_target.sh -i <iblock> -v <volumegroup> (-n <netcard> -l)"
+  echo "create_target.sh -i <ISCSI_BLOCK_NAME> -v <VOLUME_GROUP> -n <NET_CARD> -c (-s <SIZE>)"
+  echo "  args: [-i, -v, -n, -s, -c] [--iblock=, --vg=, --net=, --size=, --create=]"
+  echo "    -c: need to create lv before creating target."
+  echo "    -s: lvm disk size."
+  echo "  example: create_target.sh -i nick-block1 -v ha-group [-n eth0 -c -s 500M]"
 }
 
 opt_name=""
@@ -13,13 +14,14 @@ opt_vg=""
 opt_net=""
 opt_create_lvm="no"
 
-GETOPT_ARGS=`getopt -o i:v:n:l -al iblock:,vg:,net:,lvm -- "$@"`
+GETOPT_ARGS=`getopt -o i:v:n:s:c -al iblock:,vg:,net:,size:,create -- "$@"`
 eval set -- "$GETOPT_ARGS"
 
 function create_lvm()
 {
-    echo "Creating lvm...  lvcreate $1 -n $2 -L 128M" 
-    lvcreate $1 -n $2 -L 128M
+    size=${3:-"128M"}
+    echo "Creating lvm...  lvcreate $1 -n $2 -L $size"
+    lvcreate $1 -n $2 -L $size
 }
 
 while [ -n "$1" ]
@@ -28,7 +30,8 @@ do
         -i|--iblock) opt_name=$2; shift 2;;
         -v|--vg) opt_vg=$2; shift 2;;
         -n|--net) opt_net=$2; shift 2;;
-        -l|--lvm) opt_create_lvm="yes"; shift 1;;
+        -s|--size) opt_size=$2; shift 2;;
+        -c|--create) opt_create_lvm="yes"; shift 1;;
         --) break ;;
     esac
 done
@@ -39,29 +42,19 @@ then
     exit -1
 fi
 
-echo "--vg: $opt_vg"
-echo "--iblock_name: $opt_name"
-echo "--net: $opt_net"
-
 if [ "yes" == $opt_create_lvm ]
 then
-    create_lvm $opt_vg $opt_name
+    create_lvm $opt_vg $opt_name $opt_size
 fi
 
 iblock_name=${opt_name}
 vgname=${opt_vg}
 net=${opt_net:="eth0"}
 
-
-# ---- modify below if necessary ----
-# Automatica calc ipaddr of netcard
-# ip a | grep -A 2 " eth0:" |sed -n "s/.*inet \(.*\)\/.*/\1/p"
-portals_ip=`ip a | grep -A 2 " ${net}:" |sed -n "s/.*inet \(.*\)\/.*/\1/p"`
-# ---- modify above if necessary ----
-
 year=`date +%y`
 month=`date +%m`
 target_name="iqn.20${year}-${month}.example.com:${iblock_name}"
+portals_ip=`ip a | grep -A 2 " ${net}:" |sed -n "s/.*inet \(.*\)\/.*/\1/p"`
 
 vgchange -a y ${vgname}
 
@@ -80,7 +73,7 @@ yes
 exit"|targetcli
 echo ""
 
-sleep 3
+sleep 2
 # For test
 echo ${target_name}
 echo ${portals_ip}
