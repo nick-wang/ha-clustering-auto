@@ -51,6 +51,7 @@ then
     case ${sle_ver[0]} in
       12)
         systemctl disable sbd
+        systemctl enable corosync
         #systemctl disable pacemaker
         systemctl stop pacemaker
         systemctl start pacemaker
