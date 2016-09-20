@@ -261,7 +261,6 @@ def main():
     if options["resume"]:
         # Need to cleanup on each node
         for node in nodelist:
-            print node
             os.system('ssh root@%s \
                 "/tmp/cluster-configuration/scripts/drbd/libs/cleanLinbitTest.py"' %
                 node)
