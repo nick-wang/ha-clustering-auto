@@ -40,9 +40,12 @@ def down_res(res):
         res ).readline().strip()
     node_num = int(tmp_num) + 1
 
-    # id:0 is node itself
-    for peer_id in range(1, node_num):
-        os.popen( "drbdsetup del-peer %s %d" % (res, peer_id) )
+    # id:0 including the node itself, error msg will show when delete itself
+    # error msg: " additional info from kernel: "
+    #            " peer node id cannot be my own node id "
+    for peer_id in range(0, node_num):
+        os.popen( "drbdsetup del-peer %s %d >/dev/null 2>&1"
+                  % (res, peer_id) )
 
     time.sleep(2)
     subprocess.call( [ "drbdsetup", "down", res ] )
