@@ -49,15 +49,16 @@ nodelist = []
 
 def usage():
     print("usage:")
-    print("\t./LinbitTest.py -f <configuration> -c <case>")
+    print("\t./LinbitTest.py -f <configuration> -c <case> -r")
     sys.exit(1)
 
 def get_option():
-    options = {"configuration": "/tmp/cluster-configuration/cluster_conf", "case": None}
+    options = {"configuration": "/tmp/cluster-configuration/cluster_conf", "case": None,
+               "resume": False}
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "f:c:",
-                    ["configuration=", "case="])
+        opts, args = getopt.getopt(sys.argv[1:], "f:c:r",
+                    ["configuration=", "case=", "resume"])
     except getopt.GetoptError:
         print("Get options Error!")
         sys.exit(2)
@@ -67,6 +68,8 @@ def get_option():
             options["configuration"] = value
         elif opt in ("-c", "--case"):
             options["case"] = value
+        elif opt in ("-r", "--resume"):
+            options["resume"] = True
         else:
             usage()
 
@@ -254,6 +257,15 @@ def main():
     # get nodes's list
     global nodelist
     nodelist = get_node_list_from_conf(options["configuration"])
+
+    if options["resume"]:
+        # Need to cleanup on each node
+        for node in nodelist:
+            print node
+            os.system('ssh root@%s \
+                "/tmp/cluster-configuration/scripts/drbd/libs/cleanLinbitTest.py"' %
+                node)
+        return 0
 
     testsuite = []
     for case in TESTCASES:
