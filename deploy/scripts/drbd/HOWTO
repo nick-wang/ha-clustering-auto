@@ -3,21 +3,22 @@ A. Steps to setup drbd environment via raw disk:
     addVirioDisk.sh ./cluster_conf 2 `pwd` 3G
 
     #2) Partitioning the new created disks, running at every working node
-    make_part_drbd.sh 2
+    libs/make_part_drbd.sh 1
+    libs/make_part_drbd.sh 2
 
     #3) Continue if want to testing automatically, running at every working node
     #   Need to manually configure the relationships of device/disk/meta-disk
     #   This scripts is configuring via raw disk, not LVM.
-    configDRBD.sh /dev/vdb
-    configDRBD.sh /dev/vdc
+    libs/configDRBD.sh /dev/vdb
+    libs/configDRBD.sh /dev/vdc
 
     #4) Start the first sync, running at every working node
-    firstInitDRBD.sh
+    libs/firstInitDRBD.sh
 
     #5) Add crm resource, running at every working node(isMaster can help to run at host1 only)
-    crmDRBD.sh
+    libs/crmDRBD.sh
 
-    #6) Collect needed log file, running at 'host' machine
+    #6) Collect needed log files, running at 'host' machine
     ./drbd/collectLogs.sh ./cluster_conf /var/lib/jenkins/workspace/nwang/deploy-on-master-with-drbd/25
 
     ########### HOW TO CHANGE #############

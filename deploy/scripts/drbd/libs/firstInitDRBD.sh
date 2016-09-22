@@ -13,6 +13,8 @@ if [ $? -eq 0 ]
 then
   infoLog "Make Primary on $HOSTNAME_NODE1"
   drbdadm primary --force all
+else
+  sleep 10
 fi
 sleep 3
 
@@ -58,4 +60,4 @@ if [ $? -eq 0 ]
 then
   drbdadm secondary all
 fi
-sleep 3
+sleep 1
