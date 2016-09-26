@@ -242,8 +242,14 @@ sleep 5
 #Stop the susefirewall2
 rcSuSEfirewall2 stop
 
-#Start the drbd service for the first sync
-rcdrbd start
+# Start the drbd service for the first sync
+# Starting res one by one instead of using `rcdrbd start`
+#   to avoid failure of alloc_ordered_workqueue()
+for res in `drbdadm sh-resources`
+do
+  drbdadm up $res
+  sleep 2
+done
 
 #Sometimes it need time to wait peer node to showup
 sleep 15
