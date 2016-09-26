@@ -42,8 +42,11 @@ TESTCASES = ({"name":"connect", "nodes": 0},
             #{"name":"tl_restart-stress.KNOWN", "nodes":2},
             )
 
-error_logs = ["Traceback", "Timeout waiting"]
 s_dir = "/drbdtest/drbd-test-*"
+
+error_logs = ["Traceback", "Timeout waiting"]
+retry_logs = ["Timeout waiting"]
+timeout_retry = True
 
 nodelist = []
 
@@ -189,6 +192,10 @@ class Testcase(object):
         self.result = None
         # Error msg if failed
         self.message = None
+        # Sometimes fail due to network issue
+        self.times = 1
+        self.old_output = None
+        self.need_do = True
 
         self.__class__.number += 1;
 
@@ -197,7 +204,7 @@ class Testcase(object):
             (self.name, self.result))
 
     def run(self):
-        print "** Start to run case \"%s\":" % self.name
+        print "** Start to run case \"%s\" (%d):" % (self.name, self.times)
         sys.stdout.flush()
 
         if self.need_clean:
@@ -228,6 +235,9 @@ class Testcase(object):
             os.mkdir("output.log")
         with open("output.log/%s" % self.name, "w") as fd:
             fd.writelines(self.output)
+        if self.old_output != None:
+            with open("output.log/old-%s" % self.name, "w") as fd:
+                fd.writelines(self.old_output)
 
     def check_result(self):
         self.record_output()
@@ -236,13 +246,24 @@ class Testcase(object):
         for line in self.output:
             for e_pa in error_logs:
                 if re.search(e_pa, line):
+                    # Sometimes network cause timeout, retry in this case
+                    if timeout_retry and e_pa in retry_logs and self.times <= 3:
+                        print "   Timeout, case retry..."
+                        self.need_do = True
+                        self.old_output = self.output
+                        self.times += 1
+                        return
+
                     print " Found '%s', case '%s' FAILED!" % (e_pa, self.name)
                     self.message = "Found '%s' in '%s', case FAILED!"  % \
                         (e_pa,line)
                     self.error = True
+                    self.need_do = False
                     return
         else:
             self.result = "PASSED"
+            self.need_do = False
+            return
 
     def cleanup(self):
         # Need to cleanup on each node
@@ -271,7 +292,8 @@ def main():
         if options["case"] is None or options["case"] == case["name"]:
             aTest = Testcase(**case)
             testsuite.append(aTest)
-            aTest.run()
+            while aTest.need_do:
+                aTest.run()
 
     generate_yaml_result(testsuite)
 
