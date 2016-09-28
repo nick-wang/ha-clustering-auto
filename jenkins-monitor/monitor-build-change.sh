@@ -26,8 +26,9 @@ PATTERN="SLE-${VERSION}-${PATCHLEVEL}${PRODUCT}-DVD-${ARCH}-Build"
 SLP_URL="http://147.2.207.1/dist/install/SLP"
 KERNEL_MILESTONE="SLE-${VERSION}-${PATCHLEVEL}${PRODUCT}-LATEST"
 MEDIA="${ARCH}/CD1/media.1"
-O_K_FILE="sle_build"
-N_K_FILE="sle_newbuild"
+DIR="/tmp/jenkins-dummy"
+O_K_FILE="${DIR}/sle_build"
+N_K_FILE="${DIR}/sle_newbuild"
 
 die()
 {
@@ -44,6 +45,8 @@ download_file()
 
 main()
 {
+    [ -d ${DIR} ] || rm -rf ${DIR} && mkdir -p ${DIR}
+
     download_file
     [ ! -e $O_K_FILE ] && cp -f $N_K_FILE $O_K_FILE && echo "First run." && exit 0
 
