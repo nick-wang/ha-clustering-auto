@@ -2,7 +2,7 @@
 #
 # runCts.sh   <CTS_CONF> <NODE_LIST>
 #
-# Run ocfs2 CTS	
+# Run ocfs2 CTS
 
 source ~/.bash_profile
 
@@ -40,7 +40,7 @@ CTS_CONF="$1"
 NODE_LIST="$2"
 
 f_info "Dump configuration file for ocfs2 test:"
-cat ${CTS_CONF}	
+cat ${CTS_CONF}
 
 BLOCKSIZE="`cat ${CTS_CONF} | grep BLOCK_SIZE | cut -d "=" -f 2`"
 CLUSTERSIZE="`cat ${CTS_CONF} | grep CLUSTER_SIZE | cut -d "=" -f 2`"
@@ -94,4 +94,26 @@ if [ X"$TESTMODE" == X"multiple" -o X"$TESTMODE" == X"all" ];then
 	multiple_run.sh -k /usr/local/ocfs2-test/tmp/linux-2.6.39.tar.gz -n ${NODE_LIST} -d ${SHARED_DISK} -b ${BLOCKSIZE} -c ${CLUSTERSIZE} -t ${MULTIPLE_CASES}  -s ${CLUSTER_STACK} -C ${CLUSTER_NAME}  /mnt/ocfs2
 
 	f_info "DONE: multiple nodes testing"
+fi
+
+if [ X"$TESTMODE" == X"single_discontig_bg" -o X"$TESTMODE" == X"all" ];then
+	echo -e "\n\n\n"
+	f_info "Start single-node discontig block group testing..."
+
+	f_log "discontig_runner.sh -m ${NODE_LIST} -d ${SHARED_DISK} -b ${BLOCKSIZE} -c ${CLUSTERSIZE}  -s ${CLUSTER_STACK} -n ${CLUSTER_NAME} /mnt/ocfs2"
+
+	discontig_runner.sh -d ${SHARED_DISK} -b ${BLOCKSIZE} -c ${CLUSTERSIZE}  -s ${CLUSTER_STACK} -n ${CLUSTER_NAME} /mnt/ocfs2
+
+	f_info "DONE: single-node discontig block group testing"
+fi
+
+if [ X"$TESTMODE" == X"multiple_discontig_bg" -o X"$TESTMODE" == X"all" ];then
+	echo -e "\n\n\n"
+	f_info "Start multiple-node discontig block group testing..."
+
+	f_log "discontig_runner.sh -m ${NODE_LIST} -d ${SHARED_DISK} -b ${BLOCKSIZE} -c ${CLUSTERSIZE}  -s ${CLUSTER_STACK} -n ${CLUSTER_NAME} /mnt/ocfs2"
+
+	discontig_runner.sh -m ${NODE_LIST} -d ${SHARED_DISK} -b ${BLOCKSIZE} -c ${CLUSTERSIZE}  -s ${CLUSTER_STACK} -n ${CLUSTER_NAME} /mnt/ocfs2
+
+	f_info "DONE: multiple-node discontig block group testing"
 fi
