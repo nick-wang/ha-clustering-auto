@@ -66,7 +66,7 @@ def parseSingleLog(testreport_dir, cluster_env):
     logfile = "%s/single_report.txt" % testreport_dir
     if not os.path.isfile(logfile):
         print "WARN: %s not found!" % logfile
-        sys.exit(0)
+        return -1
 
     #Name of Test Suite
     TestSuiteName = "ocfs2 single node test"
@@ -102,7 +102,7 @@ def parseMultipleLog(testreport_dir, cluster_env):
     logfile = "%s/multiple_report.txt" % testreport_dir
     if not os.path.isfile(logfile):
         print "WARN: %s not found!" % logfile
-        sys.exit(0)
+        return -1
 
     #Name of Test Suite
     TestSuiteName = "ocfs2 Multiple nodes test"
@@ -123,11 +123,55 @@ def parseMultipleLog(testreport_dir, cluster_env):
                  ("lvb_torture", "MultipleNodes.lvb_torture", get_result)]
     parseLog(TestSuiteName, JunitXML, cases_def, logfile, cluster_env)
 
+def parseDiscontigBgSingleLog(testreport_dir, cluster_env):
+    logfile = "%s/discontig_bg_single_report.txt" % testreport_dir
+    if not os.path.isfile(logfile):
+        print "WARN: %s not found!" % logfile
+        return -1
+
+    #Name of Test Suite
+    TestSuiteName = "ocfs2 discontigous block group single node test"
+    #Name of junit xml file
+    JunitXML = "%s/junit-ocfs2-test-discontig-bg-single.xml" % testreport_dir
+
+    #Define testcases
+    #testcases = [(TestcaseName, TestcaseClass, TestcaseFunction)]
+    cases_def = [("inodes_block", "DiscontigBgSingleNode.inodes_block", get_result),
+                 ("extent_block", "DiscontigBgSingleNode.extent_block", get_result),
+                 ("inline_block", "DiscontigBgSingleNode.inline_block", get_result),
+                 ("xattr_block", "DiscontigBgSingleNode.xattr_block", get_result),
+                 ("refcount_block", "DiscontigBgSingleNode.refcount_block", get_result)]
+
+    parseLog(TestSuiteName, JunitXML, cases_def, logfile, cluster_env)
+
+def parseDiscontigBgMultipleLog(testreport_dir, cluster_env):
+
+    logfile = "%s/discontig_bg_multiple_report.txt" % testreport_dir
+    if not os.path.isfile(logfile):
+        print "WARN: %s not found!" % logfile
+        return -1
+
+    #Name of Test Suite
+    TestSuiteName = "ocfs2 disontigous block group multiple nodes test"
+    #Name of junit xml file
+    JunitXML = "%s/junit-ocfs2-test-discontig-bg-multiple.xml" % testreport_dir
+
+    #Define testcases
+    #testcases = [(TestcaseName, TestcaseClass, TestcaseFunction)]
+    cases_def = [("inodes_block", "DiscontigBgSingleNode.inodes_block", get_result),
+                 ("extent_block", "DiscontigBgSingleNode.extent_block", get_result),
+                 ("inline_block", "DiscontigBgSingleNode.inline_block", get_result),
+                 ("xattr_block", "DiscontigBgSingleNode.xattr_block", get_result),
+                 ("refcount_block", "DiscontigBgSingleNode.refcount_block", get_result)]
+
+    parseLog(TestSuiteName, JunitXML, cases_def, logfile, cluster_env)
 
 def main(cluster_conf, testreport_dir):
     cluster_env = readClusterConf(cluster_conf)
     parseSingleLog(testreport_dir, cluster_env)
     parseMultipleLog(testreport_dir, cluster_env)
+    parseDiscontigBgSingleLog(testreport_dir, cluster_env)
+    parseDiscontigBgMultipleLog(testreport_dir, cluster_env)
 
 if __name__ == "__main__":
     if len(sys.argv) < 3:

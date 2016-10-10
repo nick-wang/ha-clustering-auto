@@ -65,10 +65,62 @@ def parseMultipleLog(log, test_report_dir):
 			row = str(k) + " " + str(v[0]) + " " + str(v[1])
 			f.write(row + "\n")
 
+def parseDiscontigBgSingleLog(log, test_report_dir):
+	tblLog = {}
+	case = ""
+	result = ""
+
+# Example:
+# [*] Inodes Block Group Test:       [ PASS ]
+	with open(log, "r") as f:
+		for line in f:
+			if line.find("PASS") != -1:
+				case = re.split(r"\s", line)[1].lower() + "_block"
+				result = "PASSED"
+			elif line.find("FAILED") != -1:
+				case = re.split(r"\s", line)[1].lower() + "_block"
+				result = "FAILED"
+			else:
+				continue
+
+			tblLog[case] = [result]
+
+	with open(test_report_dir + "/discontig_bg_single_report.txt", "w") as f:
+		for k, v in tblLog.iteritems():
+			row = str(k) + " " + str(v[0])
+			f.write(row + "\n")
+
+def parseDiscontigBgMultipleLog(log, test_report_dir):
+	tblLog = {}
+	case = ""
+	result = ""
+
+# Example:
+# [*] Multi-nodes Inodes Block Group Test:      [ PASS ]
+	with open(log, "r") as f:
+		for line in f:
+			if line.find("PASS") != -1:
+				case = re.split(r"\s", line)[2].lower() + "_block"
+				result = "PASSED"
+			elif line.find("FAILED") != -1:
+				case = re.split(r"\s", line)[2].lower + "_block"
+				result = "FAILED"
+			else:
+				continue
+
+			tblLog[case] = [result]
+
+	with open(test_report_dir + "/discontig_bg_multiple_report.txt", "w") as f:
+		for k, v in tblLog.iteritems():
+			row = str(k) + " " + str(v[0])
+			f.write(row + "\n")
+
 
 def main(dir):
 	single_log = ""
 	multiple_log = ""
+	discontig_bg_single_log=""
+	discontig_bg_multiple_log=""
 
 	p = subprocess.Popen(["find", dir, "-name", "single_run.log"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 	(stdoutdata, stderrdata) = p.communicate()
@@ -88,13 +140,32 @@ def main(dir):
 	else:
 		print stderrdata
 
-	if single_log or multiple_log:
+	p = subprocess.Popen(["find", dir, "-name", "*discontig-bg-single-run.log"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+	(stdoutdata, stderrdata) = p.communicate()
+
+	if p.returncode == 0:
+		discontig_bg_single_log = str(stdoutdata).strip()
+		print "Discontig bg single log file: %s" % discontig_bg_single_log
+	else:
+		print stderrdata
+
+	p = subprocess.Popen(["find", dir, "-name", "*discontig-bg-multiple-run.log"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+	(stdoutdata, stderrdata) = p.communicate()
+
+	if p.returncode == 0:
+		discontig_bg_multiple_log = str(stdoutdata).strip()
+		print "Discontig bg multiple log file: %s" % discontig_bg_multiple_log
+	else:
+		print stderrdata
+
+
+	if single_log or multiple_log or discontig_bg_single_log or discontig_bg_multiple_log:
 		test_report_dir = dir + "/test_reports/"
 		p = subprocess.Popen(["mkdir", "-p", test_report_dir], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 		(stdoutdata, stderrdata) = p.communicate()
 
 		if p.returncode == 0:
-			print "Mkdir -p %s" % dir + test_report_dir
+			print "Mkdir -p %s" % test_report_dir
 		else:
 			print stderrdata
 
@@ -102,6 +173,10 @@ def main(dir):
 		parseSingleLog(single_log, test_report_dir)
 	if multiple_log:
 		parseMultipleLog(multiple_log, test_report_dir)
+	if discontig_bg_single_log:
+		parseDiscontigBgSingleLog(discontig_bg_single_log, test_report_dir)
+	if discontig_bg_multiple_log:
+		parseDiscontigBgMultipleLog(discontig_bg_multiple_log, test_report_dir)
 
 if __name__ == "__main__":
 	if len(sys.argv) < 2:
