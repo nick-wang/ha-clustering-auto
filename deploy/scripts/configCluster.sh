@@ -110,7 +110,7 @@ echo "modprobe softdog" >> /etc/init.d/boot.local
 #Enable service
 sle_ver=($(echo $(getSLEVersion)))
 case ${sle_ver[0]} in
-  12)
+  12|42.1|42.2)
     systemctl enable iscsid.socket
     systemctl enable iscsiuio.socket
     systemctl enable iscsi.service
@@ -164,7 +164,7 @@ fi
 sleep 2
 zypper up -y -l -t pattern ha_sles
 case ${sle_ver} in
-  12)
+  12|42.1|42.2)
     systemctl enable sbd
     systemctl restart pacemaker
     systemctl enable hawk

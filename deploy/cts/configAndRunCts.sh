@@ -49,7 +49,7 @@ then
     zypper in -y libvirt pacemaker-remote
 	#disable sbd
     case ${sle_ver[0]} in
-      12)
+      12|42.1|42.2)
         systemctl disable sbd
         systemctl enable corosync
         #systemctl disable pacemaker
@@ -91,7 +91,7 @@ then
 fi
 
 case ${sle_ver[0]} in
-  12)
+  12|42.1|42.2)
     systemctl stop pacemaker
     ;;
   11)
