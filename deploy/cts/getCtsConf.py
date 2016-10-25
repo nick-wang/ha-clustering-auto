@@ -39,7 +39,7 @@ def getOption():
         if opt in ("-i", "--interface"):
             options["interface"] = value
         elif opt in ("-s", "--stonith_type"):
-            options["sleep"] = value
+            options["stonith_type"] = value
         elif opt in ("-f", "--configuration"):
             options["configuration"] = value
         elif opt in ("-y","--yamlfile"):

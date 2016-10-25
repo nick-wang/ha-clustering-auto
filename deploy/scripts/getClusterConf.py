@@ -101,7 +101,7 @@ def restartNoIpNodes(vm_info_list):
         p.join()
 
 def get_cluster_conf(sleep_time="0", configuration="../cluster_conf",
-                     yaml="../confs/vm_list.yaml", recursive=False):
+                     yaml="../confs/vm_list.yaml", recursive=False, stonith="sbd"):
 
     vm_names = []
     if sleep_time != "0":
@@ -112,7 +112,6 @@ def get_cluster_conf(sleep_time="0", configuration="../cluster_conf",
     vm_list = dp.get_vms_conf()
     devices = dp.get_single_section_conf("devices")
     target_list = dp.get_shared_target()
-
     if devices is not None and devices.has_key("nic"):
         interface = devices["nic"]
     else:
@@ -130,8 +129,14 @@ def get_cluster_conf(sleep_time="0", configuration="../cluster_conf",
 
     num_vms = len(vm_list)
     contents = "NODES=%d\n" % num_vms
+    node_list = ""
+
     for vm in vm_list:
-	vm_names.append(vm['name'])
+        vm_names.append(vm['name'])
+        if node_list == "":
+            node_list = vm['name']
+        else:
+            node_list += ',' + vm['name']
     print "DEBUG: Checking ip range: %s" % ip_range
     vm_info_list = get_ip_list_by_mac(vm_names, ip_range)
 
@@ -165,23 +170,31 @@ def get_cluster_conf(sleep_time="0", configuration="../cluster_conf",
         i += 1
 
     iscsi = dp.get_single_section_conf("iscsi")
-
-    target_ip = iscsi["target_ip"]
-    #target_lun = iscsi["target_lun"]
-    if target_ip is None:
-        target_ip = "147.2.207.237"
-    #if target_lun is None:
-    #    target_lun = "iqn.2015-08.suse.bej.bliu:441a202b-6aa3-479f-b56f-374e2f38ba20"
-    #contents += "TARGET_IP=%s\n" % target_ip
-    #contents += "TARGET_LUN=%s\n" % target_lun
+    if iscsi is not None:
+        target_ip = iscsi["target_ip"]
+        #target_lun = iscsi["target_lun"]
+        if target_ip is None:
+            target_ip = "147.2.207.231"
+        #if target_lun is None:
+        #    target_lun = "iqn.2015-08.suse.bej.bliu:441a202b-6aa3-479f-b56f-374e2f38ba20"
+        #contents += "TARGET_IP=%s\n" % target_ip
+        #contents += "TARGET_LUN=%s\n" % target_lun
     contents += "NETADDR=%s\n" % netaddr
     contents += "IPADDR=%s\n" % ipaddr
 
     i = 1
-    for target in target_list:
-        contents += "SHARED_TARGET_LUN%d=%s\n" % (i, target['shared_target_lun'])
-        contents += "SHARED_TARGET_IP%d=%s\n" % (i, target['shared_target_ip'])
-        i += 1
+    contents += "STONITH=%s\n" % (stonith)
+    contents += "NODE_LIST=%s\n" % node_list
+
+    if (stonith == 'sbd') and ((target_list is None) or (len(target_list) == 0)):
+        print "sbd needs target."
+#        sys.exit(-1)
+
+    if target_list is not None:
+        for target in target_list:
+            contents += "SHARED_TARGET_LUN%d=%s\n" % (i, target['shared_target_lun'])
+            contents += "SHARED_TARGET_IP%d=%s\n" % (i, target['shared_target_ip'])
+            i += 1
 
     repos = dp.get_list_section_conf("repos")
     if len(repos):
@@ -197,22 +210,22 @@ def get_cluster_conf(sleep_time="0", configuration="../cluster_conf",
 
 def usage():
     print "usage:"
-    print "\t./getClusterConf.py -s <sleep-time> -f <configuration> -y <yaml>"
-    print "example:\n\t./getClusterConf.py -s 120 -f ../cluster_conf -y ../confs/vm_list.yaml"
+    print "\t./getClusterConf.py -s <sleep-time> -f <configuration> -y <yaml> -S <stonith-type>"
+    print "example:\n\t./getClusterConf.py -s 120 -f ../cluster_conf -y ../confs/vm_list.yaml -S sbd"
     print "\tsubnet will use nic in yaml file(devices)."
     sys.exit(1)
 
 def getOption():
     options = {"sleep": "0", "configuration": "../cluster_conf",
-               "yaml": "../confs/vm_list.yaml", "recursive": False}
+            "yaml": "../confs/vm_list.yaml", "stonith-type": "sbd",
+            "recursive": False}
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "s:f:y:R",
-                    ["sleep=", "configuration=", "yaml=", "recursive"])
+        opts, args = getopt.getopt(sys.argv[1:], "s:f:y:S:R",
+                    ["sleep=", "configuration=", "yaml=", "recursive", "stonith-type="])
     except getopt.GetoptError:
         print "Get options Error!"
         sys.exit(2)
-
     for opt, value in opts:
         if opt in ("-s", "--sleep"):
             options["sleep"] = value
@@ -222,6 +235,12 @@ def getOption():
             options["yaml"] = value
         elif opt in ("-R", "--recursive"):
             options["recursive"] = True
+        elif opt in ("-S", "--stonith-type"):
+            value = value.lower()
+            if (value != "sbd") and (value != "libvirt"):
+                print "stonith type can only be sbd or libvirt.\n"
+                usage()
+            options['stonith-type'] = value
         else:
             usage()
 
@@ -230,4 +249,4 @@ def getOption():
 if __name__ == "__main__":
     options = getOption()
     get_cluster_conf(options["sleep"], options["configuration"],
-                     options["yaml"], options["recursive"])
+                     options["yaml"], options["recursive"], options["stonith-type"])

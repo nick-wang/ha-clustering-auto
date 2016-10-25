@@ -92,17 +92,26 @@ then
         /etc/ssh/ssh_config
 fi
 
+#update ha packages
+zypper up -y -l -t pattern ha_sles
+
 #login iscsi target for sbd
 #and create sbd
 iscsiadm -m discovery -t st -p $TARGET_IP >/dev/null
 iscsiadm -m node -T $TARGET_LUN -p $TARGET_IP -l
 sleep 15
 
-sbd -d "/dev/disk/by-path/ip-$TARGET_IP:3260-iscsi-${TARGET_LUN}-lun-0" create
-modprobe softdog
-echo "SBD_DEVICE='/dev/disk/by-path/ip-$TARGET_IP:3260-iscsi-${TARGET_LUN}-lun-0'" > /etc/sysconfig/sbd
-echo "SBD_OPTS='-W'" >> /etc/sysconfig/sbd
-echo "modprobe softdog" >> /etc/init.d/boot.local
+#judge the stonith type
+if [ $STONITH == "libvirt" ];
+then
+    zypper in -y libvirt
+else
+    sbd -d "/dev/disk/by-path/ip-$TARGET_IP:3260-iscsi-${TARGET_LUN}-lun-0" create
+    modprobe softdog
+    echo "SBD_DEVICE='/dev/disk/by-path/ip-$TARGET_IP:3260-iscsi-${TARGET_LUN}-lun-0'" > /etc/sysconfig/sbd
+    echo "SBD_OPTS='-W'" >> /etc/sysconfig/sbd
+    echo "modprobe softdog" >> /etc/init.d/boot.local
+fi
 
 #Open ports if firewall enabled
 #Default disable after installation
@@ -159,19 +168,32 @@ fi
 isMaster "$HOSTNAME_NODE1"
 if [ $? -eq 0 ]
 then
-    crm configure primitive stonith_sbd stonith:external/sbd
+    if [ $STONITH == "sbd" ];
+    then
+        crm configure primitive stonith_sbd stonith:external/sbd
+    else
+        crm configure primitive libvirt_stonith stonith:external/libvirt \
+                  params hostlist="$NODE_LIST" \
+                  hypervisor_uri="qemu+tcp://$IPADDR/system" \
+                  op monitor interval="60"
+    fi
 fi
 sleep 2
-zypper up -y -l -t pattern ha_sles
 case ${sle_ver} in
   12|42.1|42.2)
-    systemctl enable sbd
+    if [ $STONITH == "sbd" ];
+    then
+        systemctl enable sbd
+    fi
     systemctl restart pacemaker
     systemctl enable hawk
     systemctl start hawk
     ;;
   11)
-    chkconfig sbd on
+    if [ $STONITH == "sbd" ];
+    then
+        chkconfig sbd on
+    fi
     service openais restart
     chkconfig hawk on
     rchawk start

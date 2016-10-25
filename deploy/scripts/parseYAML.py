@@ -75,6 +75,11 @@ class GET_VM_CONF:
                         'devices': ('disk_dir', 'nic', 'vcpus', 'memory', 'disk_size'),
                         'resources': ('sle_source', 'ha_source')}
 
+    def is_key_none(self, key):
+        if key is None:
+            return True
+        return False
+
     def get_yaml(self, url):
         '''
             Get group infomation from client.yaml
@@ -130,6 +135,8 @@ class GET_VM_CONF:
 
     def get_vms_conf(self):
         vms = []
+        if self.ya is None:
+            return None
         nodes = self.ya.get('nodes')
         vm_elements = ('name', 'mac', 'ostype', 'disk', 'vcpus', 'memory',
                        'disk_size', 'nic', 'graphics', 'os_settings' )
@@ -156,7 +163,11 @@ class GET_VM_CONF:
 
     def get_shared_target(self):
         targets = []
+        if self.is_key_none(self.ya):
+            return None
         iscsis = self.ya.get('iscsi')
+        if self.is_key_none(iscsis):
+            return None
         ip = iscsis.get('target_ip')
         target_luns = iscsis.get('shared_target_luns')
         if target_luns is None:
