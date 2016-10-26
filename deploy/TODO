@@ -47,3 +47,5 @@ Maybe We can use what pacemaker-cts did, added it to functions
 20. Detect the host OS. Using virt-install instead of vm-install for SLE12 or later.
 
 21. Reconstruct the directory structure, as the deploy directory is in disorder so far
+
+[done]22. add stonith options while deploying cluster, so far we support libvirt and sbd
