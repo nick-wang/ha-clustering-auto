@@ -21,7 +21,7 @@ deploy/  : the main part of this project, we deploy cluster and run testcases ba
 
   This is just for the project configuration and description, we run it in jenkins so
   far, you need some configurations in jenkins, for configure example of jenkins,
-  you can visit http://147.2.207.237:8080
+  you can visit http://147.2.207.231:8080
   If you need access of this server, please contact bliu@suse.com or nwang@suse.com
 
 jenkins-monitor/: script to  monitor a url, and download the latest ISO to local server.
