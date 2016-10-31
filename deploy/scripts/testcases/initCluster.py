@@ -140,5 +140,9 @@ def Run(conf, xmldir):
     with open(xmldir+"/"+"crm_mon", "w") as p:
         p.writelines(lines)
 
+    lines = os.popen("ssh root@%s cat /etc/YaST2/*build*" % cluster_env["IP_NODE1"]).readlines()
+    with open(xmldir+"/"+"host-build", "w") as p:
+        p.writelines(lines)
+
 if __name__ == "__main__":
     Run(sys.argv[1], sys.argv[2])
