@@ -45,8 +45,8 @@ TESTCASES = ({"name":"connect", "nodes": 0},
 s_dir = "/drbdtest/drbd-test-*"
 
 error_logs = ["Traceback", "Timeout waiting"]
-retry_logs = ["Timeout waiting"]
-timeout_retry = True
+retry_logs = error_logs
+need_retry = True
 
 nodelist = []
 
@@ -247,8 +247,8 @@ class Testcase(object):
             for e_pa in error_logs:
                 if re.search(e_pa, line):
                     # Sometimes network cause timeout, retry in this case
-                    if timeout_retry and e_pa in retry_logs and self.times <= 3:
-                        print "   Timeout, case retry..."
+                    if need_retry and e_pa in retry_logs and self.times <= 3:
+                        print "   %s, case retry..." % e_pa
                         self.need_do = True
                         self.old_output = self.output
                         self.times += 1
