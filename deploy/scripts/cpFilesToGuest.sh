@@ -21,6 +21,13 @@ chmod 0600 ../ssh_keys/id_rsa
 for ip in `cat ${CLUSTER_CONF} |grep IP_NODE |cut -d "=" -f 2`
 do
 {
+tmp=0
+while [ ${tmp} -lt 10 ]
+do
+    nmap ${ip} 2>&1|grep -q "22/tcp" && echo "${ip} ssh enabled. (${tmp})" && break ||
+        tmp=$((tmp+1)) && sleep 3
+done
+
 ssh root@${ip} "mkdir -p ${CLUSTER_DIR}/template; mkdir -p ${CLUSTER_DIR}/scripts"
 
 scp ${CLUSTER_CONF} root@${ip}:${CLUSTER_DIR}
