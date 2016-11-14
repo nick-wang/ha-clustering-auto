@@ -107,7 +107,8 @@ if [ X"$TESTMODE" == X"single_discontig_bg" -o X"$TESTMODE" == X"all" ];then
 	f_info "DONE: single-node discontig block group testing"
 fi
 
-if [ X"$TESTMODE" == X"multiple_discontig_bg" -o X"$TESTMODE" == X"all" ];then
+#if [ X"$TESTMODE" == X"multiple_discontig_bg" -o X"$TESTMODE" == X"all" ];then
+if [ X"$TESTMODE" == X"multiple_discontig_bg" ];then
 	echo -e "\n\n\n"
 	f_info "Start multiple-node discontig block group testing..."
 
