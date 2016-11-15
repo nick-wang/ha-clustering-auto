@@ -24,7 +24,7 @@ do
 		CLUSTER_CONFIG="${1#--cluster-config=}"
 		;;
 	*)
-		f_usage()
+		f_usage
 		;;
 	esac
 	shift
