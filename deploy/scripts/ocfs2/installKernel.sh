@@ -2,7 +2,7 @@
 
 f_usage()
 {
-    echo "`basename ${0}` --cluster-conf=<cluser configuration>"
+    echo "`basename ${0}` --cluster-config=<cluser configuration>"
 }
 
 # main
@@ -14,20 +14,20 @@ fi
 while [ $# -gt "0" ]
 do
     case "$1" in
-	"--cluster-conf="*)
-	    CLUSTER_CONF="${1#--cluster-conf=}"
+	"--cluster-config="*)
+	    CLUSTER_CONFIG="${1#--cluster-config=}"
 	    ;;
     esac
 
     shift
 done
 
-NUM_NODES="`cat ${CLUSTER_CONF} | grep NODES | cut -d'=' -f2`"
+NUM_NODES="`cat ${CLUSTER_CONFIG} | grep NODES | cut -d'=' -f2`"
 for id in `seq ${NUM_NODES}`
 do
 {
-	ip="`cat ${CLUSTER_CONF} | grep IP_NODE${id} | cut -d "=" -f 2`"
-	name="`cat ${CLUSTER_CONF} | grep HOSTNAME_NODE${id} | cut -d "=" -f 2`"
+	ip="`cat ${CLUSTER_CONFIG} | grep IP_NODE${id} | cut -d "=" -f 2`"
+	name="`cat ${CLUSTER_CONFIG} | grep HOSTNAME_NODE${id} | cut -d "=" -f 2`"
 	# install kernel
 	echo "ssh root@${ip} zypper --non-interactive install kernel-vanilla"
         ssh root@${ip} "zypper --non-interactive install kernel-vanilla"
