@@ -126,6 +126,14 @@ def get_config_and_install(deployfile='../confs/vm_list.yaml', autoyast=''):
     devices = dp.get_single_section_conf("devices")
     installVMs(vm_list, resource, devices, autoyast)
 
+def mkdir_p(path):
+    if os.path.exists(path):
+        return
+    dir_name = os.path.dirname(path)
+    mkdir_p(dir_name)
+    if os.path.exists(path) == False:
+        os.mkdir(path)
+
 def usage():
     print "usage:"
     print "\t./installVM.py <yaml-conf> <autoyast>"
@@ -134,6 +142,8 @@ def usage():
     sys.exit(1)
 
 if __name__ == "__main__":
+    mkdir_p("/var/run/vm-install/")
+    os.chmod("/var/run/vm-install/", 0755)
     if len(sys.argv) > 3:
         usage()
     elif len(sys.argv) == 3:
