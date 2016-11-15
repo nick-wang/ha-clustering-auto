@@ -2,10 +2,11 @@
 
 f_usage()
 {
-    echo "scpFils2Guest.sh <CLUSTER_CONF> <CTS_DIR>"
-    echo "	<CLUSTER_CONF> - Basic configuration about cluster"
-    echo "	<CTS_CONF> - Configuration to control ocfs2 test"
-    echo "	<CTS_DIR> - Where ocfs2 CTS will be running"
+    echo "scpFils2Guest.sh <--cluster-config=CLUSTER_CONFIG> <SOURCE> <TARGET>"
+    echo "	--cluster-config: cluster configuration file"
+    echo "	<SOURCE> - source file(s) in host, only support"
+    echo "	single directory or file"
+    echo "	<TARGET> - Where ocfs2 CTS scripts will be running in guest"
     exit 1
 }
 
@@ -15,47 +16,37 @@ then
     exit 1
 fi
 
-CLUSTER_CONF=$1
-CTS_CONF=$2
-CTS_DIR=$3
+while [ "$#" -gt "0" ]
+do
+    case "$1" in
+	"--cluster-config="*)
+	    CLUSTER_CONFIG="${1#--cluster-config=}"
+	    ;;
+	*)
+	    break
+	    ;;
+    esac
+    shift
+done
 
-# Copy scripts to guest
-for ip in `cat $CLUSTER_CONF |grep IP_NODE |cut -d "=" -f 2`
+SOURCE="$1"
+shift
+TARGET="$1"
+
+# Copy files from host to guest
+for ip in `cat ${CLUSTER_CONFIG} | grep IP_NODE | cut -d "=" -f 2`
 do
 {
-    echo "ssh root@${ip} mkdir -p ${CTS_DIR}"
-    ssh root@${ip} "mkdir -p ${CTS_DIR}"
+    echo "ssh root@${ip} [ -d ${TARGET} ] || mkdir ${TARGET}"
+    ssh root@${ip} "[ -d ${TARGET} ] || mkdir ${TARGET}"
 
-    echo "scp ${CTS_CONF} root@${ip}:${CTS_DIR}"
-    scp ${CTS_CONF} root@${ip}:${CTS_DIR}
-
-
-    echo "scp guest/* root@${ip}:${CTS_DIR}"
-    scp guest/* root@${ip}:${CTS_DIR}
-
-    echo  "ssh root@${ip} chmod 0600 /root/.ssh/id_rsa"
-    ssh root@${ip} "chmod 0600 /root/.ssh/id_rsa"
+    if [ -f ${SOURCE} ];then
+	echo "scp ${SOURCE} root@${ip}:${TARGET}"
+	scp ${SOURCE} root@${ip}:${TARGET}
+    else
+	echo "scp -r ${SOURCE}/* root@${ip}:${TARGET}"
+	scp -r ${SOURCE}/* root@${ip}:${TARGET}
+    fi
 } &
 done
 wait
-
-# Pull test results into host after test done
-
-#source $CLUSTER_CONF
-#ip=`cat $CLUSTER_CONF | grep -A 1 ${master_node} | grep IP_NODE | cut -d "=" -f 2`
-#echo scp -r root@${ip}:/usr/local/ocfs2-test/log ${BUILD_LOG_DIR_IN_HOST}
-#scp -r root@${ip}:/usr/local/ocfs2-test/log ${BUILD_LOG_DIR_IN_HOST}
-
-# TODO: decorate test result
-
-#for ip in `cat $CLUSTER_CONF |grep IP_NODE |cut -d "=" -f 2`
-#do
-#{
-#ip=`cat $CLUSTER_CONF | grep IP_NODE |cut -d "=" -f 2 | head -1`
-#date_str=`date +%s`
-#hb_report="hb_report_${ip}_${date_str}"
-#ssh root@${ip} "systemctl restart pacemaker; sleep 3; hb_report -f 0:00 $hb_report"
-#echo "ssh root@${ip}" "systemctl start pacemaker; sleep 3; hb_report -f 0:00 $hb_report"
-#scp ${ip}:/root/$hb_report* $3
-#}
-#done
