@@ -45,12 +45,24 @@ cat ${CTS_CONF}
 BLOCKSIZE="`cat ${CTS_CONF} | grep BLOCK_SIZE | cut -d "=" -f 2`"
 CLUSTERSIZE="`cat ${CTS_CONF} | grep CLUSTER_SIZE | cut -d "=" -f 2`"
 TESTMODE="`cat ${CTS_CONF} | grep TESTMODE | cut -d "=" -f 2`"
-TESTMODE="`cat ${CTS_CONF} | grep TESTMODE | cut -d "=" -f 2`"
 SINGLE_CASES="`cat ${CTS_CONF} | grep SINGLE_CASES | cut -d "=" -f 2`"
 MULTIPLE_CASES="`cat ${CTS_CONF} | grep MULTIPLE_CASES | cut -d "=" -f 2`"
 CLUSTER_STACK="`cat ${CTS_CONF} | grep CLUSTER_STACK | cut -d "=" -f 2`"
 CLUSTER_NAME="`cat ${CTS_CONF} | grep CLUSTER_NAME | cut -d "=" -f 2`"
 SHARED_DISK="`cat ${CTS_CONF} | grep SHARED_DISK | cut -d "=" -f 2`"
+KERNEL_SOURCE="`cat ${CTS_CONF} | grep KERNEL_SOURCE | cut -d "=" -f 2`"
+
+# exit if TESTMODE == none
+if [ ${TESTMODE} == "none" ];then
+	f_info "testmode is none, so exit!"
+	exit 0
+fi
+
+# Prepare kernel-source used by ocfs2 CTS
+if [ ! -f ${KERNEL_SOURCE} ];then
+	f_info "ERR: source kernel not found"
+	exit 1
+fi
 
 # __MAIN__
 
