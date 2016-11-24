@@ -5,6 +5,9 @@
 import os, sys, subprocess
 import re
 
+# how the parse* func works below really depends on what the
+# ocfs2-test testing result log looks like...
+
 def parseSingleLog(log, test_report_dir):
 	tblLog = {}
 	priorLine = ""
