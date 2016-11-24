@@ -93,12 +93,16 @@ def getVMByName(vmname):
         vm.adddisk(disk1)
     return vm
 
-def remove_vm(vm):
+def remove_vm(vm, remove=True):
     vmname = vm.get_vmname()
     disk_list = vm.get_disks()
     cmd = 'virsh destroy %s' % vmname
     status, output = commands.getstatusoutput(cmd)
     print "destroying vm %s" % vmname
+    #just shutdown vm
+    if remove == False:
+        return
+
     for disk in disk_list:
         path = disk.get_path()
         if os.path.exists(path) == False:
@@ -117,9 +121,9 @@ def checkVMExists(vmname):
     else:
         return False
 
-def removeVMByName(vmname):
+def removeVMByName(vmname, remove=True):
     vm = getVMByName(vmname)
-    remove_vm(vm)
+    remove_vm(vm, remove)
 
 def getVMList():
     cmd='virsh list --all|grep "shut off"'
@@ -146,13 +150,13 @@ def getVMList():
     content = content + '\n' + formatVMs(expired_list, "expired") + '\n\n'
     return content
 
-def removeVMViaYaml(yamlfile):
+def removeVMViaYaml(yamlfile, remove=True):
     with open(yamlfile,'r') as f:
         ya = yaml.load(f)
     vms = ya.get('nodes')
     for vm in vms:
         if checkVMExists(vm["name"]):
-            removeVMByName(vm["name"])
+            removeVMByName(vm["name"], remove)
 
 def getHostInfo():
     hostname = socket.gethostname()
@@ -200,6 +204,7 @@ def usage():
         To clean old vms and sendmail: ./cleanVM.py -m
         To remove specified vms: ./cleanVM.py -c "vm1 vm2"
         To remove specified vms via yaml: ./cleanVM.py -f file.yaml
+        To shutdown vm instead of remove vm, please add "-s" option
           example of yaml file:
             nodes:
               - name: node-1
@@ -209,7 +214,10 @@ def usage():
     sys.exit(-2)
 
 if __name__ == '__main__':
-    opts, args = getopt.getopt(sys.argv[1:], "c:mf:")
+    opts, args = getopt.getopt(sys.argv[1:], "c:mf:s")
+    remove = True
+    yaml_file = None
+    vm_list = None
     for opt, value in opts:
        if opt == '-m':
            title, content = get_content()
@@ -222,18 +230,28 @@ if __name__ == '__main__':
                sys.exit(-3)
        elif opt == '-c':
            vm_list = value.split()
-           for vmname in vm_list:
-               if checkVMExists(vmname):
-                   removeVMByName(vmname)
-           sys.exit(0)
+#           for vmname in vm_list:
+#               if checkVMExists(vmname):
+#                   removeVMByName(vmname)
+#           sys.exit(0)
        elif opt == '-f':
            if os.path.exists(value) and os.path.isfile(value):
-              removeVMViaYaml(value)
-              sys.exit(0)
+               yaml_file = value
+#              removeVMViaYaml(value)
+#              sys.exit(0)
            else:
               print "%s is not exist or not a file." % value
               sys.exit(-3)
+       elif opt == "-s":
+           remove = False
        else:
            print "Wrong input. opt %s, value %s" % (opt, value)
-
+    if vm_list is not None:
+        for vmname in vm_list:
+            if checkVMExists(vmname):
+                removeVMByName(vmname, remove)
+        sys.exit(0)
+    elif yaml_file is not None:
+        removeVMViaYaml(yaml_file, remove)
+        sys.exit(0)
     usage()
