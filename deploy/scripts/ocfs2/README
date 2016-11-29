@@ -1,22 +1,39 @@
 OCFS2 CTS scripts
 =================
 
-1. prepareInHost.sh
+1. scpFils2Guest.sh
 
-  o Make passwordless SSH for ocfs2 test uers among nodes
+  o scp scripts to cluster nodes
 
-2. cpCtsFilesToGuest.sh
+2. sshTestUsr.sh
 
-  o Copy and invoke scripts to guest
+  o passwordless ssh among nodes for test user
 
-3. runInGuest.sh
+3. runProg.sh
 
-  o Prepare test environment and start running test
+  o helper tool to run script on nodes
 
-4. runCts.sh
+4. downloadTestLogs.sh
 
-  o Run OCFS2 CTS
+  o pull logs into host server
 
-5. sshkeys
+5. genTestReport.py
+  
+  o generate simplified report from logs
+
+6. ../testcases/parseOCFS2Report.py
+
+  o make a beautiful report for jenkins
+
+7. guest/prepTestEnv.sh
+
+  o prepare env for ocfs2-test
+
+8. guest/runTest.sh
+
+  o run ocfs2-test
+
+7. sshkeys
 
   o RSA keys for #1
+

@@ -10,7 +10,6 @@ KERNEL_SOURCE="linux-2.6.39.tar.gz"
 f_usage()
 {
 	echo "Usage: `basename ${0}` <MASTER_NODE>"
-	exit 1
 }
 
 f_info()
@@ -28,7 +27,7 @@ if [ $# -lt 1 ];then
 	exit 1
 fi
 
-# some commands just need to run on any one of the nodes
+# some commands just need to run on anyone of the nodes
 MASTER_NODE="$1"
 
 # __MAIN__
@@ -78,7 +77,7 @@ if [ x"`hostname`" == x"$MASTER_NODE" ];then
 	f_log "crm configure show"
 	crm configure show
 
-	sleep 5
+	sleep 3
 
 	f_log "crm status full"
 	crm status full
