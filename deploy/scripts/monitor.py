@@ -2,11 +2,13 @@
 #http://download.suse.de/ibs/SUSE:/SLE-12-SP2:/GA/standard/x86_64/
 
 import re, os, urllib2, sys
+import getopt
 #pacemaker-1.1.15-17-x86_64.rpm
 #corosync-2.3.5-4.2.x86_64.rpm
 #patterns=['pacemaker-(\d)','corosync-(\d)+']
 patterns=['^pacemaker-(\d)+\.(\d)+\.(\d)+-(\d)+\.(\d)+\.(\w)+\.rpm','^corosync-(\d)+\.(\d)+\.(\d)+-(\d)+\.(\d)+\.\w+\.rpm']
 packages_monitoring=['pacemaker', 'corosync']
+proj_name=""
 
 def isTheRPM(package):
     if not package.endswith('rpm'):
@@ -30,7 +32,8 @@ def get_all_packages(html):
 
 def save_package_info(html):
     packages = get_all_packages(html)
-    f = open('package_info','w')
+    filename = "%s_package_info" % proj_name
+    f = open(filename,'w')
     content=""
     for package in packages:
         content = content + package + "\n"
@@ -38,8 +41,9 @@ def save_package_info(html):
     f.close()
 
 def get_package_info():
-    if os.path.exists('package_info'):
-        f = open('package_info')
+    filename = "%s_package_info" % proj_name
+    if os.path.exists(filename):
+        f = open(filename)
         return f.read().split()
     return None
 
@@ -90,8 +94,25 @@ def main(url):
     print "do not update"
     sys.exit(1)
 
+def usage():
+    print "./monitor.py -u <url> -p <packages> -P <project_name>"
+    sys.exit(3)
+
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print "usage: ./monitor.py <url>"
+    url = ""
+    try:
+        opts, args = getopt.getopt(sys.argv[1:], "u:p:P:")
+    except getopt.GetoptError:
+        print "Get options Error!"
         sys.exit(2)
-    main(sys.argv[1])
+    for opt, value in opts:
+        if opt in ("-u", "--url"):
+            url = value.strip()
+        elif opt in ("-p", "--packages"):
+            packages_monitoring = value.split()
+        elif opt in ("-P", "--project"):
+            proj_name = value.strip()
+        else:
+            usage()
+
+    main(url)
