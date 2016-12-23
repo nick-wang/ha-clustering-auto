@@ -82,6 +82,7 @@
   <software>
     <packages config:type="list">
       <package>autoyast2-installation</package>
+      <package>systemd-rpm-macros</package>
       <!--package>open-iscsi</package-->
     </packages>
     <patterns config:type="list">

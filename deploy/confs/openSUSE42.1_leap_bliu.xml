@@ -102,6 +102,7 @@
       <package>yast2-cluster</package>
       <package>yast2-drbd</package>
       <package>yast2-iplb</package>
+      <package>systemd-rpm-macros</package>
     </packages>
     <patterns config:type="list">
       <pattern>yast2_basis</pattern>
