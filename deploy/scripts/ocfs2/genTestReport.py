@@ -138,7 +138,8 @@ def main(dir):
 	(stdoutdata, stderrdata) = p.communicate()
 
 	if p.returncode == 0:
-		multiple_log = str(stdoutdata).strip()
+		if (stdoutdata):
+			multiple_log = str(stdoutdata).splitlines()[-1]
 		print "Multiple log file: %s" % multiple_log
 	else:
 		print stderrdata
@@ -147,7 +148,8 @@ def main(dir):
 	(stdoutdata, stderrdata) = p.communicate()
 
 	if p.returncode == 0:
-		discontig_bg_single_log = str(stdoutdata).strip()
+		if (stdoutdata):
+			discontig_bg_single_log = str(stdoutdata).splitlines()[-1]
 		print "Discontig bg single log file: %s" % discontig_bg_single_log
 	else:
 		print stderrdata
@@ -156,7 +158,8 @@ def main(dir):
 	(stdoutdata, stderrdata) = p.communicate()
 
 	if p.returncode == 0:
-		discontig_bg_multiple_log = str(stdoutdata).strip()
+		if (stdoutdata):
+			discontig_bg_multiple_log = str(stdoutdata).splitlines()[-1]
 		print "Discontig bg multiple log file: %s" % discontig_bg_multiple_log
 	else:
 		print stderrdata
