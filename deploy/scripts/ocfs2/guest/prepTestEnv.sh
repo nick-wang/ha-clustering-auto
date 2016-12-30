@@ -4,9 +4,6 @@
 #
 # Prepare Env for running ocfs2 test
 
-KERNEL_PATH="/mnt/vm/eric"
-KERNEL_SOURCE="linux-2.6.39.tar.gz"
-
 f_usage()
 {
 	echo "Usage: `basename ${0}` <MASTER_NODE>"
@@ -87,16 +84,5 @@ fi
 f_info "Make ocfs2test as passwordless sudoer"
 sed -i '/%wheel ALL=(ALL) NOPASSWD: ALL/a ocfs2test ALL=(ALL) NOPASSWD: ALL' /etc/sudoers
 
-# 4. Create mount point
-f_info "Create mount point"
-mkdir -p /mnt/ocfs2
-chmod 777 /mnt/ocfs2
-
-# 5. Prepare kernel-source used by ocfs2 CTS
-f_info "Prepare kernel-source used by ocfs2 CTS"
-f_log "scp root@147.2.207.234:/mnt/vm/eric/linux-2.6.39.tar.gz /usr/local/ocfs2-test/tmp"
-scp root@147.2.207.234:${KERNEL_PATH}/${KERNEL_SOURCE} /usr/local/ocfs2-test/tmp
-chown -R ocfs2test:users /usr/local/ocfs2-test/tmp/${KERNEL_SOURCE}
-
-# 6. blkid, refer to "man blkid"
+# 4. blkid, refer to "man blkid"
 sed -i '/^EVALUATE=udev$/ s/$/,scan/' /etc/blkid.conf
