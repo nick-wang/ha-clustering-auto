@@ -111,9 +111,11 @@ mkdir -p ${MOUNT_POINT}
 chmod 777 ${MOUNT_POINT}
 
 # Prepare kernel-source used by some test cases
-f_info "Prepare kernel-source used by some test cases"
-f_log "scp root@${HOST_IP}:${KERNEL_SOURCE} /usr/local/ocfs2-test/tmp"
-scp root@${HOST_IP}:${KERNEL_SOURCE} /usr/local/ocfs2-test/tmp
+#f_info "Prepare kernel-source used by some test cases"
+#f_log "scp root@${HOST_IP}:${KERNEL_SOURCE} /usr/local/ocfs2-test/tmp"
+
+# we cannot access to host passwordlessly, pity
+#scp root@${HOST_IP}:${KERNEL_SOURCE} /usr/local/ocfs2-test/tmp
 
 # kernel source path in guest node
 KERNEL_SOURCE=/usr/local/ocfs2-test/tmp/`basename ${KERNEL_SOURCE}`
