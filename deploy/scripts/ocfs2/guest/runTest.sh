@@ -26,8 +26,8 @@ f_umount()
 {
 	for node in `echo ${NODE_LIST} | sed "s:,: :g"`
 	do
-		echo "ssh ${node} sudo umount /mnt/ocfs2 > /dev/null 2>&1"
-		ssh ${node} "sudo umount /mnt/ocfs2 > /dev/null 2>&1"
+		echo "ssh ${node} sudo umount ${MOUNT_POINT} > /dev/null 2>&1"
+		ssh ${node} "sudo umount ${MOUNT_POINT} > /dev/null 2>&1"
 	done
 }
 
@@ -50,16 +50,27 @@ MULTIPLE_CASES="`cat ${CTS_CONF} | grep MULTIPLE_CASES | cut -d "=" -f 2`"
 CLUSTER_STACK="`cat ${CTS_CONF} | grep CLUSTER_STACK | cut -d "=" -f 2`"
 CLUSTER_NAME="`cat ${CTS_CONF} | grep CLUSTER_NAME | cut -d "=" -f 2`"
 SHARED_DISK="`cat ${CTS_CONF} | grep SHARED_DISK | cut -d "=" -f 2`"
+MOUNT_POINT="`cat ${CTS_CONF} | grep MOUNT_POINT | cut -d "=" -f 2`"
+HOST_IP="`cat ${CTS_CONF} | grep HOST_IP | cut -d "=" -f 2`"
 KERNEL_SOURCE="`cat ${CTS_CONF} | grep KERNEL_SOURCE | cut -d "=" -f 2`"
 
 # exit if TESTMODE == none
 if [ ${TESTMODE} == "none" ];then
-	f_info "testmode is none, so exit!"
+	f_info "testmode is none, don't run any testcase!"
 	exit 0
 fi
 
-# Prepare kernel-source used by ocfs2 CTS
-if [ ! -f ${KERNEL_SOURCE} ];then
+if [ -z ${SHARED_DISK} ]; then
+	f_info "ERR: shared disk not specified"
+	exit 1
+fi
+
+if [ -z ${MOUNT_POINT} ]; then
+	f_info "ERR: mount point not specified"
+	exit 1
+fi
+
+if [ -z ${KERNEL_SOURCE} ]; then
 	f_info "ERR: source kernel not found"
 	exit 1
 fi
@@ -94,52 +105,70 @@ fi
 #
 # lvb_torture: unknown
 
-if [ X"$TESTMODE" == X"single" -o X"$TESTMODE" == X"all" ];then
-	echo -e "\n\n\n"
-	f_info "Start single node testing..."
+# Create mount point
+f_info "Create mount point"
+mkdir -p ${MOUNT_POINT}
+chmod 777 ${MOUNT_POINT}
 
-	f_log "single_run-WIP.sh -k /usr/local/ocfs2-test/tmp/linux-2.6.39.tar.gz -l /usr/local/ocfs2-test/log -m /mnt/ocfs2/ -d ${SHARED_DISK} ${BLOCKSIZE} ${CLUSTERSIZE} -s ${CLUSTER_STACK} -n ${CLUSTER_NAME} -t ${SINGLE_CASES}"
+# Prepare kernel-source used by some test cases
+#f_info "Prepare kernel-source used by some test cases"
+#f_log "scp root@${HOST_IP}:${KERNEL_SOURCE} /usr/local/ocfs2-test/tmp"
 
-	single_run-WIP.sh -k  /usr/local/ocfs2-test/tmp/linux-2.6.39.tar.gz -l /usr/local/ocfs2-test/log -m /mnt/ocfs2/ -d ${SHARED_DISK} ${BLOCKSIZE} ${CLUSTERSIZE}  -s ${CLUSTER_STACK} -n ${CLUSTER_NAME} -t ${SINGLE_CASES}
+# we cannot access to host passwordlessly, pity
+#scp root@${HOST_IP}:${KERNEL_SOURCE} /usr/local/ocfs2-test/tmp
 
-	f_info "DONE: single node testing"
-fi
+# kernel source path in guest node
+KERNEL_SOURCE=/usr/local/ocfs2-test/tmp/`basename ${KERNEL_SOURCE}`
+chown -R ocfs2test:users ${KERNEL_SOURCE}
 
-sleep 3
-f_umount
-sleep 3
+for tm in $(echo ${TESTMODE} | sed 's:,: :g'); do
+	# try to proceed further when previous one failed
+	f_umount
 
+	if [ X"$tm" == X"single" ]; then
+		echo -e "\n\n\n"
+		f_info "Start single node testing..."
 
-if [ X"$TESTMODE" == X"multiple" -o X"$TESTMODE" == X"all" ];then
-	echo -e "\n\n\n"
-	f_info "Start multiple nodes testing..."
+		f_log "single_run-WIP.sh -k ${KERNEL_SOURCE} -l /usr/local/ocfs2-test/log -m ${MOUNT_POINT} -d ${SHARED_DISK} ${BLOCKSIZE} ${CLUSTERSIZE} -s ${CLUSTER_STACK} -n ${CLUSTER_NAME} -t ${SINGLE_CASES}"
 
-	f_log "multiple_run.sh -k /usr/local/ocfs2-test/tmp/linux-2.6.39.tar.gz -n ${NODE_LIST} -d ${SHARED_DISK} ${BLOCKSIZE} ${CLUSTERSIZE}  -s ${CLUSTER_STACK} -C ${CLUSTER_NAME} -t ${MULTIPLE_CASES}  /mnt/ocfs2"
+		single_run-WIP.sh -k  ${KERNEL_SOURCE} -l /usr/local/ocfs2-test/log -m ${MOUNT_POINT} -d ${SHARED_DISK} ${BLOCKSIZE} ${CLUSTERSIZE}  -s ${CLUSTER_STACK} -n ${CLUSTER_NAME} -t ${SINGLE_CASES}
 
-	multiple_run.sh -k /usr/local/ocfs2-test/tmp/linux-2.6.39.tar.gz -n ${NODE_LIST} -d ${SHARED_DISK} ${BLOCKSIZE} ${CLUSTERSIZE} -t ${MULTIPLE_CASES}  -s ${CLUSTER_STACK} -C ${CLUSTER_NAME}  /mnt/ocfs2
+		f_info "DONE: single node testing"
+		continue
+	fi
 
-	f_info "DONE: multiple nodes testing"
-fi
+	if [ X"$tm" == X"multiple" ]; then
+		echo -e "\n\n\n"
+		f_info "Start multiple nodes testing..."
 
-if [ X"$TESTMODE" == X"single_discontig_bg" -o X"$TESTMODE" == X"all" ];then
-	echo -e "\n\n\n"
-	f_info "Start single-node discontig block group testing..."
+		f_log "multiple_run.sh -k ${KERNEL_SOURCE} -n ${NODE_LIST} -d ${SHARED_DISK} ${BLOCKSIZE} ${CLUSTERSIZE}  -s ${CLUSTER_STACK} -C ${CLUSTER_NAME} -t ${MULTIPLE_CASES}  ${MOUNT_POINT}"
 
-	f_log "discontig_runner.sh -m ${NODE_LIST} -d ${SHARED_DISK} ${BLOCKSIZE} ${CLUSTERSIZE}  -s ${CLUSTER_STACK} -n ${CLUSTER_NAME} /mnt/ocfs2"
+		multiple_run.sh -k ${KERNEL_SOURCE} -n ${NODE_LIST} -d ${SHARED_DISK} ${BLOCKSIZE} ${CLUSTERSIZE} -t ${MULTIPLE_CASES}  -s ${CLUSTER_STACK} -C ${CLUSTER_NAME}  ${MOUNT_POINT}
 
-	discontig_runner.sh -d ${SHARED_DISK} ${BLOCKSIZE} ${CLUSTERSIZE}  -s ${CLUSTER_STACK} -n ${CLUSTER_NAME} /mnt/ocfs2
+		f_info "DONE: multiple nodes testing"
+		continue
+	fi
 
-	f_info "DONE: single-node discontig block group testing"
-fi
+	if [ X"$tm" == X"single_discontig_bg" ]; then
+		echo -e "\n\n\n"
+		f_info "Start single-node discontig block group testing..."
 
-#if [ X"$TESTMODE" == X"multiple_discontig_bg" -o X"$TESTMODE" == X"all" ];then
-if [ X"$TESTMODE" == X"multiple_discontig_bg" ];then
-	echo -e "\n\n\n"
-	f_info "Start multiple-node discontig block group testing..."
+		f_log "discontig_runner.sh -m ${NODE_LIST} -d ${SHARED_DISK} ${BLOCKSIZE} ${CLUSTERSIZE}  -s ${CLUSTER_STACK} -n ${CLUSTER_NAME} ${MOUNT_POINT}"
 
-	f_log "discontig_runner.sh -m ${NODE_LIST} -d ${SHARED_DISK} ${BLOCKSIZE} ${CLUSTERSIZE}  -s ${CLUSTER_STACK} -n ${CLUSTER_NAME} /mnt/ocfs2"
+		discontig_runner.sh -d ${SHARED_DISK} ${BLOCKSIZE} ${CLUSTERSIZE}  -s ${CLUSTER_STACK} -n ${CLUSTER_NAME} ${MOUNT_POINT}
 
-	discontig_runner.sh -m ${NODE_LIST} -d ${SHARED_DISK} ${BLOCKSIZE} ${CLUSTERSIZE}  -s ${CLUSTER_STACK} -n ${CLUSTER_NAME} /mnt/ocfs2
+		f_info "DONE: single-node discontig block group testing"
+		continue
+	fi
 
-	f_info "DONE: multiple-node discontig block group testing"
-fi
+	if [ X"$tm" == X"multiple_discontig_bg" ];then
+		echo -e "\n\n\n"
+		f_info "Start multiple-node discontig block group testing..."
+
+		f_log "discontig_runner.sh -m ${NODE_LIST} -d ${SHARED_DISK} ${BLOCKSIZE} ${CLUSTERSIZE}  -s ${CLUSTER_STACK} -n ${CLUSTER_NAME} ${MOUNT_POINT}"
+
+		discontig_runner.sh -m ${NODE_LIST} -d ${SHARED_DISK} ${BLOCKSIZE} ${CLUSTERSIZE}  -s ${CLUSTER_STACK} -n ${CLUSTER_NAME} ${MOUNT_POINT}
+
+		f_info "DONE: multiple-node discontig block group testing"
+	fi
+done
