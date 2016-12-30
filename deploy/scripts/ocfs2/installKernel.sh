@@ -28,14 +28,14 @@ do
 {
 	ip="`cat ${CLUSTER_CONFIG} | grep IP_NODE${id} | cut -d "=" -f 2`"
 	name="`cat ${CLUSTER_CONFIG} | grep HOSTNAME_NODE${id} | cut -d "=" -f 2`"
-	# install kernel
-	echo "ssh root@${ip} zypper --non-interactive install kernel-vanilla"
-        ssh root@${ip} "zypper --non-interactive install kernel-vanilla"
-
+	
 	# install kernel debuginfo, debugsource and vanilla source on 1st node, etc.
 	if [ "$id" == "1" ];then
-	    echo "ssh root@${ip} zypper --non-interactive install --detail kernel-vanilla-debuginfo kernel-vanilla-debugsource kernel-source-vanilla kernel-vanilla-devel"
-	    ssh root@${ip} zypper --non-interactive install --detail kernel-vanilla-debuginfo kernel-vanilla-debugsource kernel-source-vanilla kernel-vanilla-devel
+	    echo "ssh root@${ip} zypper --non-interactive install kernel-vanilla kernel-vanilla-debuginfo kernel-source-vanilla kernel-vanilla-devel"
+	    ssh root@${ip} zypper --non-interactive install kernel-vanilla kernel-vanilla-debuginfo kernel-source-vanilla kernel-vanilla-devel
+	else
+	    echo "ssh root@${ip} zypper --non-interactive install kernel-vanilla"
+	    ssh root@${ip} "zypper --non-interactive install kernel-vanilla"
 	fi
 
 	# set default kernel
@@ -67,6 +67,6 @@ do
 	    echo "ERROR: giving up ping ${ip} after retrying several times"
 	    exit 1
 	fi
-    } &
+} &
 done
 wait
