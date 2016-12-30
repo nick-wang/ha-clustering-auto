@@ -129,7 +129,8 @@ def main(dir):
 	(stdoutdata, stderrdata) = p.communicate()
 
 	if p.returncode == 0:
-		single_log = str(stdoutdata).strip()
+		if (stdoutdata):
+			single_log = str(stdoutdata).splitlines()[-1]
 		print "Single log file: %s" % single_log
 	else:
 		print stderrdata
