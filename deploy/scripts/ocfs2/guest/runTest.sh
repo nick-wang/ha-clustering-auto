@@ -107,8 +107,8 @@ fi
 
 # Create mount point
 f_info "Create mount point"
-mkdir -p ${MOUNT_POINT}
-chmod 777 ${MOUNT_POINT}
+sudo mkdir -p ${MOUNT_POINT}
+sudo chmod 777 ${MOUNT_POINT}
 
 # Prepare kernel-source used by some test cases
 #f_info "Prepare kernel-source used by some test cases"
@@ -119,7 +119,7 @@ chmod 777 ${MOUNT_POINT}
 
 # kernel source path in guest node
 KERNEL_SOURCE=/usr/local/ocfs2-test/tmp/`basename ${KERNEL_SOURCE}`
-chown -R ocfs2test:users ${KERNEL_SOURCE}
+sudo chown -R ocfs2test:users ${KERNEL_SOURCE}
 
 for tm in $(echo ${TESTMODE} | sed 's:,: :g'); do
 	# try to proceed further when previous one failed
