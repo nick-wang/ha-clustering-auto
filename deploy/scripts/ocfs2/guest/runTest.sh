@@ -22,13 +22,20 @@ f_log()
 	echo [LOG]@{`hostname`} $*
 }
 
-f_umount()
+f_do_on_each_node()
 {
+	CMD=$1
+
 	for node in `echo ${NODE_LIST} | sed "s:,: :g"`
 	do
-		echo "ssh ${node} sudo umount ${MOUNT_POINT} > /dev/null 2>&1"
-		ssh ${node} "sudo umount ${MOUNT_POINT} > /dev/null 2>&1"
+		echo "ssh ${node} $CMD"
+		ssh ${node} $CMD
 	done
+}
+
+f_umount()
+{
+	f_do_on_each_node "sudo umount ${MOUNT_POINT} > /dev/null 2>&1"
 }
 
 if [ $# -lt "2" ];then
@@ -107,8 +114,8 @@ fi
 
 # Create mount point
 f_info "Create mount point"
-mkdir -p ${MOUNT_POINT}
-chmod 777 ${MOUNT_POINT}
+f_do_on_each_node "sudo mkdir -p ${MOUNT_POINT}"
+f_do_on_each_node "sudo chmod 777 ${MOUNT_POINT}"
 
 # Prepare kernel-source used by some test cases
 #f_info "Prepare kernel-source used by some test cases"
@@ -119,7 +126,7 @@ chmod 777 ${MOUNT_POINT}
 
 # kernel source path in guest node
 KERNEL_SOURCE=/usr/local/ocfs2-test/tmp/`basename ${KERNEL_SOURCE}`
-chown -R ocfs2test:users ${KERNEL_SOURCE}
+sudo chown -R ocfs2test:users ${KERNEL_SOURCE}
 
 for tm in $(echo ${TESTMODE} | sed 's:,: :g'); do
 	# try to proceed further when previous one failed
