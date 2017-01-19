@@ -32,9 +32,6 @@ function patch_the_code()
     popd >/dev/null
 }
 
-ins_packages=(exxe fio logscan drbd-test)
-ins_src_packages=(drbd-test)
-
 #Import ENV conf
 . cluster_conf
 . scripts/functions
