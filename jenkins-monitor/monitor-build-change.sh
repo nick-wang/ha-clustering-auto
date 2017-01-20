@@ -26,7 +26,7 @@ PATTERN="SLE-${VERSION}-${PATCHLEVEL}${PRODUCT}-DVD-${ARCH}-Build"
 SLP_URL="http://147.2.207.1/dist/install/SLP"
 KERNEL_MILESTONE="SLE-${VERSION}-${PATCHLEVEL}${PRODUCT}-LATEST"
 MEDIA="${ARCH}/CD1/media.1"
-DIR="/tmp/jenkins-dummy"
+DIR="/tmp/jenkins-dummy/build-change"
 O_K_FILE="${DIR}/sle_build"
 N_K_FILE="${DIR}/sle_newbuild"
 
