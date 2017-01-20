@@ -19,7 +19,8 @@ TESTCASES = ({"name":"connect", "nodes": 0},
             {"name":"add-path-multiple-times", "nodes":2},
             {"name":"ahead-behind.KNOWN", "nodes":2},
             {"name":"resize.KNOWN", "nodes":2},
-            {"name":"resync-never-connected.KNOWN", "nodes":0},
+            # "resync-never-connected.KNOWN": timeout or hang sometimes
+            #{"name":"resync-never-connected.KNOWN", "nodes":0},
             # "diskless": can't finish resource.skip_initial_sync()
             #            because one of them is diskless...
             #{"name":"diskless", "nodes":0},
