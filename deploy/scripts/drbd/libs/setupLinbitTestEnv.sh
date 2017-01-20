@@ -39,9 +39,6 @@ function patch_the_code()
 
 nextPhase "Launch $0"
 
-ins_packages=(exxe fio logscan drbd-test)
-ins_src_packages=(drbd-test)
-
 # Should not change vgname unless upstream changed
 vgname="scratch"
 NUM=$1
@@ -51,6 +48,7 @@ case ${sle_ver[0]} in
   42.1|42.2)
     # Need to install patch and rsyslog in leap42.2
     ins_packages=(exxe fio logscan drbd-test patch rsyslog)
+    ins_src_packages=(drbd-test)
 
     # Install all needed packages
     # rsyslog conflicting with systemd-syslog
@@ -58,6 +56,7 @@ case ${sle_ver[0]} in
     ;;
   11|12)
     ins_packages=(exxe fio logscan drbd-test)
+    ins_src_packages=(drbd-test)
 
     # Install all needed packages
     infoRun zypper --non-interactive install ${ins_packages[*]}
