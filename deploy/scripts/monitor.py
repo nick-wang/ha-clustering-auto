@@ -60,11 +60,9 @@ def get_package_info():
             return f.read().split()
     elif os.path.isfile(dummy_dir):
         os.unlink(dummy_dir)
+        os.mkdir(dummy_dir)
     else:
-        #Not exist
-        pass
-
-    os.mkdir(dummy_dir)
+        os.mkdir(dummy_dir)
 
     return None
 
