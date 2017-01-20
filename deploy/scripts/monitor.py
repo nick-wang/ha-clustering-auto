@@ -44,7 +44,7 @@ def get_all_packages(html):
 def save_package_info(html):
     packages = get_all_packages(html)
     filename = "%s_package_info" % proj_name
-    f = open(filename,'w')
+    f = open(dummy_dir + filename,'w')
     content=""
     for package in packages:
         content = content + package + "\n"
@@ -52,10 +52,30 @@ def save_package_info(html):
     f.close()
 
 def get_package_info():
-    filename = "%s_package_info" % proj_name
-    if os.path.exists(filename):
-        f = open(filename)
-        return f.read().split()
+    if os.path.isdir(dummy_dir):
+        filename = "%s_package_info" % proj_name
+
+        if os.path.exists(dummy_dir + filename):
+            f = open(dummy_dir + filename)
+            return f.read().split()
+    elif os.path.isfile(dummy_dir):
+        os.unlink(dummy_dir)
+    else:
+        #Not exist
+        pass
+
+    os.mkdir(dummy_dir)
+
+    return None
+
+def getName(rpm):
+    pattern = "(.*)-(\d+(\.\w+)+)-((\d+\.)+)(\w+)\.rpm"
+    tmp = re.match(pattern, rpm)
+
+    if tmp is not None:
+        name=tmp.groups()[0]
+        return name
+
     return None
 
 def need_update(old_packages, new_packages):
@@ -63,10 +83,28 @@ def need_update(old_packages, new_packages):
     for old_package in old_packages:
         for new_package in new_packages:
             if new_package == old_package:
+                break
+            elif getName(old_package) == getName(new_package):
+                need_updated[old_package] = new_package
+                break
+            else:
                 continue
-            if old_package.split('-')[0] not in new_package:
-                continue
-            need_updated[old_package] = new_package
+        else:
+            print old_package + " is not in the new repo."
+
+    for new_package in new_packages:
+        p_name = getName(new_package)
+
+        for old_package in old_packages:
+            if p_name == getName(old_package):
+                break
+        else:
+            #print "New record: " + new_package
+            if need_updated.has_key("NEW"):
+                need_updated["NEW"].append(new_package)
+            else:
+                need_updated["NEW"] = [new_package]
+
     return need_updated
 
 def main(url):
