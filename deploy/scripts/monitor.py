@@ -6,9 +6,11 @@ import getopt
 support_schemas = {'pacemaker':
                        ('pacemaker', 'corosync'),
                    'drbd':
-                       ('drbd', 'drbd-utils', 'kernel-default'),
+                       ('drbd', 'drbd-utils', 'drbd-kmp-default'),
                    'cluster-md':
-                       ('mdadm', 'cluster-md-kmp-default', 'kernel-default'),
+                       ('mdadm', 'cluster-md-kmp-default'),
+                   'ocfs2':
+                       ('ocfs2-tools', 'libdlm', 'ocfs2-kmp-default', 'dlm-kmp-default'),
                   }
 
 module = 'pacemaker'
