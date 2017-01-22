@@ -160,20 +160,20 @@ function checkAllFinish()
 {
     if [ $# -ne 2 ]
     then
-        echo "Error! Need two parameters, checkAllFinish <CLUSTER_CONF_IN_HOST> <FILE>"
+        echo "Error! Need two parameters, checkAllFinish <CLUSTER_CONF_IN_HOST> <COMPLETION_FILE>"
         echo "Error command: checkAllFinish $*"
         return
     fi
 
     CLUSTER_CONF=$1
-    FILE=$2
+    COMPLETION_FILE=$2
 
     for ip in `cat ${CLUSTER_CONF} |grep IP_NODE |cut -d "=" -f 2`
     do
     {
         while :
         do
-            ssh root@${ip} "ls ${LOG_DIR}/done >/dev/null 2>&1"
+            ssh root@${ip} "ls ${COMPLETION_FILE} >/dev/null 2>&1"
 
             if [ $? -eq 0 ]
             then
