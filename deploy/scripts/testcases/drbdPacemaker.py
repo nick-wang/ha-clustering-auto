@@ -18,7 +18,7 @@ def getResNumber(cluster_env):
 
     lines = os.popen("ssh root@%s crm configure show" % cluster_env["IP_NODE1"]).readlines()
     for line in lines:
-        tmp = re.match("\s*params drbd_resource=([\w-]*)\s+.*", p)
+        tmp = re.match("\s*params drbd_resource=([\w-]*)\s+.*", line)
         if tmp is not None:
             resource_lists.append(tmp.groups()[0])
     return len(resource_lists)
@@ -40,7 +40,7 @@ def configurePacemaker(args=None):
 
     lines = os.popen("ssh root@%s crm configure show" % cluster_env["IP_NODE1"]).readlines()
 
-    pa = re.pattern("\s*params drbd_resource=([\w-]*)\s+.*")
+    pa = re.compile("\s*params drbd_resource=([\w-]*)\s+.*")
     for line in lines:
         tmp = re.match(pa, line)
         if tmp is not None:
@@ -52,12 +52,11 @@ def configurePacemaker(args=None):
         all_lines = "".join(lines)
         for res in resource_lists:
             if re.search("ms ms_%s" % res, all_lines) is None:
-                result["status"] == "fail"
                 message = "No corresponding ms(%s) resource configured." % res
                 output = all_lines
                 break
         else:
-            result["status"] == "pass"
+            result["status"] = "pass"
 
     #Skipall following test cases when this failed
     if result["status"] == "fail":
@@ -81,7 +80,7 @@ def checkDRBDState(args=None):
     disk_num = getVolumeNumber(cluster_env)
 
     lines = os.popen("ssh root@%s drbdadm status all" % cluster_env["IP_NODE1"]).readlines()
-    pa = re.pattern("[ -]disk:UpToDate$")
+    pa = re.compile("[ -]disk:UpToDate$")
     for line in lines:
         if re.search(pa, line) is not None:
             uptodate_disk += 1
@@ -112,8 +111,8 @@ def checkDRBDRole(args=None):
 
     lines = os.popen("ssh root@%s drbdadm status all" % cluster_env["IP_NODE1"]).readlines()
 
-    pa_p = re.pattern("\srole:Primary")
-    pa_s = re.pattern("\srole:Secondary")
+    pa_p = re.compile("\srole:Primary")
+    pa_s = re.compile("\srole:Secondary")
     for line in lines:
         if re.search(pa_p, line) is not None:
             primary_num += 1
@@ -145,7 +144,7 @@ def checkPacemakerStatus(args=None):
 
     lines = os.popen("ssh root@%s crm configure show" % cluster_env["IP_NODE1"]).readlines()
     for line in lines:
-        tmp = re.match("\s*params drbd_resource=([\w-]*)\s+.*", p)
+        tmp = re.match("\s*params drbd_resource=([\w-]*)\s+.*", line)
         if tmp is not None:
             resource_lists.append(tmp.groups()[0])
 
@@ -154,12 +153,12 @@ def checkPacemakerStatus(args=None):
     for res in resource_lists:
         for i in range(len(lines)):
             if re.search("Master/Slave Set: ms_%s" % res, lines[i]) is not None:
-                if re.search("Masters:\s*[", lines[i+1]) is None:
+                if re.search("Masters:\s*\[", lines[i+1]) is None:
                     message = "No Master of res ms_%s" % res
                     output = lines[i+1]
                     break
 
-                if re.search("Slaves:\s*[", lines[i+2]) is None:
+                if re.search("Slaves:\s*\[", lines[i+2]) is None:
                     message = "No Slaves of res ms_%s" % res
                     output = lines[i+2]
                     break
@@ -185,7 +184,7 @@ def switchDRBD(args=None):
     resource_lists = []
     lines = os.popen("ssh root@%s crm configure show" % cluster_env["IP_NODE1"]).readlines()
     for line in lines:
-        tmp = re.match("\s*params drbd_resource=([\w-]*)\s+.*", p)
+        tmp = re.match("\s*params drbd_resource=([\w-]*)\s+.*", line)
         if tmp is not None:
             resource_lists.append(tmp.groups()[0])
 
@@ -209,7 +208,7 @@ def switchDRBD(args=None):
                 output = tmp
 
     # Sleep 30 secs for moving resources
-    sleep(30)
+    sleep(15)
 
     if message == "" and output == "":
         result["status"] = "pass"
@@ -251,7 +250,7 @@ def Run(conf, xmldir):
         testcases.append(case)
         if skip_flag:
             skipCase(case, "Can not test!",
-                     "Pacemaker service of the first node not started.")
+                     "Pacemaker service of the first node not started or didn't configure DRBD.")
             continue
         skip_flag = assertCase(case, a_case[2], cluster_env)
 
