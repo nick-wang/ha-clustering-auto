@@ -9,6 +9,9 @@ def usage():
     sys.exit(1)
 
 def runCases(conf, run_list, output_dir):
+    if not os.path.isdir(output_dir):
+        os.mkdir(output_dir)
+
     for run_name in run_list.split():
         os.system("./testcases/%s %s %s" % (run_name, conf, output_dir))
 
