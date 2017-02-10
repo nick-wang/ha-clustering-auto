@@ -208,7 +208,7 @@ def switchDRBD(args=None):
                 output = tmp
 
     # Sleep 30 secs for moving resources
-    sleep(15)
+    sleep(60)
 
     if message == "" and output == "":
         result["status"] = "pass"
