@@ -248,8 +248,36 @@ rcSuSEfirewall2 stop
 for res in `drbdadm sh-resources`
 do
   drbdadm up $res
-  sleep 2
+  sleep 3
 done
 
 #Sometimes it need time to wait peer node to showup
 sleep 15
+
+infoRun echo "DRBD resources should connected with inconsistent data"
+case $(getDRBDVer) in
+  9)
+    infoRun drbdadm status all | tee -a ${DRBD_LOGFILE}
+    ;;
+  84)
+    infoRun cat /proc/drbd | tee -a ${DRBD_LOGFILE}
+    ;;
+  *)
+    echo "Error! Wrong DRBD version."
+esac
+
+# Run on each node for each resource
+for res in `drbdadm sh-resources`
+do
+  retry=0
+  while [ $retry -lt 5 ]
+  do
+    drbdadm cstate $res |grep "StandAlone" >/dev/null || break
+    retry=$((retry+1))
+    echo "Try reconnect $res on $HOSTNAME."
+    drbdadm disconnect $res
+    sleep 2
+    drbdadm connect $res
+    sleep 5
+  done
+done

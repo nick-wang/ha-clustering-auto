@@ -60,4 +60,7 @@ if [ $? -eq 0 ]
 then
   drbdadm secondary all
 fi
-sleep 1
+sleep 5
+
+drbdadm down all
+sleep 5
