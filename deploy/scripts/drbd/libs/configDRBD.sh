@@ -269,12 +269,12 @@ esac
 # Run on each node for each resource
 for res in `drbdadm sh-resources`
 do
-  retry=0
-  while [ $retry -lt 5 ]
+  retry=1
+  while [ $retry -lt 6 ]
   do
     drbdadm cstate $res |grep "StandAlone" >/dev/null || break
     retry=$((retry+1))
-    echo "Try reconnect $res on $HOSTNAME."
+    echo "Try reconnect($retry times) $res on $HOSTNAME."
     drbdadm disconnect $res
     sleep 2
     drbdadm connect $res
