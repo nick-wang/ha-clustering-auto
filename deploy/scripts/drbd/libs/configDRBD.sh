@@ -254,13 +254,13 @@ done
 #Sometimes it need time to wait peer node to showup
 sleep 15
 
-infoRun echo "DRBD resources should connected with inconsistent data"
+echo "DRBD resources should connected with inconsistent data"
 case $(getDRBDVer) in
   9)
-    infoRun drbdadm status all | tee -a ${DRBD_LOGFILE}
+    drbdadm status all
     ;;
   84)
-    infoRun cat /proc/drbd | tee -a ${DRBD_LOGFILE}
+    cat /proc/drbd
     ;;
   *)
     echo "Error! Wrong DRBD version."
