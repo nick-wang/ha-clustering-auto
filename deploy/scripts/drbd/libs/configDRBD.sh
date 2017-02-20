@@ -254,7 +254,7 @@ done
 #Sometimes it need time to wait peer node to showup
 sleep 15
 
-echo "DRBD resources should connected with inconsistent data"
+echo "DRBD resources should connected with inconsistent data, $HOSTNAME"
 case $(getDRBDVer) in
   9)
     drbdadm status all
@@ -273,11 +273,23 @@ do
   while [ $retry -lt 6 ]
   do
     drbdadm cstate $res |grep "StandAlone" >/dev/null || break
-    retry=$((retry+1))
-    echo "Try reconnect($retry times) $res on $HOSTNAME."
+    echo "Try reconnect($retry times) $res on $HOSTNAME"
     drbdadm disconnect $res
     sleep 2
     drbdadm connect $res
     sleep 5
+    retry=$((retry+1))
+
+    case $(getDRBDVer) in
+      9)
+        drbdadm status $res
+        ;;
+      84)
+        cat /proc/drbd
+        ;;
+      *)
+        echo "Error! Wrong DRBD version."
+    esac
+
   done
 done
