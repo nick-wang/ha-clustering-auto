@@ -253,6 +253,7 @@ def Run(conf, xmldir):
                      "Pacemaker service of the first node not started or didn't configure DRBD.")
             continue
         skip_flag = assertCase(case, a_case[2], cluster_env)
+        sleep(3)
 
     ts = TestSuite(TestSuiteName, testcases)
 
