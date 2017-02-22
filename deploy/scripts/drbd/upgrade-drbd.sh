@@ -30,7 +30,7 @@ nextPhase "Upgrading..."
 # Allow verdor change for upgrade
 runOnAllNodes ${CLUSTER_CONF} "sed -i \"s/# solver.allowVendorChange = false/solver.allowVendorChange = true\"/ /etc/zypp/zypp.conf;
                                cat /etc/zypp/zypp.conf |grep allowVendorChange"
-runOnAllNodes ${CLUSTER_CONF} "rm -rf ${LOG_DIR}/done; zypper --non-interactive up ${pkgs[*]}; sleep 1; touch ${LOG_DIR}/update-drbd-done; reboot"
+runOnAllNodes ${CLUSTER_CONF} "rm -rf ${LOG_DIR}/done; zypper --non-interactive up --replacefiles ${pkgs[*]}; sleep 1; touch ${LOG_DIR}/update-drbd-done; reboot"
 
 checkAllFinish ${CLUSTER_CONF} "${LOG_DIR}/update-drbd-done"
 
