@@ -1,6 +1,7 @@
 resource <RESNAME> {
    net {
       protocol	C;
+      ping-timeout 10;
    }
    disk {
       on-io-error	pass_on;
