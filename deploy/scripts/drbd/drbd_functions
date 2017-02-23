@@ -44,3 +44,60 @@ function getDRBDVer()
 
     echo $DRBD_VERSION
 }
+
+function showDRBDStatus()
+{
+    # Show the drbd status of resource(s)
+    # usage:
+    #   showDRBDStatus      (showDRBDStatus all)
+    # or
+    #   showDRBDStatus <resname>
+
+    if [ -n $1 ]
+    then
+        res=$1
+    else
+        res="all"
+    fi
+
+    case $(getDRBDVer) in
+      9)
+        drbdadm status $res
+        ;;
+      84)
+        cat /proc/drbd
+        ;;
+      *)
+        echo "Error! Wrong DRBD version."
+    esac
+}
+
+function reconnectStandAloneRes()
+{
+    # Reconnect the standalone resource
+    # usage:
+    #   reconnectStandAloneRes <resname>
+
+    retry=1
+    if [[ -n "$1" ]] && [[ x"all" != x"$1" ]]
+    then
+        res=$1
+    else
+        retry=100
+        echo "Script Error! Need to input resource name"
+    fi
+
+    while [ $retry -lt 6 ]
+    do
+      drbdadm cstate $res |grep "StandAlone" >/dev/null || break
+      echo "Try reconnect($retry times) $res on $HOSTNAME"
+      drbdadm disconnect $res
+      sleep 2
+      drbdadm connect $res
+      sleep 5
+      retry=$((retry+1))
+
+      showDRBDStatus $res
+
+    done
+}

@@ -255,41 +255,10 @@ done
 sleep 15
 
 echo "DRBD resources should connected with inconsistent data, $HOSTNAME"
-case $(getDRBDVer) in
-  9)
-    drbdadm status all
-    ;;
-  84)
-    cat /proc/drbd
-    ;;
-  *)
-    echo "Error! Wrong DRBD version."
-esac
+showDRBDStatus "all"
 
 # Run on each node for each resource
 for res in `drbdadm sh-resources`
 do
-  retry=1
-  while [ $retry -lt 6 ]
-  do
-    drbdadm cstate $res |grep "StandAlone" >/dev/null || break
-    echo "Try reconnect($retry times) $res on $HOSTNAME"
-    drbdadm disconnect $res
-    sleep 2
-    drbdadm connect $res
-    sleep 5
-    retry=$((retry+1))
-
-    case $(getDRBDVer) in
-      9)
-        drbdadm status $res
-        ;;
-      84)
-        cat /proc/drbd
-        ;;
-      *)
-        echo "Error! Wrong DRBD version."
-    esac
-
-  done
+  reconnectStandAloneRes $res
 done

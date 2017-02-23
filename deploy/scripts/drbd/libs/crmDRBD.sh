@@ -71,6 +71,23 @@ else
   sleep 8
 fi
 
+# Run on each node for each resource
+# Make sure all connection up before testing
+#
+# Sometimes may failed by connection shutdown
+# One node:
+#   drbd_send_ping has failed (Connection reset by peer)
+#   ...
+#   Failed to create workqueue ack_sender
+# The other node:
+#   sock was shut down by peer
+#
+sleep 20  # waiting to drbd start
+for res in `drbdadm sh-resources`
+do
+  reconnectStandAloneRes $res
+done
+
 infoRun crm_mon -1 | tee -a ${DRBD_LOGFILE}
 case $(getDRBDVer) in
   9)
