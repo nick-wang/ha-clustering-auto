@@ -64,7 +64,7 @@ def get_package_info():
         os.unlink(dummy_dir)
         os.mkdir(dummy_dir)
     else:
-        os.mkdir(dummy_dir)
+        os.makedirs(dummy_dir)
 
     return None
 
