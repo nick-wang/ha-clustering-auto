@@ -71,7 +71,7 @@ then
     stonith_args="--stonith-args hypervisor_uri='qemu+tcp://$host_ip/system',hostlist='$node_list $remote_node_list'"
 elif [ $stonith_type == "external/sbd" ];
 then
-	stonith_args="--stonith-args SBD_DEVICE='/dev/disk/by-path/ip-$TARGET_IP:3260-iscsi-${TARGET_LUN}-lun-0',SBD_OPTS='-W'"
+	stonith_args=""
 fi
 
 #form the commandline
@@ -82,7 +82,7 @@ new_node_list=`echo ${new_node_list//','/' '}`
 echo "exit 0" > /var/lib/pacemaker/notify.sh
 chmod +x /var/lib/pacemaker/notify.sh
 #update cprpsync and pacemaker
-zypper up -y pacemaker libpacemaker-devel libpacemaker3 pacemaker-cli pacemaker-cts pacemaker-remote corosync libcorosync-devel libcorosync4
+zypper up -y pacemaker libpacemaker-devel libpacemaker3 pacemaker-cli pacemaker-cts corosync libcorosync-devel libcorosync4
 
 isMaster "$HOSTNAME_NODE1"
 if [ $? -ne 0 ]
