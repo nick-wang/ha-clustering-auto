@@ -95,17 +95,16 @@ fi
 #update ha packages
 zypper up -y -l -t pattern ha_sles
 
+#judge the stonith type
 #login iscsi target for sbd
 #and create sbd
-iscsiadm -m discovery -t st -p $TARGET_IP >/dev/null
-iscsiadm -m node -T $TARGET_LUN -p $TARGET_IP -l
-sleep 15
-
-#judge the stonith type
 if [ $STONITH == "libvirt" ];
 then
     zypper in -y libvirt
 else
+    iscsiadm -m discovery -t st -p $TARGET_IP >/dev/null
+    iscsiadm -m node -T $TARGET_LUN -p $TARGET_IP -l
+    sleep 15
     sbd -d "/dev/disk/by-path/ip-$TARGET_IP:3260-iscsi-${TARGET_LUN}-lun-0" create
     modprobe softdog
     echo "SBD_DEVICE='/dev/disk/by-path/ip-$TARGET_IP:3260-iscsi-${TARGET_LUN}-lun-0'" > /etc/sysconfig/sbd
@@ -145,8 +144,12 @@ case ${sle_ver[0]} in
 esac
 
 #Enable automatic login to iscsi server
+if [ $STONITH == "sbd" ];
+then
 iscsiadm -m node -I default -T $TARGET_LUN -p $TARGET_IP \
          --op=update --name=node.startup --value=automatic
+fi
+
 if [ $? -ne 0 ]; then
 	echo "failed to login $TARGET_LUN on $TARGET_IP"
 	exit -1
