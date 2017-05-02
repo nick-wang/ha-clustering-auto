@@ -159,7 +159,7 @@ def parseDiscontigBgMultipleLog(testreport_dir, cluster_env):
     #Define testcases
     #testcases = [(TestcaseName, TestcaseClass, TestcaseFunction)]
     cases_def = [("inodes_block", "DiscontigBgSingleNode.inodes_block", get_result),
-                 ("extent_block", "DiscontigBgSingleNode.extent_block", get_result),
+                 ("extents_block", "DiscontigBgSingleNode.extents_block", get_result),
                  ("xattr_block", "DiscontigBgSingleNode.xattr_block", get_result),
                  ("refcount_block", "DiscontigBgSingleNode.refcount_block", get_result)]
 
