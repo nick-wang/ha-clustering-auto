@@ -25,8 +25,8 @@ def installVM(VMName, disk, OSType, vcpus, memory, disk_size, source, nic, graph
     # TODO: Detect host OS, using virt-install in SLE12 or later
     cmd = "echo << EOF| vm-install %s%s%s" % (options, "\n\n\n\n\n\n\n", "EOF")
     print "Install command is: %s" % cmd
-    return os.system(cmd)
-
+    ret = os.system(cmd)
+    exit(ret>>8)
     #status, output = commands.getstatusoutput(cmd)
     #p = subprocess.Popen(args=["vm-install", options], \
     #    stdin=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -123,12 +123,11 @@ def installVMs(vm_list=[], res={}, devices={}, autoyast=""):
     for vm in vm_list:
         vm_name = vm['name']
         process = processes[vm_name]["process"]
-        print process.pid, vm_name, process.exitcode
         if process.exitcode is None:
             print "process %d for installing %s timeout\n" %(process.pid, vm_name)
 	    sys.exit(-1)
         elif process.exitcode != 0:
-            print "process %d for installing %s returned error\n" %(process.pid, vm_name, process.exitcode)
+            print "process %d for installing %s returned error %d\n" %(process.pid, vm_name, process.exitcode)
             sys.exit(-2)
 
 def get_config_and_install(deployfile='../confs/vm_list.yaml', autoyast=''):
