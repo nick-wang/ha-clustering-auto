@@ -6,9 +6,8 @@
 
 hosts_content=""
 csync2_content=""
-NUM_SHARED_TARGETS=`grep SHARED_TARGET_LUN cluster_conf | wc -l`
-TARGET_LUN=$SHARED_TARGET_LUN1
-TARGET_IP=$SHARED_TARGET_IP1
+TARGET_LUN=$SHARED_TARGET_LUN0
+TARGET_IP=$SHARED_TARGET_IP0
 cd template
 
 #Add extra repos
@@ -102,7 +101,7 @@ if [ $STONITH == "libvirt" ];
 then
     zypper in -y libvirt
 else
-    iscsiadm -m discovery -t st -p $TARGET_IP >/dev/null
+    iscsiadm -m discovery -t st -p $TARGET_IP > /dev/null
     iscsiadm -m node -T $TARGET_LUN -p $TARGET_IP -l
     sleep 15
     sbd -d "/dev/disk/by-path/ip-$TARGET_IP:3260-iscsi-${TARGET_LUN}-lun-0" create
@@ -143,31 +142,31 @@ case ${sle_ver[0]} in
     echo "Not support. SLE${sle_ver[0]} SP${sle_ver[1]}"
 esac
 
-#Enable automatic login to iscsi server
-if [ $STONITH == "sbd" ];
-then
-iscsiadm -m node -I default -T $TARGET_LUN -p $TARGET_IP \
-         --op=update --name=node.startup --value=automatic
-fi
-
-if [ $? -ne 0 ]; then
-	echo "failed to login $TARGET_LUN on $TARGET_IP"
-	exit -1
-fi
 #login other target for shared storage
-if [ $NUM_SHARED_TARGETS -gt 1 ];then
-    for i in `seq 2 $NUM_SHARED_TARGETS`; do
+if [ $NUM_SHARED_TARGETS -gt 0 ];then
+    for i in `seq 1 $NUM_SHARED_TARGETS`; do
         name=`echo "SHARED_TARGET_IP$i"`
         tgt_ip=`getEnv $name ../cluster_conf`
         name=`echo "SHARED_TARGET_LUN$i"`
         tgt_lun=`getEnv $name ../cluster_conf`
 
+        iscsiadm -m discovery -t st -p $tgt_ip
         iscsiadm -m node -T $tgt_lun -p $tgt_ip -l
-        #Enable automatic login to iscsi server
-        iscsiadm -m node -I default -T $tgt_lun -p $tgt_ip \
-             --op=update --name=node.startup --value=automatic
     done
 fi
+
+#Enable automatic login to iscsi server
+for i in `seq 0 $NUM_SHARED_TARGETS`; do
+    name=`echo "SHARED_TARGET_IP$i"`
+    tgt_ip=`getEnv $name ../cluster_conf`
+    name=`echo "SHARED_TARGET_LUN$i"`
+    tgt_lun=`getEnv $name ../cluster_conf`
+
+    #Enable automatic login to iscsi server
+    iscsiadm -m node -I default -T $tgt_lun -p $tgt_ip \
+         --op=update --name=node.startup --value=automatic
+done
+
 #config stonith resource and restart pacemaker
 isMaster "$HOSTNAME_NODE1"
 if [ $? -eq 0 ]

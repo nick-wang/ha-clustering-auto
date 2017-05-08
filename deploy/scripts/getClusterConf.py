@@ -189,13 +189,14 @@ def get_cluster_conf(sleep_time="0", configuration="../cluster_conf",
     if (stonith == 'sbd') and ((target_list is None) or (len(target_list) == 0)):
         print "sbd needs target."
 #        sys.exit(-1)
-
+    if (stonith == 'sbd'):
+        i = 0
     if target_list is not None:
         for target in target_list:
             contents += "SHARED_TARGET_LUN%d=%s\n" % (i, target['shared_target_lun'])
             contents += "SHARED_TARGET_IP%d=%s\n" % (i, target['shared_target_ip'])
             i += 1
-
+        contents += "NUM_SHARED_TARGETS=%d\n" %(i-1)
     repos = dp.get_list_section_conf("repos")
     if len(repos):
         contents += "\nEXTRA_REPOS=(%s)\n" % (" ".join(repos))
