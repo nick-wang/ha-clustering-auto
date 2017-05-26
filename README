@@ -15,9 +15,10 @@ deploy/  : the main part of this project, we deploy cluster and run testcases ba
   -conf: the vm configuration files, and autoyast files.
   -cts: the scripts to configure and run pacemaker-cts
   -scripts: the scripts to install vms, configure cluster and so on.
+            and there are also drbd and ocfs2 test scripts.
   -ssh_keys: the ssh keys to make host login vm without password, and interaction
-             between vms without password
-  -templete: stores template of configuration for the cluster
+             between vms without password.
+  -template: stores template of configuration for the cluster.
 
   This is just for the project configuration and description, we run it in jenkins so
   far, you need some configurations in jenkins, for configure example of jenkins,
