@@ -101,3 +101,33 @@ function reconnectStandAloneRes()
 
     done
 }
+
+function renewOutdated()
+{
+    # Reconnect the outdated resource
+    # usage:
+    #   renewOutdated <resname>
+
+    retry=1
+    if [[ -n "$1" ]] && [[ x"all" != x"$1" ]]
+    then
+        res=$1
+    else
+        retry=100
+        echo "Script Error! Need to input resource name"
+    fi
+
+    while [ $retry -lt 6 ]
+    do
+      drbdadm cstate $res |grep "Outdated" >/dev/null || break
+      echo "Try renew($retry times) outdated $res on $HOSTNAME"
+      drbdadm down $res
+      sleep 2
+      drbdadm up $res
+      sleep 5
+      retry=$((retry+1))
+
+      showDRBDStatus $res
+
+    done
+}
