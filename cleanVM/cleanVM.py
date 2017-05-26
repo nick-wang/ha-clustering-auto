@@ -230,15 +230,9 @@ if __name__ == '__main__':
                sys.exit(-3)
        elif opt == '-c':
            vm_list = value.split()
-#           for vmname in vm_list:
-#               if checkVMExists(vmname):
-#                   removeVMByName(vmname)
-#           sys.exit(0)
        elif opt == '-f':
            if os.path.exists(value) and os.path.isfile(value):
                yaml_file = value
-#              removeVMViaYaml(value)
-#              sys.exit(0)
            else:
               print "%s is not exist or not a file." % value
               sys.exit(-3)

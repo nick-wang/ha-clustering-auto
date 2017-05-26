@@ -24,7 +24,8 @@
 [Done]11. Create log and informations into working dir.
 
 [Done]12. Create lib to add vir/shared disk, iscsi device.
-So far we can add multiple iscsi device when deploying cluster
+So far we can add multiple iscsi device when deploying cluster,
+and if you specify use sbd stonith or by default, we set up the 1st device to sbd device
 
 13. Parameterized the jenkins task. Support input yaml file via command line.
 
@@ -33,9 +34,9 @@ So far we can add multiple iscsi device when deploying cluster
     Auto deploy or manually input.
     Manually field.(No need to change.)
 
-[done]15. an option to reinstall OS, or just upgrade, an operation to autoremove vms if reinstall
+[Done]15. an option to reinstall OS, or just upgrade, an operation to autoremove vms if reinstall
 
-[done]16. library to collect hb_report after running test-case
+[Done]16. library to collect hb_report after running test-case
 Maybe We can use what pacemaker-cts did, added it to functions
 
 17. Using twopence instead of ssh only.
@@ -48,4 +49,9 @@ Maybe We can use what pacemaker-cts did, added it to functions
 
 21. Reconstruct the directory structure, as the deploy directory is in disorder so far
 
-[done]22. add stonith options while deploying cluster, so far we support libvirt and sbd
+[Done]22. add stonith options while deploying cluster, so far we support libvirt and sbd
+By default, we use sbd
+
+[Done]23. add timeout and exception handler for vm installation
+For the timeout expiration and exception during vm installation, this program will clean all vms,
+and exit with -1
