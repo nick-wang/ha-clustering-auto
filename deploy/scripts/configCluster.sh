@@ -167,20 +167,6 @@ for i in `seq 0 $NUM_SHARED_TARGETS`; do
          --op=update --name=node.startup --value=automatic
 done
 
-#config stonith resource and restart pacemaker
-isMaster "$HOSTNAME_NODE1"
-if [ $? -eq 0 ]
-then
-    if [ $STONITH == "sbd" ];
-    then
-        crm configure primitive stonith_sbd stonith:external/sbd
-    else
-        crm configure primitive libvirt_stonith stonith:external/libvirt \
-                  params hostlist="$NODE_LIST" \
-                  hypervisor_uri="qemu+tcp://$IPADDR/system" \
-                  op monitor interval="60"
-    fi
-fi
 sleep 2
 case ${sle_ver} in
   12|42.1|42.2)
@@ -188,7 +174,9 @@ case ${sle_ver} in
     then
         systemctl enable sbd
     fi
-    systemctl restart pacemaker
+    systemctl stop pacemaker
+    sleep 1
+    systemctl start pacemaker
     systemctl enable hawk
     systemctl start hawk
     ;;
@@ -210,3 +198,18 @@ passwd hacluster > /dev/null 2>&1 <<EOF
 linux
 linux
 EOF
+
+#config stonith resource and restart pacemaker
+isMaster "$HOSTNAME_NODE1"
+if [ $? -eq 0 ]
+then
+    if [ $STONITH == "sbd" ];
+    then
+        crm configure primitive stonith_sbd stonith:external/sbd
+    else
+        crm configure primitive libvirt_stonith stonith:external/libvirt \
+                  params hostlist="$NODE_LIST" \
+                  hypervisor_uri="qemu+tcp://$IPADDR/system" \
+                  op monitor interval="60"
+    fi
+fi
