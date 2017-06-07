@@ -30,10 +30,11 @@ nextPhase "Upgrading..."
 # Allow verdor change for upgrade
 runOnAllNodes ${CLUSTER_CONF} "sed -i \"s/# solver.allowVendorChange = false/solver.allowVendorChange = true\"/ /etc/zypp/zypp.conf; cat /etc/zypp/zypp.conf |grep allowVendorChange"
 
-# FIXME: Ever meet installed two versions of drbd-kmp-default... need to remove first?
-runOnAllNodes ${CLUSTER_CONF} "rm -rf ${LOG_DIR}/done; zypper --non-interactive up --replacefiles ${pkgs[*]}; sleep 1; touch ${LOG_DIR}/update-drbd-done; reboot"
+# Remove the old version and reinstall the new version
+# Sometimes need to update kernel-default as well, so add kernel repo
+runOnAllNodes ${CLUSTER_CONF} "rm -rf ${LOG_DIR}/done; zypper -q -n rm ${pkgs[*]}; zypper -q -n in --replacefiles ${pkgs[*]}; sleep 1; touch ${LOG_DIR}/update-drbd-done; reboot"
 
 checkAllFinish ${CLUSTER_CONF} "${LOG_DIR}/update-drbd-done"
 
-nextPhase "Finished upgrade. After reboot."
+nextPhase "Upgrade finished and system rebooted."
 runOnAllNodes ${CLUSTER_CONF} "rpm -qa|sort>${LOG_DIR}/rpm-after-update"
