@@ -15,20 +15,15 @@ VERSION=12
 PATCHLEVEL=3
 ARCH=x86_64
 
+SLP_URL="http://147.2.207.1/dist/install/SLP"
+DIR="/tmp/jenkins-dummy/build-change"
+
 if [ ${PATCHLEVEL} != 0 ]
 then
     PATCHLEVEL=SP${PATCHLEVEL}-
 else
     PATCHLEVEL=""
 fi
-
-PATTERN="SLE-${VERSION}-${PATCHLEVEL}${PRODUCT}-DVD-${ARCH}-Build"
-SLP_URL="http://147.2.207.1/dist/install/SLP"
-KERNEL_MILESTONE="SLE-${VERSION}-${PATCHLEVEL}${PRODUCT}-LATEST"
-MEDIA="${ARCH}/CD1/media.1"
-DIR="/tmp/jenkins-dummy/build-change"
-O_K_FILE="${DIR}/sle_build"
-N_K_FILE="${DIR}/sle_newbuild"
 
 die()
 {
@@ -70,6 +65,30 @@ main()
 
     rm -fr $N_K_FILE
 }
+
+while getopts "u:v:P:a:D:h" OPT; do
+    case $OPT in
+        u)
+            SLP_URL="$OPTARG";;
+        v)
+            VERSION="$OPTARG";;
+        P)
+            PATCHLEVEL="$OPTARG";;
+        a)
+            ARCH="$OPTARG";;
+        D)
+            DIR="$OPTARG";;
+        h)
+            echo "monitor-build-change.sh [-u SLP_URL] [-v VERSION] [-P PATCHLEVEL] [-a arch] [-D dir]"
+            exit 0;;
+    esac
+done
+
+PATTERN="SLE-${VERSION}-${PATCHLEVEL}${PRODUCT}-DVD-${ARCH}-Build"
+KERNEL_MILESTONE="SLE-${VERSION}-${PATCHLEVEL}${PRODUCT}-LATEST"
+MEDIA="${ARCH}/CD1/media.1"
+O_K_FILE="${DIR}/sle_build"
+N_K_FILE="${DIR}/sle_newbuild"
 
 main
 
