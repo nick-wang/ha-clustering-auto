@@ -125,7 +125,7 @@ def installVMs(vm_list=[], res={}, devices={}, autoyast=""):
         process = processes[vm_name]["process"]
         if process.exitcode is None:
             print "process %d for installing %s timeout\n" %(process.pid, vm_name)
-	    sys.exit(-1)
+            sys.exit(-1)
         elif process.exitcode != 0:
             print "process %d for installing %s returned error %d\n" %(process.pid, vm_name, process.exitcode)
             sys.exit(-2)
