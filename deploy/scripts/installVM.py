@@ -37,6 +37,7 @@ def installVMs(vm_list=[], res={}, devices={}, autoyast=""):
     disk_pattern = "qcow2:%s/sles12sp1-HA-%s.qcow2"
 
     processes = {}
+    exitcode = 0
     default_vm_instll = {'ostype': "sles11",
                          'vcpus': 1,
                          'memory': 1024,
@@ -123,12 +124,22 @@ def installVMs(vm_list=[], res={}, devices={}, autoyast=""):
     for vm in vm_list:
         vm_name = vm['name']
         process = processes[vm_name]["process"]
+
         if process.exitcode is None:
             print "process %d for installing %s timeout\n" %(process.pid, vm_name)
-            sys.exit(-1)
+            exitcode = -1
         elif process.exitcode != 0:
             print "process %d for installing %s returned error %d\n" %(process.pid, vm_name, process.exitcode)
-            sys.exit(-2)
+            exitcode = -2
+
+        if exitcode != 0:
+            print "the installing processes exited with %d" % (exitcode)
+            for vm1 in processes.keys():
+                process1 = processes[vm1]["process"]
+                if process1.is_alive():
+                    print "terminate process"
+                    process1.terminate()
+            sys.exit(exitcode)
 
 def get_config_and_install(deployfile='../confs/vm_list.yaml', autoyast=''):
     dp = GET_VM_CONF(deployfile)
