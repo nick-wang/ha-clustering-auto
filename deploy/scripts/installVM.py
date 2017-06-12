@@ -137,7 +137,7 @@ def installVMs(vm_list=[], res={}, devices={}, autoyast=""):
             for vm1 in processes.keys():
                 process1 = processes[vm1]["process"]
                 if process1.is_alive():
-                    print "terminate process"
+                    print "terminate process %d" %(process1.pid)
                     process1.terminate()
             sys.exit(exitcode)
 
