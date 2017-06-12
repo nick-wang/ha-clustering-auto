@@ -160,7 +160,7 @@ for tm in $(echo ${TESTMODE} | sed 's:,: :g'); do
 		echo -e "\n\n\n"
 		f_info "Start single-node discontig block group testing..."
 
-		f_log "discontig_runner.sh -m ${NODE_LIST} -d ${SHARED_DISK} ${BLOCKSIZE} ${CLUSTERSIZE}  -s ${CLUSTER_STACK} -n ${CLUSTER_NAME} ${MOUNT_POINT}"
+		f_log "discontig_runner.sh -d ${SHARED_DISK} ${BLOCKSIZE} ${CLUSTERSIZE}  -s ${CLUSTER_STACK} -n ${CLUSTER_NAME} ${MOUNT_POINT}"
 
 		discontig_runner.sh -d ${SHARED_DISK} ${BLOCKSIZE} ${CLUSTERSIZE}  -s ${CLUSTER_STACK} -n ${CLUSTER_NAME} ${MOUNT_POINT}
 
