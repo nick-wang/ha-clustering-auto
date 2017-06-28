@@ -15,7 +15,6 @@ eval set -- "$GETOPT_ARGS"
 
 function remove_lvm()
 {
-    size=${3:-"128M"}
     echo "Remove lvm...  lvremove /dev/${1}/${2}"
     echo "y"| lvremove /dev/${1}/${2}
 }
@@ -39,7 +38,7 @@ target_name=$(targetcli ls |sed -n "s/.*o- \(iqn.*:${iblock_name}\) .*/\1/p")
 
 if [ -z ${target_name} ]
 then
-    echo "Can not find $iblock_name in target"
+    echo "Can not find $iblock_name in target."
     exit -2
 fi
 
