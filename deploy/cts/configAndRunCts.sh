@@ -14,7 +14,7 @@
 #get args
 node_list=$NODE_LIST
 ip_base=$NETADDR
-stonith_type=$STONITH_TYPE
+stonith_type="external/$STONITH"
 stonith_args=""
 #host_ip=$HOST_IP
 host_ip=$IPADDR
