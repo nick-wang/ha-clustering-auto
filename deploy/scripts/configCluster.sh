@@ -124,19 +124,15 @@ case ${sle_ver[0]} in
     systemctl enable iscsi.service
     systemctl enable csync2.socket
     systemctl enable pacemaker
-
-    #Start service
-    systemctl start csync2.socket
-    systemctl start pacemaker
+    systemctl enable hawk
     ;;
   11)
     chkconfig open-iscsi on
     chkconfig csync2 on
     chkconfig openais on
+    chkconfig hawk on
     cp -rf corosync.conf_template_1.4.7 /etc/corosync/corosync.conf
     cp -rf authkey /etc/corosync/
-
-    service openais start
     ;;
   *)
     echo "Not support. SLE${sle_ver[0]} SP${sle_ver[1]}"
@@ -168,16 +164,17 @@ for i in `seq 0 $NUM_SHARED_TARGETS`; do
 done
 
 sleep 2
+infoLog "Start pacemaker."
 case ${sle_ver} in
   12|42.1|42.2)
     if [ $STONITH == "sbd" ];
     then
         systemctl enable sbd
     fi
-    systemctl stop pacemaker
-    sleep 1
+
+    #Start service
+    systemctl start csync2.socket
     systemctl start pacemaker
-    systemctl enable hawk
     systemctl start hawk
     ;;
   11)
@@ -185,8 +182,9 @@ case ${sle_ver} in
     then
         chkconfig sbd on
     fi
-    service openais restart
-    chkconfig hawk on
+
+    #Start service
+    service openais start
     rchawk start
     ;;
   *)
@@ -212,4 +210,5 @@ then
                   hypervisor_uri="qemu+tcp://$IPADDR/system" \
                   op monitor interval="60"
     fi
+    infoRun crm configure show
 fi
