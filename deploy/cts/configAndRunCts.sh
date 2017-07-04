@@ -66,7 +66,7 @@ case ${sle_ver[0]} in
     echo "Not support. SLE${sle_ver[0]} SP${sle_ver[1]}"
 esac
 
-if [ $stonith_type == "external/libvirt" ];
+if [ $stonith_type == "external/libvirt" ];then
     zypper in -y libvirt
     stonith_args="--stonith-args hypervisor_uri='qemu+tcp://$host_ip/system',hostlist='$node_list $remote_node_list'"
 elif [ $stonith_type == "external/sbd" ];
