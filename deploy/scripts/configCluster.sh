@@ -94,19 +94,40 @@ fi
 #update ha packages
 zypper up -y -l -t pattern ha_sles
 
+#Login and enable automatic login of iscsi target
+#TODO: remove if seperate SBD from iscsi target list.
+if [ $STONITH == "libvirt" ];
+then
+    START_NUM=1
+else
+    START_NUM=0
+fi
+
+for i in `seq $START_NUM $NUM_SHARED_TARGETS`; do
+    name=`echo "SHARED_TARGET_IP$i"`
+    tgt_ip=`getEnv $name ../cluster_conf`
+    name=`echo "SHARED_TARGET_LUN$i"`
+    tgt_lun=`getEnv $name ../cluster_conf`
+
+    iscsiadm -m discovery -t st -p $tgt_ip > /dev/null
+    iscsiadm -m node -T $tgt_lun -p $tgt_ip -l
+
+    #Enable automatic login to iscsi server
+    iscsiadm -m node -I default -T $tgt_lun -p $tgt_ip \
+         --op=update --name=node.startup --value=automatic
+done
+
 #judge the stonith type
-#login iscsi target for sbd
-#and create sbd
+#create sbd if using sbd as stonith
 if [ $STONITH == "libvirt" ];
 then
     zypper in -y libvirt
 else
-    iscsiadm -m discovery -t st -p $TARGET_IP > /dev/null
-    iscsiadm -m node -T $TARGET_LUN -p $TARGET_IP -l
     sleep 15
-    sbd -d "/dev/disk/by-path/ip-$TARGET_IP:3260-iscsi-${TARGET_LUN}-lun-0" create
+    # To use sbd, should configure at least one iscsi target - $SHARED_TARGET_LUN0
+    sbd -d "/dev/disk/by-path/ip-${TARGET_IP}:3260-iscsi-${TARGET_LUN}-lun-0" create
     modprobe softdog
-    echo "SBD_DEVICE='/dev/disk/by-path/ip-$TARGET_IP:3260-iscsi-${TARGET_LUN}-lun-0'" > /etc/sysconfig/sbd
+    echo "SBD_DEVICE='/dev/disk/by-path/ip-${TARGET_IP}:3260-iscsi-${TARGET_LUN}-lun-0'" > /etc/sysconfig/sbd
     echo "SBD_OPTS='-W'" >> /etc/sysconfig/sbd
     echo "modprobe softdog" >> /etc/init.d/boot.local
 fi
@@ -115,6 +136,7 @@ fi
 #Default disable after installation
 
 #Enable service
+infoLog "Enable services and start pacemaker."
 sle_ver=($(echo $(getSLEVersion)))
 case ${sle_ver[0]} in
   12|42.1|42.2)
@@ -125,6 +147,17 @@ case ${sle_ver[0]} in
     systemctl enable csync2.socket
     systemctl enable pacemaker
     systemctl enable hawk
+    if [ $STONITH == "sbd" ];
+    then
+        systemctl enable sbd
+    fi
+
+    sleep 2
+
+    #Start service
+    systemctl start csync2.socket
+    systemctl start pacemaker
+    systemctl start hawk
     ;;
   11)
     chkconfig open-iscsi on
@@ -133,55 +166,13 @@ case ${sle_ver[0]} in
     chkconfig hawk on
     cp -rf corosync.conf_template_1.4.7 /etc/corosync/corosync.conf
     cp -rf authkey /etc/corosync/
-    ;;
-  *)
-    echo "Not support. SLE${sle_ver[0]} SP${sle_ver[1]}"
-esac
 
-#login other target for shared storage
-if [ $NUM_SHARED_TARGETS -gt 0 ];then
-    for i in `seq 1 $NUM_SHARED_TARGETS`; do
-        name=`echo "SHARED_TARGET_IP$i"`
-        tgt_ip=`getEnv $name ../cluster_conf`
-        name=`echo "SHARED_TARGET_LUN$i"`
-        tgt_lun=`getEnv $name ../cluster_conf`
-
-        iscsiadm -m discovery -t st -p $tgt_ip
-        iscsiadm -m node -T $tgt_lun -p $tgt_ip -l
-    done
-fi
-
-#Enable automatic login to iscsi server
-for i in `seq 0 $NUM_SHARED_TARGETS`; do
-    name=`echo "SHARED_TARGET_IP$i"`
-    tgt_ip=`getEnv $name ../cluster_conf`
-    name=`echo "SHARED_TARGET_LUN$i"`
-    tgt_lun=`getEnv $name ../cluster_conf`
-
-    #Enable automatic login to iscsi server
-    iscsiadm -m node -I default -T $tgt_lun -p $tgt_ip \
-         --op=update --name=node.startup --value=automatic
-done
-
-sleep 2
-infoLog "Start pacemaker."
-case ${sle_ver} in
-  12|42.1|42.2)
-    if [ $STONITH == "sbd" ];
-    then
-        systemctl enable sbd
-    fi
-
-    #Start service
-    systemctl start csync2.socket
-    systemctl start pacemaker
-    systemctl start hawk
-    ;;
-  11)
     if [ $STONITH == "sbd" ];
     then
         chkconfig sbd on
     fi
+
+    sleep 2
 
     #Start service
     service openais start
