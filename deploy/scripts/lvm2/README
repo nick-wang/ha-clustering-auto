@@ -1,0 +1,26 @@
+lvm2 CI scripts
+=================
+
+1. scpFils2Guest.sh
+
+  o scp scripts to cluster nodes
+
+2. runProg.sh
+
+  o helper tool to run script on nodes
+
+3. guest/prepTestEnv.sh
+
+  o prepare env for ocfs2-test
+
+4. guest/runTest.sh
+
+  o run lvm2-testsuite
+
+5. downloadTestLogs.sh
+
+  o pull logs into host server
+
+6. genTestReport.py
+
+  o generate simplified report from logs
