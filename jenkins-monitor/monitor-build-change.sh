@@ -16,7 +16,7 @@ PATCHLEVEL=3
 ARCH=x86_64
 
 SLP_URL="http://147.2.207.1/dist/install/SLP"
-DIR="/tmp/jenkins-dummy/build-change"
+DIR="/tmp/jenkins-dummy/build-change/"
 
 if [ ${PATCHLEVEL} != 0 ]
 then
@@ -77,7 +77,7 @@ while getopts "u:v:P:a:D:h" OPT; do
         a)
             ARCH="$OPTARG";;
         D)
-            DIR="$OPTARG";;
+            DIR=${DIR}"$OPTARG";;
         h)
             echo "monitor-build-change.sh [-u SLP_URL] [-v VERSION] [-P PATCHLEVEL] [-a arch] [-D dir]"
             exit 0;;
