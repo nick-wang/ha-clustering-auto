@@ -38,7 +38,7 @@
   <login_settings/>
   <networking>
     <dns>
-      <dhcp_hostname config:type="boolean">true</dhcp_hostname>
+      <dhcp_hostname config:type="boolean">false</dhcp_hostname>
       <hostname>HOSTNAME</hostname>
       <nameservers config:type="list">
         <nameserver>147.2.136.1</nameserver>
