@@ -56,7 +56,7 @@ def save_package_info(html):
 
 def get_package_info():
     filename = "%s_package_info" % proj_name
-    print "Packages info saved in %s." % dummy_dir + filename
+    print "Packages info saved in %s" % (dummy_dir + filename)
 
     if os.path.isdir(dummy_dir):
         if os.path.exists(dummy_dir + filename):
