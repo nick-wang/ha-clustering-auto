@@ -16,7 +16,7 @@ then
   infoRun crm configure show | tee -a ${DRBD_LOGFILE}
 
   #Disable stonith, in case error happened, one always fence the other
-  crm configure property stonith-enabled="false"
+  crm configure property stonith-enabled="true"
 
   tempfile=drbd-tempfile
   for resname in `drbdadm dump all |grep -P "^resource .+ {" | cut -d " " -f 2`
