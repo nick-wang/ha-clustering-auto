@@ -16,6 +16,7 @@ support_schemas = {'pacemaker':
 module = 'pacemaker'
 packages_monitoring = ''
 proj_name = ""
+dir_name = ""
 dummy_dir = "/tmp/jenkins-dummy/pkgs-change/"
 
 def isTheRPM(package):
@@ -54,9 +55,10 @@ def save_package_info(html):
     f.close()
 
 def get_package_info():
-    if os.path.isdir(dummy_dir):
-        filename = "%s_package_info" % proj_name
+    filename = "%s_package_info" % proj_name
+    print "Packages info saved in %s." % dummy_dir + filename
 
+    if os.path.isdir(dummy_dir):
         if os.path.exists(dummy_dir + filename):
             f = open(dummy_dir + filename)
             return f.read().split()
@@ -116,6 +118,7 @@ def main(url):
     except Exception, e:
         print "wrong url %s" % url
         print e
+        usage()
         sys.exit(-1)
     if packages_monitoring == '':
         packages_monitoring = support_schemas[module]
@@ -152,26 +155,38 @@ def main(url):
     sys.exit(1)
 
 def usage():
-    print "./monitor.py -u <url> -m <module> -P <project_name> (-p <packages>)"
+    print "Usage:"
+    print "./monitor.py -u <url> -m <module> -P <project_name> -D <job_name> (-p <packages>)"
+    print "\tIf gives -p <packages>, then -m <module> will be ignored."
+    print "\tIf gives -D <job_name>, -P <project_name> can be omitted."
     sys.exit(3)
 
 if __name__ == "__main__":
     url = ""
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "u:p:m:P:")
+        opts, args = getopt.getopt(sys.argv[1:], "u:p:m:P:D:")
     except getopt.GetoptError:
         print "Get options Error!"
         sys.exit(2)
     for opt, value in opts:
         if opt in ("-u", "--url"):
             url = value.strip()
+        # If packages give, ignore the module
         elif opt in ("-p", "--packages"):
             packages_monitoring = value.split()
         elif opt in ("-m", "--module"):
             module = value.strip()
+        # Could use "JOB_BASE_NAME" for proj_name
         elif opt in ("-P", "--project"):
             proj_name = value.strip()
+        # Could use "JOB_NAME" for dir_name
+        elif opt in ("-D", "--dirname"):
+            dir_name = value.strip() + "/"
+            dummy_dir += dir_name
         else:
             usage()
+
+    if dir_name != "" and proj_name == "":
+        proj_name = dir_name.split("/")[-2]
 
     main(url)
