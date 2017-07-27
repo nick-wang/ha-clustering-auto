@@ -71,13 +71,14 @@ def get_package_info():
     return None
 
 def getName(rpm):
-    pattern = "(.*)-(\d+(\.\w+)+)-((\d+\.)+)(\w+)\.rpm"
+    pattern = "(.*)-(\d+(\.[\w\+\~]+)+)-((\d+\.)+)(\w+)\.rpm"
     tmp = re.match(pattern, rpm)
 
     if tmp is not None:
         name=tmp.groups()[0]
         return name
 
+    print "Fail to parse: %s" % rpm
     return None
 
 def need_update(old_packages, new_packages):
