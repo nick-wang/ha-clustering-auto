@@ -44,7 +44,7 @@ node_list=`echo ${new_node_list//','/' '}`
 
 sle_ver=($(echo $(getSLEVersion)))
 #deal with stonith, external/libvirt, external/sbd and external/ssh so far
-zypper in -y pacemaker-remote
+#zypper in -y pacemaker-remote
 #disable sbd
 case ${sle_ver[0]} in
 12|42.1|42.2)
@@ -68,7 +68,8 @@ esac
 
 if [ $stonith_type == "external/libvirt" ];then
     zypper in -y libvirt
-    stonith_args="--stonith-args hypervisor_uri='qemu+tcp://$host_ip/system',hostlist='$node_list $remote_node_list'"
+    #stonith_args="--stonith-args hypervisor_uri='qemu+tcp://$host_ip/system',hostlist='$node_list $remote_node_list'"
+    stonith_args="--stonith-args hypervisor_uri='qemu+tcp://$host_ip/system',hostlist='$node_list'"
 elif [ $stonith_type == "external/sbd" ];
 then
 	stonith_args=""
