@@ -2,6 +2,8 @@ Q. How to deploy a host server?
 
   1. Configure ntp-client:
      server address: "clock.via.net"
+     or 
+     China ntp server: "cn.pool.ntp.org"
   2. Install package "java".
   3. Add to jenkins server slave.
   4. Install package "zypper in python-PyYAML".
@@ -18,6 +20,12 @@ Q. How to deploy a host server?
       For sles, need python-setuptools.
   12. Install python library python-psutil.
       For cleanVM, get cpu/mem usage.
+  13. Configure mail:
+      /var/lib/jenkins/jenkins.model.JenkinsLocationConfiguration.xml
+                       hudson.tasks.Mailer.xml
+      configure:
+      ./email-templates/template.jelly
+      (./plugins/emailext-template/templates/template.jelly)
 
 A.To make the cmd on the guest
 "virsh -c qemu+tcp://host_ip/system", we have to modify
