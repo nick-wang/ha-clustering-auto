@@ -33,11 +33,9 @@ def installVM(VMName, disk, OSType, vcpus, memory, disk_size, source, nic, graph
     #p.communicate("\n\n\n\n\n\n\n")
     #print p.wait()
 
-def installVMs(vm_list=[], res={}, devices={}, autoyast=""):
+def installVMs(vm_list=[], res={}, devices={}, autoyast="", backfile=False):
     disk_pattern = "qcow2:%s/sles12sp1-HA-%s.qcow2"
 
-    processes = {}
-    exitcode = 0
     default_vm_instll = {'ostype': "sles11",
                          'vcpus': 1,
                          'memory': 1024,
@@ -54,66 +52,85 @@ def installVMs(vm_list=[], res={}, devices={}, autoyast=""):
         os_settings = '%s/%s' % (os.getcwd(), '../confs/my_ha_inst.xml')
     else:
         os_settings = autoyast
-
     for key in default_res.keys():
         if res[key] is None:
             res[key] = default_res[key]
 
-    for vm in vm_list:
-        vm_name = vm['name']
-        print "DEBUG: install virt-machine %s." % vm_name
-        process = {}
-        # get value from vm config
-        if vm['disk'] is not None:
-            disk = vm['disk']
-        elif devices.has_key("disk_dir") and devices["disk_dir"] is not None:
-            disk = disk_pattern % (devices["disk_dir"], vm_name)
-        else:
-            disk = disk_pattern % (default_dev["disk_dir"], vm_name)
+    if backfile == False:
+        installVMs_raw(vm_list, res, devices, autoyast, os_settings, disk_pattern, default_vm_instll)
+    else:
+        installVms_back(vm_list, res, devices, autoyast, os_settings, disk_pattern, default_vm_instll)
 
-        # Should exactly the same with devices in parseYAML.py
-        devices_keys=('nic', 'vcpus', 'memory', 'disk_size')
+def parse_vm_args(vm, devices, disk_pattern, default_vm_instll):
+    vm_name = vm['name']
+    print "DEBUG: install virt-machine %s." % vm_name
+    # get value from vm config
+    if vm['disk'] is not None:
+        disk = vm['disk']
+    elif devices.has_key("disk_dir") and devices["disk_dir"] is not None:
+        disk = disk_pattern % (devices["disk_dir"], vm_name)
+    else:
+        disk = disk_pattern % (default_dev["disk_dir"], vm_name)
 
-        for key in default_vm_instll.keys():
-            if key in devices_keys:
-                if vm[key] is not None:
-                    vm[key] = vm[key]
-                elif devices.has_key(key) and devices[key] is not None:
-                    vm[key] = devices[key]
-                else:
-                    vm[key] = default_vm_instll[key]
-                continue
+    # Should exactly the same with devices in parseYAML.py
+    devices_keys=('nic', 'vcpus', 'memory', 'disk_size')
 
-            if vm[key] is None:
+    for key in default_vm_instll.keys():
+        if key in devices_keys:
+            if vm[key] is not None:
+                vm[key] = vm[key]
+            elif devices.has_key(key) and devices[key] is not None:
+                vm[key] = devices[key]
+            else:
                 vm[key] = default_vm_instll[key]
+            continue
 
-        f = open(os_settings, 'r')
-        conf_str = f.readlines()
-        f.close()
+        if vm[key] is None:
+            vm[key] = default_vm_instll[key]
 
-        if not os.path.isdir("../dummy_temp"):
-            os.mkdir("../dummy_temp")
+    return vm, disk
 
-        f = open("../dummy_temp/%s" % vm_name, 'w')
-        for line in conf_str:
-            line = _replaceXML(line, "media_url", res['ha_source'])
-            line = _replaceXML(line, "hostname", vm_name)
-            f.write(line)
-        f.close()
+def run_install_cmd(os_settings, vm_name, vm, disk, res):
+    f = open(os_settings, 'r')
+    conf_str = f.readlines()
+    f.close()
 
-        autoyast = "../dummy_temp/%s" % vm_name
-        parent_fd, child_fd = multiprocessing.Pipe()
-        process["process"] = multiprocessing.Process(target=installVM,
-                                args=(vm_name, disk, vm["ostype"],
-                                      vm["vcpus"], vm["memory"],
-                                      vm["disk_size"], res["sle_source"],
-                                      vm["nic"], vm["graphics"],
-                                      autoyast, child_fd),
-                                name=vm_name)
-        process["pipe"] = parent_fd
-        process["autoyast"] = autoyast
+    if not os.path.isdir("../dummy_temp"):
+        os.mkdir("../dummy_temp")
+
+    f = open("../dummy_temp/%s" % vm_name, 'w')
+    for line in conf_str:
+        line = _replaceXML(line, "media_url", res['ha_source'])
+        line = _replaceXML(line, "hostname", vm_name)
+        f.write(line)
+    f.close()
+
+    autoyast = "../dummy_temp/%s" % vm_name
+    parent_fd, child_fd = multiprocessing.Pipe()
+    process = multiprocessing.Process(target=installVM,
+                            args=(vm_name, disk, vm["ostype"],
+                                  vm["vcpus"], vm["memory"],
+                                  vm["disk_size"], res["sle_source"],
+                                  vm["nic"], vm["graphics"],
+                                  autoyast, child_fd),
+                            name=vm_name)
+    return autoyast, parent_fd, process
+    
+def installVms_back(vm_list, res, devices, autoyast, os_settings, disk_pattern, default_vm_instll):
+    pass
+
+def installVMs_raw(vm_list, res, devices, autoyast, os_settings, disk_pattern, default_vm_instll):
+
+    exitcode = 0
+    processes = {}
+    for i in range(len(vm_list)):
+        vm = vm_list[i]
+        vm_name = vm['name']
+        vm, disk = parse_vm_args(vm, devices, disk_pattern, default_vm_instll)
+        vm_list[i] = vm
+        process = {}
+        process["pipe"], process["autoyast"], process['process'] = run_install_cmd(os_settings, vm_name, vm, disk, res)
         processes[vm_name] = process
-
         process["process"].start()
 
     for vm in vm_list:
@@ -147,7 +164,12 @@ def get_config_and_install(deployfile='../confs/vm_list.yaml', autoyast=''):
     vm_list = dp.get_vms_conf()
     resource = dp.get_single_section_conf("resources")
     devices = dp.get_single_section_conf("devices")
-    installVMs(vm_list, resource, devices, autoyast)
+    backfile=dp.get_install_method()
+    if backfile.strip().lower() == "raw":
+        installVMs(vm_list, resource, devices, autoyast, False)
+    else:
+        installVMs(vm_list, resource, devices, autoyast, True)
+
 
 def mkdir_p(path):
     if os.path.exists(path):

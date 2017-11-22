@@ -62,6 +62,8 @@ iscsi:
     shared_target_ip:
   - shared_target_lun:
     shared_target_ip:
+
+installation: backing-file/raw
 '''
 
 class GET_VM_CONF:
@@ -87,6 +89,13 @@ class GET_VM_CONF:
         with open(url,'r') as f:
             ya = yaml.load(f)
         return ya
+
+    def get_install_method(self):
+        install = self.ya.get("installation")
+        if install is None:
+            install = "raw"
+
+        return install
 
     def get_single_section_conf(self, section):
         '''
