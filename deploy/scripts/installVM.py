@@ -33,7 +33,8 @@ def installVM(VMName, disk, OSType, vcpus, memory, disk_size, source, nic, graph
     #p.communicate("\n\n\n\n\n\n\n")
     #print p.wait()
 
-def installVMs(vm_list=[], res={}, devices={}, autoyast="", backfile=False):
+def installVMs(vm_list=[], res={}, devices={}, autoyast=""):
+    backfile = False
     disk_pattern = "qcow2:%s/sles12sp1-HA-%s.qcow2"
 
     default_vm_instll = {'ostype': "sles11",
@@ -48,6 +49,7 @@ def installVMs(vm_list=[], res={}, devices={}, autoyast="", backfile=False):
                   }
     default_dev = {'disk_dir':"/mnt/vm/sles_ha_auto/"
                   }
+
     if (autoyast.strip() == '') or (os.path.exists(autoyast) == False):
         os_settings = '%s/%s' % (os.getcwd(), '../confs/my_ha_inst.xml')
     else:
@@ -55,6 +57,9 @@ def installVMs(vm_list=[], res={}, devices={}, autoyast="", backfile=False):
     for key in default_res.keys():
         if res[key] is None:
             res[key] = default_res[key]
+
+    if not ( devices["backing_file"] > "base" ) - ( "base" > devices["backing_file"] ):
+        backfile = True
 
     if backfile == False:
         installVMs_raw(vm_list, res, devices, autoyast, os_settings, disk_pattern, default_vm_instll)
@@ -73,6 +78,7 @@ def parse_vm_args(vm, devices, disk_pattern, default_vm_instll):
         disk = disk_pattern % (default_dev["disk_dir"], vm_name)
 
     # Should exactly the same with devices in parseYAML.py
+    # Not necessary to add 'disk_dir' and 'backing_file' here
     devices_keys=('nic', 'vcpus', 'memory', 'disk_size')
 
     for key in default_vm_instll.keys():
@@ -231,11 +237,7 @@ def get_config_and_install(deployfile='../confs/vm_list.yaml', autoyast=''):
     vm_list = dp.get_vms_conf()
     resource = dp.get_single_section_conf("resources")
     devices = dp.get_single_section_conf("devices")
-    backfile=dp.get_install_method()
-    if backfile.strip().lower() == "raw":
-        installVMs(vm_list, resource, devices, autoyast, False)
-    else:
-        installVMs(vm_list, resource, devices, autoyast, True)
+    installVMs(vm_list, resource, devices, autoyast)
 
 
 def mkdir_p(path):

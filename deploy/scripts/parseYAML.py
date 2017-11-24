@@ -53,6 +53,7 @@ devices:
   vcpus:
   memory:
   disk_size:
+  backing_file: base
 
 iscsi:
   target_ip: 147.2.207.237
@@ -62,8 +63,6 @@ iscsi:
     shared_target_ip:
   - shared_target_lun:
     shared_target_ip:
-
-installation: backing-file/raw
 '''
 
 class GET_VM_CONF:
@@ -74,7 +73,7 @@ class GET_VM_CONF:
         # refer to 'nodes'
         self.lists = {'repos': 'repo'}
         self.structs = {'iscsi': ('target_ip', 'target_lun'),
-                        'devices': ('disk_dir', 'nic', 'vcpus', 'memory', 'disk_size'),
+                        'devices': ('disk_dir', 'nic', 'vcpus', 'memory', 'disk_size', 'backing_file'),
                         'resources': ('sle_source', 'ha_source')}
 
     def is_key_none(self, key):
@@ -89,13 +88,6 @@ class GET_VM_CONF:
         with open(url,'r') as f:
             ya = yaml.load(f)
         return ya
-
-    def get_install_method(self):
-        install = self.ya.get("installation")
-        if install is None:
-            install = "raw"
-
-        return install
 
     def get_single_section_conf(self, section):
         '''
@@ -215,11 +207,11 @@ def test(deployfile=""):
     print vm_list
     print target_list
 
-
 if __name__ == "__main__":
     '''
         This is a library to parse yaml file, should not running via itself.
     '''
     if len(sys.argv) != 2:
-       test()
-    test(sys.argv[1])
+        test()
+    else:
+        test(sys.argv[1])
