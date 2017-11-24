@@ -8,6 +8,18 @@ hosts_content=""
 csync2_content=""
 TARGET_LUN=$SHARED_TARGET_LUN0
 TARGET_IP=$SHARED_TARGET_IP0
+i=0
+for ip in `cat cluster_conf |grep IP_NODE |cut -d "=" -f 2`
+do
+	let i+=1
+	ip a|grep inet|grep "${ip}/" > /dev/null
+	if [ $? -eq 0 ]; then
+		echo ${ip}
+		host_name=`cat cluster_conf | grep "HOSTNAME_NODE$i"|cut -d "=" -f 2`
+		hostname $host_name
+	fi
+done
+
 cd template
 
 #Add extra repos
