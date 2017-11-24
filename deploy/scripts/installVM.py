@@ -9,6 +9,23 @@ from parseYAML import GET_VM_CONF
 
 MAX_VM_INSTALL_TIMEOUT = 1800
 
+disk_pattern = "qcow2:%s/SUSE-HA-%s.qcow2"
+
+default_vm_install = {'ostype': "sles11",
+                     'vcpus': 1,
+                     'memory': 1024,
+                     'disk_size': 8192,
+                     'nic': 'br0',
+                     'graphics': 'cirrus'
+                    }
+
+default_res = {'sle_source': 'http://mirror.bej.suse.com/dist/install/SLP/SLE-12-SP1-Server-LATEST/x86_64/DVD1/',
+              'ha_source':'http://mirror.bej.suse.com/dist/install/SLP/SLE-12-SP1-HA-LATEST/x86_64/DVD1/'
+              }
+
+default_dev = {'disk_dir':"/mnt/vm/sles_ha_auto/"
+              }
+
 def _replaceXML(line, key, value):
     pattern = "( *<%s>).*(</%s> *)"
     m_pa = pattern % (key, key)
@@ -35,20 +52,6 @@ def installVM(VMName, disk, OSType, vcpus, memory, disk_size, source, nic, graph
 
 def installVMs(vm_list=[], res={}, devices={}, autoyast=""):
     backfile = False
-    disk_pattern = "qcow2:%s/sles12sp1-HA-%s.qcow2"
-
-    default_vm_instll = {'ostype': "sles11",
-                         'vcpus': 1,
-                         'memory': 1024,
-                         'disk_size': 8192,
-                         'nic': 'br0',
-                         'graphics': 'cirrus'
-                        }
-    default_res = {'sle_source': 'http://mirror.bej.suse.com/dist/install/SLP/SLE-12-SP1-Server-LATEST/x86_64/DVD1/',
-                  'ha_source':'http://mirror.bej.suse.com/dist/install/SLP/SLE-12-SP1-HA-LATEST/x86_64/DVD1/'
-                  }
-    default_dev = {'disk_dir':"/mnt/vm/sles_ha_auto/"
-                  }
 
     if (autoyast.strip() == '') or (os.path.exists(autoyast) == False):
         os_settings = '%s/%s' % (os.getcwd(), '../confs/my_ha_inst.xml')
@@ -62,11 +65,11 @@ def installVMs(vm_list=[], res={}, devices={}, autoyast=""):
         backfile = True
 
     if backfile == False:
-        installVMs_raw(vm_list, res, devices, autoyast, os_settings, disk_pattern, default_vm_instll)
+        installVMs_raw(vm_list, res, devices, autoyast, os_settings)
     else:
-        installVms_back("../confs/template.xml",vm_list, res, devices, autoyast, os_settings, disk_pattern, default_vm_instll)
+        installVms_back("../confs/template.xml",vm_list, res, devices, autoyast, os_settings)
 
-def parse_vm_args(vm, devices, disk_pattern, default_vm_instll):
+def parse_vm_args(vm, devices):
     vm_name = vm['name']
     print "DEBUG: install virt-machine %s." % vm_name
     # get value from vm config
@@ -81,18 +84,18 @@ def parse_vm_args(vm, devices, disk_pattern, default_vm_instll):
     # Not necessary to add 'disk_dir' and 'backing_file' here
     devices_keys=('nic', 'vcpus', 'memory', 'disk_size')
 
-    for key in default_vm_instll.keys():
+    for key in default_vm_install.keys():
         if key in devices_keys:
             if vm[key] is not None:
                 vm[key] = vm[key]
             elif devices.has_key(key) and devices[key] is not None:
                 vm[key] = devices[key]
             else:
-                vm[key] = default_vm_instll[key]
+                vm[key] = default_vm_install[key]
             continue
 
         if vm[key] is None:
-            vm[key] = default_vm_instll[key]
+            vm[key] = default_vm_install[key]
 
     return vm, disk
 
@@ -122,12 +125,12 @@ def run_install_cmd(os_settings, vm_name, vm, disk, res):
                             name=vm_name)
     return autoyast, parent_fd, process
     
-def installVms_back(templatefile, vm_list, res, devices, autoyast, os_settings, disk_pattern, default_vm_instll):
+def installVms_back(templatefile, vm_list, res, devices, autoyast, os_settings):
     exitcode = 0
     processes = {}
     vm = vm_list[0]
     vm_name = vm['name']
-    vm, disk = parse_vm_args(vm, devices, disk_pattern, default_vm_instll)
+    vm, disk = parse_vm_args(vm, devices)
     vm_list[0] = vm
     process_dict = {}
     process_dict["autoyast"], process_dict["pipe"], process_dict['process'] = run_install_cmd(os_settings, vm_name, vm, disk, res)
@@ -161,7 +164,7 @@ def installVms_back(templatefile, vm_list, res, devices, autoyast, os_settings, 
     os.rename(disk_name, base_image)
     for i in range(len(vm_list)):
         vm = vm_list[i]
-        vm, disk = parse_vm_args(vm, devices, disk_pattern, default_vm_instll)
+        vm, disk = parse_vm_args(vm, devices)
         disk_name = disk.split(':')[1]
         vm_list[i] = vm
         xmlfile = "%s/%s" % (os.path.dirname(disk_name), vm['name'])
@@ -192,14 +195,14 @@ def fill_vm_xml(templatefile, xmlfile, vmname, memory, cur_mem, vcpus, disk, net
         return True
     return False
 
-def installVMs_raw(vm_list, res, devices, autoyast, os_settings, disk_pattern, default_vm_instll):
+def installVMs_raw(vm_list, res, devices, autoyast, os_settings):
 
     exitcode = 0
     processes = {}
     for i in range(len(vm_list)):
         vm = vm_list[i]
         vm_name = vm['name']
-        vm, disk = parse_vm_args(vm, devices, disk_pattern, default_vm_instll)
+        vm, disk = parse_vm_args(vm, devices)
         vm_list[i] = vm
         process = {}
         process["autoyast"], process["pipe"], process['process'] = run_install_cmd(os_settings, vm_name, vm, disk, res)
