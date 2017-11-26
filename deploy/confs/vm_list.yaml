@@ -8,7 +8,7 @@ nodes:
   ostype: sles11
   vcpus: 2
   memory: 1024
-  disk_size: 8192
+  disk_size: 15360
   nic:
   graphics:
 
@@ -17,7 +17,7 @@ nodes:
   ostype: sles11
   vcpus: 2
   memory: 1024
-  disk_size: 8192
+  disk_size: 15360
   nic:
   graphics:
 
@@ -26,13 +26,14 @@ nodes:
   ostype: sles11
   vcpus: 2
   memory: 1024
-  disk_size: 8192
+  disk_size: 15360
   nic:
   graphics:
 
 devices:
   disk_dir: /mnt/vm/sles_ha_auto/
   nic: br0
+  backing_file: base
 
 iscsi:
   target_ip: 147.2.207.237

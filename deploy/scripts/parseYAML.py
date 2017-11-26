@@ -16,7 +16,7 @@ nodes:
   ostype: sles11
   vcpus: 2
   memory: 1024
-  disk_size: 8192
+  disk_size: 15360
   nic:
   graphics:
   os_settings:
@@ -27,7 +27,7 @@ nodes:
   ostype: sles11
   vcpus: 2
   memory: 1024
-  disk_size: 8192
+  disk_size: 15360
   nic:
   graphics:
   os_settings:
@@ -38,7 +38,7 @@ nodes:
   ostype: sles11
   vcpus: 2
   memory: 1024
-  disk_size: 8192
+  disk_size: 15360
   nic:
   graphics:
   os_settings:

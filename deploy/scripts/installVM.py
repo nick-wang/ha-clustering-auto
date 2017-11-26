@@ -10,11 +10,12 @@ from parseYAML import GET_VM_CONF
 MAX_VM_INSTALL_TIMEOUT = 1800
 
 disk_pattern = "qcow2:%s/SUSE-HA-%s.qcow2"
+backing_file_disk_pattern = "qcow2:%s/SUSE-HA-%s-base.qcow2"
 
 default_vm_install = {'ostype': "sles11",
                      'vcpus': 1,
                      'memory': 1024,
-                     'disk_size': 8192,
+                     'disk_size': 15360,
                      'nic': 'br0',
                      'graphics': 'cirrus'
                     }
@@ -50,8 +51,43 @@ def installVM(VMName, disk, OSType, vcpus, memory, disk_size, source, nic, graph
     #p.communicate("\n\n\n\n\n\n\n")
     #print p.wait()
 
-def installVMs(vm_list=[], res={}, devices={}, autoyast=""):
-    backfile = False
+def get_backing_file_name(vm_list, devices):
+     vm_name = vm_list[0]['name']
+
+     if devices.has_key("disk_dir") and devices["disk_dir"] is not None:
+         disk = backing_file_disk_pattern % (devices["disk_dir"], vm_name)
+     else:
+         disk = backing_file_disk_pattern % (default_dev["disk_dir"], vm_name)
+
+     return disk.split(':')[1]
+
+# TODO: Reuse backing file for different projects
+def find_an_exist_backing_file():
+    return False
+
+def is_backing_file(backing_file):
+    if (( backing_file > "base" ) - ( "base" > backing_file )):
+        return False
+    else:
+        return True
+
+def create_vms_on_backing_file(vm_list, base_image):
+    for i in range(len(vm_list)):
+        vm = vm_list[i]
+        vm, disk = parse_vm_args(vm, devices)
+        disk_name = disk.split(':')[1]
+
+        #create the new image
+        print "qemu-img create -f qcow2 %s -b %s" % (disk_name, base_image)
+        os.system("qemu-img create -f qcow2 %s -b %s" % (disk_name, base_image))
+
+        xmlfile = "%s/%s_auto.xml" % (os.path.dirname(disk_name), vm['name'])
+        fill_vm_xml(vm['name'], vm['memory'], vm['memory'], vm['vcpus'], disk_name,
+            'bridge', vm['nic'], xmlfile, "../confs/backing_file_template.xml")
+        os.system("virsh create %s" % xmlfile)
+
+def prepareVMs(vm_list=[], res={}, devices={}, autoyast=""):
+    new_vm_list = []
 
     if (autoyast.strip() == '') or (os.path.exists(autoyast) == False):
         os_settings = '%s/%s' % (os.getcwd(), '../confs/my_ha_inst.xml')
@@ -61,17 +97,25 @@ def installVMs(vm_list=[], res={}, devices={}, autoyast=""):
         if res[key] is None:
             res[key] = default_res[key]
 
-    if not ( devices["backing_file"] > "base" ) - ( "base" > devices["backing_file"] ):
-        backfile = True
+    if is_backing_file(devices["backing_file"]):
+        base_image = get_backing_file_name(vm_list, devices)
 
-    if backfile == False:
-        installVMs_raw(vm_list, res, devices, autoyast, os_settings)
+        if not find_an_exist_backing_file(base_image):
+            # Only installed one(1st) vm as backing file
+            installVMs(vm_list[:1], res, devices, autoyast, os_settings, base_image)
+
+            # Destroy and undefine vm to use disk as backing file
+            os.system("virsh destroy %s" % vm_list[0]['name'])
+            os.system("virsh undefine %s" % vm_list[0]['name'])
+
+        create_vms_on_backing_file(vm_list, base_image)
+
     else:
-        installVms_back("../confs/template.xml",vm_list, res, devices, autoyast, os_settings)
+        installVMs(vm_list, res, devices, autoyast, os_settings)
 
 def parse_vm_args(vm, devices):
     vm_name = vm['name']
-    print "DEBUG: install virt-machine %s." % vm_name
+
     # get value from vm config
     if vm['disk'] is not None:
         disk = vm['disk']
@@ -125,58 +169,7 @@ def run_install_cmd(os_settings, vm_name, vm, disk, res):
                             name=vm_name)
     return autoyast, parent_fd, process
     
-def installVms_back(templatefile, vm_list, res, devices, autoyast, os_settings):
-    exitcode = 0
-    processes = {}
-    vm = vm_list[0]
-    vm_name = vm['name']
-    vm, disk = parse_vm_args(vm, devices)
-    vm_list[0] = vm
-    process_dict = {}
-    process_dict["autoyast"], process_dict["pipe"], process_dict['process'] = run_install_cmd(os_settings, vm_name, vm, disk, res)
-    process = process_dict["process"]
-    process.start()
-
-    process.join(MAX_VM_INSTALL_TIMEOUT)
-    os.remove(process_dict["autoyast"])
-
-    if process.exitcode is None:
-        print "process %d for installing %s timeout\n" %(process.pid, vm_name)
-        exitcode = -1
-    elif process.exitcode != 0:
-        print "process %d for installing %s returned error %d\n" %(process.pid, vm_name, process.exitcode)
-        exitcode = -2
-
-    if exitcode != 0:
-        print "the installing processes exited with %d" % (exitcode)
-        if process.is_alive():
-            print "terminate process %d with vm %s" %(process1.pid, vm1)
-            process.terminate()
-        sys.exit(exitcode)
-
-    #1.destroy the newly installed vm, and rename the base disk
-    version='0'
-    os.system("virsh destroy %s" % vm_name)
-    os.system("virsh undefine %s" % vm_name)
-    disk_name = disk.split(':')[1]
-    disk_dir = os.path.dirname(disk_name)
-    base_image = "%s/%s-base.qcow2" % (disk_dir, version)
-    os.rename(disk_name, base_image)
-    for i in range(len(vm_list)):
-        vm = vm_list[i]
-        vm, disk = parse_vm_args(vm, devices)
-        disk_name = disk.split(':')[1]
-        vm_list[i] = vm
-        xmlfile = "%s/%s" % (os.path.dirname(disk_name), vm['name'])
-        #create the new image
-        print "qemu-img create -f qcow2 %s -b %s" % (disk_name, base_image)
-        os.system("qemu-img create -f qcow2 %s -b %s" % (disk_name, base_image))
-        fill_vm_xml(templatefile, xmlfile, vm['name'], vm['memory'], vm['memory'], vm['vcpus'], disk_name, 'bridge', vm['nic'])
-        os.system("virsh create %s" % xmlfile)
-    
-    
-
-def fill_vm_xml(templatefile, xmlfile, vmname, memory, cur_mem, vcpus, disk, network, interface):
+def fill_vm_xml(vmname, memory, cur_mem, vcpus, disk, network, interface, xmlfile, templatefile = "../confs/backing_file_template.xml"):
     if os.path.exists(templatefile):
         f = open(templatefile)
         content = f.read()
@@ -188,21 +181,28 @@ def fill_vm_xml(templatefile, xmlfile, vmname, memory, cur_mem, vcpus, disk, net
         content = content.replace("DISK",disk)
         content = content.replace("NETWORK_MODE", network)
         content = content.replace("INTERFACE", interface)
+
         f = open(xmlfile, 'w')
         f.write(content)
-        print xmlfile
         f.close()
+
         return True
+
     return False
 
-def installVMs_raw(vm_list, res, devices, autoyast, os_settings):
+def installVMs(vm_list, res, devices, autoyast, os_settings, base_image = ""):
 
     exitcode = 0
     processes = {}
     for i in range(len(vm_list)):
         vm = vm_list[i]
         vm_name = vm['name']
+
         vm, disk = parse_vm_args(vm, devices)
+        if base_image != "" :
+            disk = "qcow2:" + base_image
+        print "DEBUG: prepare to install virt-machine %s in disk(base:%s) %s." % ( vm['name'], base_image, disk )
+
         vm_list[i] = vm
         process = {}
         process["autoyast"], process["pipe"], process['process'] = run_install_cmd(os_settings, vm_name, vm, disk, res)
@@ -240,7 +240,8 @@ def get_config_and_install(deployfile='../confs/vm_list.yaml', autoyast=''):
     vm_list = dp.get_vms_conf()
     resource = dp.get_single_section_conf("resources")
     devices = dp.get_single_section_conf("devices")
-    installVMs(vm_list, resource, devices, autoyast)
+
+    prepareVMs(vm_list, resource, devices, autoyast)
 
 
 def mkdir_p(path):
