@@ -172,7 +172,7 @@ def create_vms_on_backing_file(vm_list, devices, base_image):
 
         #create the new image
         print "qemu-img create -f qcow2 %s -b %s" % (disk_name, base_image)
-        mkdir_p(os.path.dirname(disk_name))
+        os.makedirs(os.path.dirname(disk_name))
         os.system("qemu-img create -f qcow2 %s -b %s" % (disk_name, base_image))
 
         xmlfile = "%s/%s_auto.xml" % (os.path.dirname(disk_name), vm['name'])
@@ -345,14 +345,6 @@ def get_config_and_install(deployfile='../confs/vm_list.yaml', autoyast=''):
 
     prepareVMs(vm_list, resource, devices, autoyast)
 
-def mkdir_p(path):
-    if os.path.exists(path):
-        return
-    dir_name = os.path.dirname(path)
-    mkdir_p(dir_name)
-    if os.path.exists(path) == False:
-        os.mkdir(path)
-
 def usage():
     print "usage:"
     print "\t./installVM.py <yaml-conf> <autoyast>"
@@ -366,7 +358,7 @@ if __name__ == "__main__":
     #getSUSEVersionViaURL("http://mirror.suse.asia/dist/install/SLP/SLE-15-Installer-LATEST/x86_64/DVD1/")
     #getSUSEVersionViaURL("http://mirror.suse.asia/dist/install/SLP/SLE-16-Installer-LATEST/x86_64/DVD1/")
 
-    mkdir_p("/var/run/vm-install/")
+    os.makedirs("/var/run/vm-install/")
     os.chmod("/var/run/vm-install/", 0755)
     if len(sys.argv) > 3:
        usage()
