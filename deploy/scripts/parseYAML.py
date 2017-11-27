@@ -53,7 +53,7 @@ devices:
   vcpus:
   memory:
   disk_size:
-  backing_file: base
+  backing_file: yes
   sharing_backing_file: yes
 
 iscsi:

@@ -164,19 +164,6 @@ def get_backing_file_name(vm_list, devices):
 def find_an_exist_backing_file(base_image):
     return os.path.isfile(base_image)
 
-def is_backing_file(backing_file):
-    if (( backing_file.lower() > "base" ) - ( "base" > backing_file.lower() )):
-        return False
-    else:
-        return True
-
-def is_sharing_backing_file(is_shared):
-    if (( is_shared.lower() > "yes" ) - ( "yes" > is_shared.lower() )) or
-        (( is_shared.lower() > "y" ) - ( "y" > is_shared.lower() )):
-        return False
-    else:
-        return True
-
 def create_vms_on_backing_file(vm_list, base_image):
     for i in range(len(vm_list)):
         vm = vm_list[i]
@@ -203,8 +190,8 @@ def prepareVMs(vm_list=[], res={}, devices={}, autoyast=""):
         if res[key] is None:
             res[key] = default_res[key]
 
-    if is_backing_file(devices["backing_file"]):
-        if is_sharing_backing_file(devices["sharing_backing_file"]):
+    if devices["backing_file"]:
+        if devices["sharing_backing_file"]:
             # Get the disk_size based on the first node's configuration
             base_image = get_shared_backing_file_name(vm_list[0], devices, res["sle_source"])
         else:
@@ -352,7 +339,6 @@ def get_config_and_install(deployfile='../confs/vm_list.yaml', autoyast=''):
     devices = dp.get_single_section_conf("devices")
 
     prepareVMs(vm_list, resource, devices, autoyast)
-
 
 def mkdir_p(path):
     if os.path.exists(path):

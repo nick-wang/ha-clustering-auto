@@ -33,7 +33,7 @@ nodes:
 devices:
   disk_dir: /mnt/vm/sles_ha_auto/
   nic: br0
-  backing_file: base
+  backing_file: yes
   sharing_backing_file: yes
 
 iscsi:
