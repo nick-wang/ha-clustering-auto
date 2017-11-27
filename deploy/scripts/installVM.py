@@ -34,6 +34,8 @@ default_res = {'sle_source': 'http://mirror.bej.suse.com/dist/install/SLP/SLE-12
 default_dev = {'disk_dir':"/mnt/vm/sles_ha_auto/"
               }
 
+default_base_dir = "/mnt/vm/sle_base"
+
 def getSUSEVersionViaURL(repo):
     # http://mirror.suse.asia/dist/install/SLP/SLES-11-SP4-GM/x86_64/DVD1/media.1/build
     #    SLES-11-SP4-DVD-x86_64-Build1221
@@ -73,11 +75,11 @@ def getSUSEVersionViaURL(repo):
     suse_release = {}
     lines = []
 
-    for patch in url_pattern.keys():
-        if patch not in repo:
+    for version in url_pattern.keys():
+        if version not in repo:
             continue
 
-        fd = urlopen(repo+url_pattern[patch]['postfix'])
+        fd = urlopen(repo+url_pattern[version]['postfix'])
         lines = fd.readlines()
         fd.close()
 
@@ -85,7 +87,7 @@ def getSUSEVersionViaURL(repo):
             return suse_release
 
         for line in lines:
-            reg = re.search(url_pattern[patch]['pattern'], line)
+            reg = re.search(url_pattern[version]['pattern'], line)
             if reg is not None:
                 #SLES-11-SP4-DVD-x86_64-Build1221
                 #('S', 'SP4-', 'x86_64', '1221')
@@ -93,11 +95,11 @@ def getSUSEVersionViaURL(repo):
                 #('SP3-', 'Server', 'x86_64', '0473')
                 #SUSE - SLE-15-Installer-DVD-x86_64-Build349.1-Media
                 #(None, 'Installer', 'x86_64', '349.1')
-                suse_release['flavor'] = reg.groups()[url_pattern[patch]['flavor']]
-                suse_release['version'] = url_pattern[patch]['version']
-                suse_release['patch'] = reg.groups()[url_pattern[patch]['patch']]
-                suse_release['arch'] = reg.groups()[url_pattern[patch]['arch']]
-                suse_release['build'] = reg.groups()[url_pattern[patch]['build']]
+                suse_release['flavor'] = reg.groups()[url_pattern[version]['flavor']]
+                suse_release['version'] = url_pattern[version]['version']
+                suse_release['patch'] = reg.groups()[url_pattern[version]['patch']]
+                suse_release['arch'] = reg.groups()[url_pattern[version]['arch']]
+                suse_release['build'] = reg.groups()[url_pattern[version]['build']]
                 break
         else:
             print "Not found any pattern in url."
@@ -142,6 +144,13 @@ def installVM(VMName, disk, OSType, vcpus, memory, disk_size, source, nic, graph
     #p.communicate("\n\n\n\n\n\n\n")
     #print p.wait()
 
+def get_shared_backing_file_name(vm, devices, repo_url):
+    suse = getSUSEVersionViaURL(repo_url)
+    base_name = "%s-%s-%s-%s-Build%s-size" % (suse['flavor'], suse['version'],
+                    suse['patch'], suse['arch'], suse['build'], vm['disk_size'])
+    disk = backing_file_disk_pattern % (default_base_dir, base_name)
+    return disk.split(':')[1]
+
 def get_backing_file_name(vm_list, devices):
      vm_name = vm_list[0]['name']
 
@@ -152,12 +161,18 @@ def get_backing_file_name(vm_list, devices):
 
      return disk.split(':')[1]
 
-# TODO: Reuse backing file for different projects
-def find_an_exist_backing_file():
-    return False
+def find_an_exist_backing_file(base_image):
+    return os.path.isfile(base_image)
 
 def is_backing_file(backing_file):
-    if (( backing_file > "base" ) - ( "base" > backing_file )):
+    if (( backing_file.lower() > "base" ) - ( "base" > backing_file.lower() )):
+        return False
+    else:
+        return True
+
+def is_sharing_backing_file(is_shared):
+    if (( is_shared.lower() > "yes" ) - ( "yes" > is_shared.lower() )) or
+        (( is_shared.lower() > "y" ) - ( "y" > is_shared.lower() )):
         return False
     else:
         return True
@@ -189,7 +204,11 @@ def prepareVMs(vm_list=[], res={}, devices={}, autoyast=""):
             res[key] = default_res[key]
 
     if is_backing_file(devices["backing_file"]):
-        base_image = get_backing_file_name(vm_list, devices)
+        if is_sharing_backing_file(devices["sharing_backing_file"]):
+            # Get the disk_size based on the first node's configuration
+            base_image = get_shared_backing_file_name(vm_list[0], devices, res["sle_source"])
+        else:
+            base_image = get_backing_file_name(vm_list, devices)
 
         if not find_an_exist_backing_file(base_image):
             # Only installed one(1st) vm as backing file

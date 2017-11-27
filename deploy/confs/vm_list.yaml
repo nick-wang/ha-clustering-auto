@@ -34,6 +34,7 @@ devices:
   disk_dir: /mnt/vm/sles_ha_auto/
   nic: br0
   backing_file: base
+  sharing_backing_file: yes
 
 iscsi:
   target_ip: 147.2.207.237
