@@ -146,7 +146,7 @@ def installVM(VMName, disk, OSType, vcpus, memory, disk_size, source, nic, graph
 
 def get_shared_backing_file_name(vm, devices, repo_url):
     suse = getSUSEVersionViaURL(repo_url)
-    base_name = "%s-%s-%s-%s-Build%s-size" % (suse['flavor'], suse['version'],
+    base_name = "%s-%s-%s-%s-Build%s-size%d" % (suse['flavor'], suse['version'],
                     suse['patch'], suse['arch'], suse['build'], vm['disk_size'])
     disk = backing_file_disk_pattern % (default_base_dir, base_name)
     return disk.split(':')[1]
@@ -164,7 +164,7 @@ def get_backing_file_name(vm_list, devices):
 def find_an_exist_backing_file(base_image):
     return os.path.isfile(base_image)
 
-def create_vms_on_backing_file(vm_list, base_image):
+def create_vms_on_backing_file(vm_list, devices, base_image):
     for i in range(len(vm_list)):
         vm = vm_list[i]
         vm, disk = parse_vm_args(vm, devices)
@@ -172,15 +172,20 @@ def create_vms_on_backing_file(vm_list, base_image):
 
         #create the new image
         print "qemu-img create -f qcow2 %s -b %s" % (disk_name, base_image)
+        mkdir_p(os.path.dirname(disk_name))
         os.system("qemu-img create -f qcow2 %s -b %s" % (disk_name, base_image))
 
         xmlfile = "%s/%s_auto.xml" % (os.path.dirname(disk_name), vm['name'])
+
         fill_vm_xml(vm['name'], vm['memory'], vm['memory'], vm['vcpus'], disk_name,
             'bridge', vm['nic'], xmlfile, "../confs/backing_file_template.xml")
-        os.system("virsh create %s" % xmlfile)
+
+        print "virsh define %s with name %s" % (xmlfile, vm['name'])
+        os.system("virsh define %s" % xmlfile)
+        os.system("virsh start %s" % vm['name'])
+
 
 def prepareVMs(vm_list=[], res={}, devices={}, autoyast=""):
-    new_vm_list = []
 
     if (autoyast.strip() == '') or (os.path.exists(autoyast) == False):
         os_settings = '%s/%s' % (os.getcwd(), '../confs/my_ha_inst.xml')
@@ -190,7 +195,7 @@ def prepareVMs(vm_list=[], res={}, devices={}, autoyast=""):
         if res[key] is None:
             res[key] = default_res[key]
 
-    if devices["backing_file"]:
+    if devices["backing_file"] or devices["sharing_backing_file"]:
         if devices["sharing_backing_file"]:
             # Get the disk_size based on the first node's configuration
             base_image = get_shared_backing_file_name(vm_list[0], devices, res["sle_source"])
@@ -205,7 +210,7 @@ def prepareVMs(vm_list=[], res={}, devices={}, autoyast=""):
             os.system("virsh destroy %s" % vm_list[0]['name'])
             os.system("virsh undefine %s" % vm_list[0]['name'])
 
-        create_vms_on_backing_file(vm_list, base_image)
+        create_vms_on_backing_file(vm_list, devices, base_image)
 
     else:
         installVMs(vm_list, res, devices, autoyast, os_settings)
