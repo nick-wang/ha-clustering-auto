@@ -27,8 +27,8 @@ default_vm_install = {'ostype': "sles11",
                      'graphics': 'cirrus'
                     }
 
-default_res = {'sle_source': 'http://mirror.bej.suse.com/dist/install/SLP/SLE-12-SP1-Server-LATEST/x86_64/DVD1/',
-              'ha_source':'http://mirror.bej.suse.com/dist/install/SLP/SLE-12-SP1-HA-LATEST/x86_64/DVD1/'
+default_res = {'sle_source': 'http://mirror.bej.suse.com/dist/install/SLP/SLE-12-SP3-Server-LATEST/x86_64/DVD1/',
+              'ha_source':'http://mirror.bej.suse.com/dist/install/SLP/SLE-12-SP3-HA-LATEST/x86_64/DVD1/'
               }
 
 default_dev = {'disk_dir':"/mnt/vm/sles_ha_auto/"
