@@ -7,6 +7,13 @@ import multiprocessing
 
 from parseYAML import GET_VM_CONF
 
+try:
+    # python3
+    from urllib.request import urlopen
+except:
+    # python2
+    from urllib import urlopen
+
 MAX_VM_INSTALL_TIMEOUT = 1800
 
 disk_pattern = "qcow2:%s/SUSE-HA-%s.qcow2"
@@ -26,6 +33,90 @@ default_res = {'sle_source': 'http://mirror.bej.suse.com/dist/install/SLP/SLE-12
 
 default_dev = {'disk_dir':"/mnt/vm/sles_ha_auto/"
               }
+
+def getSUSEVersionViaURL(repo):
+    # http://mirror.suse.asia/dist/install/SLP/SLES-11-SP4-GM/x86_64/DVD1/media.1/build
+    #    SLES-11-SP4-DVD-x86_64-Build1221
+    # http://mirror.suse.asia/dist/install/SLP/SLE-12-SP3-Server-GM/x86_64/DVD1/media.1/build
+    #    SLE-12-SP3-Server-DVD-x86_64-Build0473
+    # http://mirror.suse.asia/dist/install/SLP/SLE-15-Installer-Beta2/x86_64/DVD1/media.1/media
+    #    SUSE - SLE-15-Installer-DVD-x86_64-Build333.4-Media
+    #    SLE-15-Installer-DVD-x86_64-Build333.4
+    #    2
+    url_pattern = {'-11-': {'postfix' : '/media.1/build',
+                            'pattern' : 'SLE(\w)-11-(SP[1-4]-)*DVD-(\w*)-Build([\w\.]+)',
+                            'flavor' : 0,
+                            'version' : '11',
+                            'patch' : 1,
+                            'arch' : 2,
+                            'build' : 3
+                           },
+                   '-12-': {'postfix' : '/media.1/build',
+                            'pattern' : 'SLE-12-(SP[1-4]-)*(\w+)-DVD-(\w*)-Build([\w\.]+)',
+                            'flavor' : 1,
+                            'version' : '12',
+                            'patch' : 0,
+                            'arch' : 2,
+                            'build' : 3
+                           },
+                   '-15-': {'postfix' : '/media.1/media',
+                            'pattern' : 'SLE-15-(SP[1-4]-)*(\w+)-DVD-(\w*)-Build([\w\.]+)',
+                            'flavor' : 1,
+                            'version' : '15',
+                            'patch' : 0,
+                            'arch' : 2,
+                            'build' : 3
+                           },
+                  }
+
+    # flavor, version, arch, build
+    suse_release = {}
+    lines = []
+
+    for patch in url_pattern.keys():
+        if patch not in repo:
+            continue
+
+        fd = urlopen(repo+url_pattern[patch]['postfix'])
+        lines = fd.readlines()
+        fd.close()
+
+        if len(lines) == 0:
+            return suse_release
+
+        for line in lines:
+            reg = re.search(url_pattern[patch]['pattern'], line)
+            if reg is not None:
+                #SLES-11-SP4-DVD-x86_64-Build1221
+                #('S', 'SP4-', 'x86_64', '1221')
+                #SLE-12-SP3-Server-DVD-x86_64-Build0473
+                #('SP3-', 'Server', 'x86_64', '0473')
+                #SUSE - SLE-15-Installer-DVD-x86_64-Build349.1-Media
+                #(None, 'Installer', 'x86_64', '349.1')
+                suse_release['flavor'] = reg.groups()[url_pattern[patch]['flavor']]
+                suse_release['version'] = url_pattern[patch]['version']
+                suse_release['patch'] = reg.groups()[url_pattern[patch]['patch']]
+                suse_release['arch'] = reg.groups()[url_pattern[patch]['arch']]
+                suse_release['build'] = reg.groups()[url_pattern[patch]['build']]
+                break
+        else:
+            print "Not found any pattern in url."
+
+    if len(suse_release) == 0:
+        print "Do not have any patch info. Wrong url?"
+        return suse_release
+
+    if suse_release['flavor'] == 'S':
+        suse_release['flavor'] = 'Server'
+    elif suse_release['flavor'] == 'D':
+        suse_release['flavor'] = 'Desktop'
+
+    if suse_release['patch'] is None:
+        suse_release['patch'] = 'SP0'
+    else:
+       suse_release['patch'] = suse_release['patch'].strip("-")
+
+    return suse_release
 
 def _replaceXML(line, key, value):
     pattern = "( *<%s>).*(</%s> *)"
@@ -260,6 +351,11 @@ def usage():
     sys.exit(1)
 
 if __name__ == "__main__":
+    #getSUSEVersionViaURL("http://mirror.suse.asia/dist/install/SLP/SLES-11-SP4-GM/x86_64/DVD1/")
+    #getSUSEVersionViaURL("http://mirror.suse.asia/dist/install/SLP/SLE-12-SP3-Server-GM/x86_64/DVD1/")
+    #getSUSEVersionViaURL("http://mirror.suse.asia/dist/install/SLP/SLE-15-Installer-LATEST/x86_64/DVD1/")
+    #getSUSEVersionViaURL("http://mirror.suse.asia/dist/install/SLP/SLE-16-Installer-LATEST/x86_64/DVD1/")
+
     mkdir_p("/var/run/vm-install/")
     os.chmod("/var/run/vm-install/", 0755)
     if len(sys.argv) > 3:
@@ -270,4 +366,3 @@ if __name__ == "__main__":
        get_config_and_install(sys.argv[1])
     else:
        get_config_and_install()
-
