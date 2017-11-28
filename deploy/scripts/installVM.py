@@ -172,7 +172,8 @@ def create_vms_on_backing_file(vm_list, devices, base_image):
 
         #create the new image
         print "qemu-img create -f qcow2 %s -b %s" % (disk_name, base_image)
-        os.makedirs(os.path.dirname(disk_name))
+        if os.path.exists(os.path.dirname(disk_name)) == False:
+            os.makedirs(os.path.dirname(disk_name))
         os.system("qemu-img create -f qcow2 %s -b %s" % (disk_name, base_image))
 
         xmlfile = "%s/%s_auto.xml" % (os.path.dirname(disk_name), vm['name'])
@@ -358,7 +359,8 @@ if __name__ == "__main__":
     #getSUSEVersionViaURL("http://mirror.suse.asia/dist/install/SLP/SLE-15-Installer-LATEST/x86_64/DVD1/")
     #getSUSEVersionViaURL("http://mirror.suse.asia/dist/install/SLP/SLE-16-Installer-LATEST/x86_64/DVD1/")
 
-    os.makedirs("/var/run/vm-install/")
+    if os.path.exists("/var/run/vm-install/") == False:
+        os.makedirs("/var/run/vm-install/")
     os.chmod("/var/run/vm-install/", 0755)
     if len(sys.argv) > 3:
        usage()

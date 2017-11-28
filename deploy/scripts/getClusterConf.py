@@ -61,7 +61,7 @@ def find_ip_address_for_mac_address(xml, mac_address):
         if mac.lower() == mac_address.lower():
             return ipv4
 
-def get_ip_list_by_mac(vm_name_list, ip_range="147.2.207.0/24"):
+def get_ip_list_by_mac(vm_name_list, ip_range="10.67.16.0/16"):
     result = {}
     xml = scan_for_hosts(ip_range)
 
@@ -103,7 +103,6 @@ def restartNoIpNodes(vm_info_list):
 def get_cluster_conf(sleep_time="0", configuration="../cluster_conf",
                      yaml="../confs/vm_list.yaml", recursive=False, stonith="sbd"):
 
-    vm_names = []
     if sleep_time != "0":
         time.sleep(int(sleep_time))
 
@@ -111,26 +110,21 @@ def get_cluster_conf(sleep_time="0", configuration="../cluster_conf",
 
     vm_list = dp.get_vms_conf()
     devices = dp.get_single_section_conf("devices")
-    target_list = dp.get_shared_target()
     if devices is not None and devices.has_key("nic"):
         interface = devices["nic"]
     else:
         interface = "br0"
-    ipaddr = get_ipaddr_by_interface(interface)
-    netaddr = get_netaddr(interface)
-    netmask = get_net_mask(interface).split(".")
-    if len(netmask) != 4:
-        netmask_int = 24
-    else:
-        netmask_int = 0
-        for i in netmask:
-            netmask_int += bin(int(i))[2:].count("1")
-    ip_range = "%s/%d" % (netaddr, netmask_int)
+    contents = write_conf_file(vm_list, dp, interface, recursive, stonith)
+    #Write env file to "../cluster_conf"
+    f=open(configuration, 'w')
+    f.write(contents)
+    f.close()
 
-    num_vms = len(vm_list)
-    contents = "NODES=%d\n" % num_vms
+    print contents
+
+def get_vm_info_list(vm_list, ip_range, recursive):
+    vm_names = []
     node_list = ""
-
     for vm in vm_list:
         vm_names.append(vm['name'])
         if node_list == "":
@@ -160,7 +154,15 @@ def get_cluster_conf(sleep_time="0", configuration="../cluster_conf",
         recur_times += 1
         print "Checking again..."
         vm_info_list = get_ip_list_by_mac(vm_names, ip_range)
+    return node_list, vm_info_list
 
+def write_conf_file(vm_list, dp, interface, recursive, stonith):
+    num_vms = len(vm_list)
+    ipaddr, netaddr, netmask = get_interface_info(interface)
+    ip_range = "%s/%d" % (netaddr, netmask)
+    node_list, vm_info_list = get_vm_info_list(vm_list, ip_range, recursive)
+    num_vms = len(vm_list)
+    contents = "NODES=%d\n" % num_vms
     i = 1
     vms = vm_info_list.keys()
     vms.sort()
@@ -169,27 +171,23 @@ def get_cluster_conf(sleep_time="0", configuration="../cluster_conf",
         contents += "IP_NODE%d=%s\n" % (i, vm_info_list[vm][0])
         i += 1
 
+    target_list = dp.get_shared_target()
     iscsi = dp.get_single_section_conf("iscsi")
     if iscsi is not None:
         target_ip = iscsi["target_ip"]
-        #target_lun = iscsi["target_lun"]
         if target_ip is None:
-            target_ip = "147.2.207.231"
-        #if target_lun is None:
-        #    target_lun = "iqn.2015-08.suse.bej.bliu:441a202b-6aa3-479f-b56f-374e2f38ba20"
-        #contents += "TARGET_IP=%s\n" % target_ip
-        #contents += "TARGET_LUN=%s\n" % target_lun
-    contents += "NETADDR=%s\n" % netaddr
-    contents += "IPADDR=%s\n" % ipaddr
+            target_ip = "10.67.75.17"
+
+    contents += "NETADDR=%s\n" % (netaddr)
+    contents += "IPADDR=%s\n" % (ipaddr)
+    contents += "STONITH=%s\n" % (stonith)
+    contents += "NODE_LIST=%s\n" % (node_list)
 
     i = 1
-    contents += "STONITH=%s\n" % (stonith)
-    contents += "NODE_LIST=%s\n" % node_list
-
     if (stonith == 'sbd') and ((target_list is None) or (len(target_list) == 0)):
-        print "sbd needs target."
+        print "Warning: sbd needs target."
 #        sys.exit(-1)
-    if (stonith == 'sbd'):
+    elif stonith == 'sbd':
         i = 0
     if target_list is not None:
         for target in target_list:
@@ -201,13 +199,20 @@ def get_cluster_conf(sleep_time="0", configuration="../cluster_conf",
     if len(repos):
         contents += "\nEXTRA_REPOS=(%s)\n" % (" ".join(repos))
 
-    #Write env file to "../cluster_conf"
-    f=open(configuration, 'w')
-    f.write(contents)
-    f.close()
+    return contents
 
-    print contents
-    return
+def get_interface_info(interface):
+    ipaddr = get_ipaddr_by_interface(interface)
+    netaddr = get_netaddr(interface)
+    netmask = get_net_mask(interface).split(".")
+    if len(netmask) != 4:
+        netmask_int = 24
+    else:
+        netmask_int = 0
+        for i in netmask:
+            netmask_int += bin(int(i))[2:].count("1")
+    ip_range = "%s/%d" % (netaddr, netmask_int)
+    return (ipaddr, netaddr, netmask_int)
 
 def usage():
     print "usage:"
