@@ -47,6 +47,10 @@ def getSUSEVersionViaURL(repo):
     #    SUSE - SLE-15-Installer-DVD-x86_64-Build333.4-Media
     #    SLE-15-Installer-DVD-x86_64-Build333.4
     #    2
+    # http://mirror.bej.suse.com/dist/install/SLP/openSUSE-Leap-LATEST/x86_64/DVD1/media.1/build
+    #    openSUSE-Leap-42.3-DVD-x86_64-Build0331
+    # http://dist.suse.de/install/SLP/openSUSE-Tumbleweed/media.1/build
+    #    openSUSE-20171125-i586-x86_64-Build0001
     url_pattern = {'-11-': {'postfix' : '/media.1/build',
                             'pattern' : 'SLE(\w)-11-(SP[1-4]-)*DVD-(\w*)-Build([\w\.]+)',
                             'flavor' : 0,
@@ -69,6 +73,22 @@ def getSUSEVersionViaURL(repo):
                             'version' : '15',
                             'patch' : 0,
                             'arch' : 2,
+                            'build' : 3
+                           },
+                   '-Leap': {'postfix' : '/media.1/build',
+                            'pattern' : 'openSUSE-Leap-(\w+\.\w)-DVD-(\w+)-Build([\w\.]+)',
+                            'flavor' : 'openSUSE',
+                            'version' : 'Leap',
+                            'patch' : 0,
+                            'arch' : 1,
+                            'build' : 2
+                           },
+                   '-Tumbleweed': {'postfix' : '/media.1/build',
+                            'pattern' : 'openSUSE-(\w+)-(\w+)-(\w+)-Build([\w\.]+)',
+                            'flavor' : 'openSUSE',
+                            'version' : 'Tumbleweed',
+                            'patch' : 0,
+                            'arch' : "i586-x86_64",
                             'build' : 3
                            },
                   }
@@ -97,6 +117,10 @@ def getSUSEVersionViaURL(repo):
                 #('SP3-', 'Server', 'x86_64', '0473')
                 #SUSE - SLE-15-Installer-DVD-x86_64-Build349.1-Media
                 #(None, 'Installer', 'x86_64', '349.1')
+                #openSUSE-Leap-42.3-DVD-x86_64-Build0331
+                #('42.3', 'x86_64', '0331')
+                #openSUSE-20171125-i586-x86_64-Build0001
+                #('20171125', 'i586', 'x86_64', '0001')
                 suse_release['flavor'] = reg.groups()[url_pattern[version]['flavor']]
                 suse_release['version'] = url_pattern[version]['version']
                 suse_release['patch'] = reg.groups()[url_pattern[version]['patch']]
@@ -191,7 +215,7 @@ def create_vms_on_backing_file(vm_list, devices, base_image):
 def prepareVMs(vm_list=[], res={}, devices={}, autoyast=""):
 
     if (autoyast.strip() == '') or (os.path.exists(autoyast) == False):
-        os_settings = '%s/%s' % (os.getcwd(), '../confs/my_ha_inst.xml')
+        os_settings = '%s/%s' % (os.getcwd(), '../confs/autoyast/autoinst-SLE11-SLE12.xml')
     else:
         os_settings = autoyast
     for key in default_res.keys():
@@ -358,7 +382,7 @@ def usage():
     print "usage:"
     print "\t./installVM.py <yaml-conf> <autoyast>"
     print "\tDefault yaml file in '../confs/vm_list.yaml'"
-    print "\t        autoyast file in '../confs/my_ha_inst.xml'"
+    print "\t        autoyast file in '../confs/autoyast/autoinst-SLE11-SLE12.xml'"
     sys.exit(1)
 
 if __name__ == "__main__":
