@@ -4,8 +4,10 @@ import commands, subprocess
 import os, sys
 import re
 import multiprocessing
+import time
 
 from parseYAML import GET_VM_CONF
+from getClusterConf import get_vm_info_list, get_interface_info 
 
 try:
     # python3
@@ -199,14 +201,20 @@ def prepareVMs(vm_list=[], res={}, devices={}, autoyast=""):
     if devices["backing_file"] or devices["sharing_backing_file"]:
         if devices["sharing_backing_file"]:
             # Get the disk_size based on the first node's configuration
-            base_image = get_shared_backing_file_name(vm_list[0], devices, res["sle_source"])
+            vm, _ = parse_vm_args(vm_list[0], devices)
+            base_image = get_shared_backing_file_name(vm, devices, res["sle_source"])
         else:
             base_image = get_backing_file_name(vm_list, devices)
 
         if not find_an_exist_backing_file(base_image):
             # Only installed one(1st) vm as backing file
             installVMs(vm_list[:1], res, devices, autoyast, os_settings, base_image)
-
+            if devices["sharing_backing_file"]:
+                time.sleep(100)
+                vm = vm_list[0]
+                ipaddr, netaddr, netmask = get_interface_info(vm['nic'])
+                ip_range = "%s/%d" % (ipaddr, netmask)
+                get_vm_info_list(vm_list[:1], ip_range, True)
             # Destroy and undefine vm to use disk as backing file
             os.system("virsh destroy %s" % vm_list[0]['name'])
             os.system("virsh undefine %s" % vm_list[0]['name'])
