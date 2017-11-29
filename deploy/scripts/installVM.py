@@ -215,9 +215,16 @@ def create_vms_on_backing_file(vm_list, devices, base_image):
 def prepareVMs(vm_list=[], res={}, devices={}, autoyast=""):
 
     if (autoyast.strip() == '') or (os.path.exists(autoyast) == False):
-        os_settings = '%s/%s' % (os.getcwd(), '../confs/autoyast/autoinst-SLE11-SLE12.xml')
+        suse = getSUSEVersionViaURL(res["sle_source"])
+        if suse['flavor'] == 'openSUSE':
+            os_settings = '%s/%s' % (os.getcwd(), '../confs/autoyast/autoinst-openSUSE_leap.xml')
+        elif suse['version'] == '15':
+            os_settings = '%s/%s' % (os.getcwd(), '../confs/autoyast/autoinst-SLE15.xml')
+        else:
+            os_settings = '%s/%s' % (os.getcwd(), '../confs/autoyast/autoinst-SLE11-SLE12.xml')
     else:
         os_settings = autoyast
+
     for key in default_res.keys():
         if res[key] is None:
             res[key] = default_res[key]
@@ -382,7 +389,8 @@ def usage():
     print "usage:"
     print "\t./installVM.py <yaml-conf> <autoyast>"
     print "\tDefault yaml file in '../confs/vm_list.yaml'"
-    print "\t        autoyast file in '../confs/autoyast/autoinst-SLE11-SLE12.xml'"
+    print "\t        autoyast files in '../confs/autoyast/',"
+    print "\t        will select automatically based on source."
     sys.exit(1)
 
 if __name__ == "__main__":
