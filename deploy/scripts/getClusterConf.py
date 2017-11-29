@@ -61,7 +61,7 @@ def find_ip_address_for_mac_address(xml, mac_address):
         if mac.lower() == mac_address.lower():
             return ipv4
 
-def get_ip_list_by_mac(vm_name_list, ip_range="10.67.16.0/16"):
+def get_ip_list_by_mac(vm_name_list, ip_range="10.67.16.0/21"):
     result = {}
     xml = scan_for_hosts(ip_range)
 
@@ -176,7 +176,7 @@ def write_conf_file(vm_list, dp, interface, recursive, stonith):
     if iscsi is not None:
         target_ip = iscsi["target_ip"]
         if target_ip is None:
-            target_ip = "10.67.75.17"
+            target_ip = "10.67.17.75"
 
     contents += "NETADDR=%s\n" % (netaddr)
     contents += "IPADDR=%s\n" % (ipaddr)
