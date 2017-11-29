@@ -71,7 +71,6 @@
       <ipv6_forward config:type="boolean">false</ipv6_forward>
     </routing>
   </networking>
-<!--
   <partitioning config:type="list">
     <drive>
       <device>/dev/vda</device>
@@ -113,15 +112,6 @@
       <use>all</use>
     </drive>
   </partitioning>
--->
-  <partitioning config:type="list">
-    <drive>
-      <initialize config:type="boolean">true</initialize>
-      <partitions config:type="list"/>
-      <type config:type="symbol">CT_DISK</type>
-      <use>all</use>
-    </drive>
-  </partitioning>
   <services-manager>
       <!--default_target>graphical</default_target-->
     <services>
@@ -139,11 +129,13 @@
       <pattern>base</pattern>
       <pattern>ha_sles</pattern>
       <pattern>x11</pattern>
+      <pattern>yast2_basis</pattern>
     </patterns>
     <packages config:type="list">
       <package>openssh</package>
       <package>vim</package>
       <package>ntp</package>
+      <package>open-iscsi</package>
       <package>autoyast2</package>
       <package>autoyast2-installation</package>
       <package>patterns-ha-ha_sles</package>
