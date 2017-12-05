@@ -139,6 +139,7 @@
       <package>autoyast2</package>
       <package>autoyast2-installation</package>
       <package>patterns-ha-ha_sles</package>
+      <package>iputils</package>
     </packages>
   </software>
   <timezone>
