@@ -14,10 +14,14 @@ do
 	let i+=1
 	ip a|grep inet|grep "${ip}/" > /dev/null
 	if [ $? -eq 0 ]; then
-		echo ${ip}
+		echo "Change hostname on IP:${ip}."
 		host_name=`cat cluster_conf | grep "HOSTNAME_NODE$i"|cut -d "=" -f 2`
 		hostname $host_name
 		echo "$host_name" > /etc/HOSTNAME
+
+        echo "Replace the initiatorname in /etc/iscsi/initiatorname.iscsi:"
+        sed -i "/^InitiatorName/s/.*/&-${host_name}/" /etc/iscsi/initiatorname.iscsi
+        cat /etc/iscsi/initiatorname.iscsi |grep "^InitiatorName"
 	fi
 done
 
