@@ -17,6 +17,7 @@ do
 		echo ${ip}
 		host_name=`cat cluster_conf | grep "HOSTNAME_NODE$i"|cut -d "=" -f 2`
 		hostname $host_name
+		echo "$host_name" > /etc/HOSTNAME
 	fi
 done
 
