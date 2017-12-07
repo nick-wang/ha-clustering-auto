@@ -54,7 +54,7 @@ case ${sle_ver[0]} in
     # rsyslog conflicting with systemd-syslog
     infoRun zypper --non-interactive install --force-resolution ${ins_packages[*]}
     ;;
-  11|12)
+  11|12|15)
     ins_packages=(exxe fio logscan drbd-test)
     ins_src_packages=(drbd-test)
 
