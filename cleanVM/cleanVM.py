@@ -9,6 +9,9 @@ import smtplib
 import utils
 import getopt
 import yaml
+import pprint
+
+from glob import glob
 
 import smtplib
 from email.mime.text import MIMEText
@@ -29,6 +32,9 @@ class Disk:
         return self.label
 
     def get_path(self):
+        return self.path
+
+    def __repr__(self):
         return self.path
 
 class VM:
@@ -126,9 +132,8 @@ def removeVMByName(vmname, remove=True):
     remove_vm(vm, remove)
 
 def getVMList():
-    cmd='virsh list --all|grep "shut off"'
-    status, output=commands.getstatusoutput(cmd)
-    elelist=output.split('\n')
+    elelist = get_vm_name_list()
+
     expired_list=[]
     delete_list=[]
     now = time.time()
@@ -170,6 +175,18 @@ def get_ip_first_ip():
     ipList=output.split('\n')
     return ipList[0].strip().split()[1]
 
+def get_vm_name_list():
+    vm_list = []
+    cmd='virsh list --all|egrep "shut off|running"'
+    status, output=commands.getstatusoutput(cmd)
+    elelist=output.split('\n')
+
+    for el in elelist:
+        vmname = el[7:][:-8].strip()
+        vm_list.append(vmname)
+
+    return vm_list
+
 def get_content():
     content = getHostInfo()
     ip = get_ip_first_ip()
@@ -202,6 +219,8 @@ def send_mail(to_list,sub,content):
 def usage():
     print '''Usage:
         To clean old vms and sendmail: ./cleanVM.py -m
+        To find out all disk file usage: ./cleanVM.py -d
+        To list all backing files: ./cleanVM.py -b
         To remove specified vms: ./cleanVM.py -c "vm1 vm2"
         To remove specified vms via yaml: ./cleanVM.py -f file.yaml
         To shutdown vm instead of remove vm, please add "-s" option
@@ -213,8 +232,65 @@ def usage():
     '''
     sys.exit(-2)
 
+def get_all_disks(get_backing_files=False):
+    vms_info = {}
+    vm_list = get_vm_name_list()
+    backing_files = {}
+
+    for vmname in vm_list:
+        disks = []
+        #print vmname
+        vm = getVMByName(vmname)
+        disk_list = vm.get_disks()
+
+        for disk in disk_list:
+            tmp = {}
+            tmp["isExist"] = False
+            tmp["useBackingFile"] = False
+            tmp["BackingFileName"] = ""
+
+            #print disk
+            dpath = disk.get_path()
+            tmp["name"] = dpath
+
+            if not os.path.exists(dpath):
+                continue
+            tmp["isExist"] = True
+
+            cmd = 'qemu-img info %s |grep "backing file:"' % dpath
+            status, output = commands.getstatusoutput(cmd)
+            if status == 0:
+                tmp["useBackingFile"] = True
+                tmp["BackingFileName"] = output.split(":")[1].strip()
+
+                if tmp["BackingFileName"] in backing_files:
+                    backing_files[tmp["BackingFileName"]] += 1
+                else:
+                    backing_files[tmp["BackingFileName"]] = 1
+            else:
+                tmp["useBackingFile"] = False
+                tmp["BackingFileName"] = ""
+
+            disks.append(tmp)
+
+        vms_info[vmname] = disks
+
+    if get_backing_files:
+        return backing_files
+    else:
+        return vms_info
+
+def find_isolate_backing_files(disks):
+    file_list = glob("/mnt/vm/sle_base/*.qcow2")
+
+    for f in file_list:
+        if f not in disks:
+            disks[f] = 0
+
+    return disks
+
 if __name__ == '__main__':
-    opts, args = getopt.getopt(sys.argv[1:], "c:mf:s")
+    opts, args = getopt.getopt(sys.argv[1:], "c:mdbf:s")
     remove = True
     yaml_file = None
     vm_list = None
@@ -228,6 +304,15 @@ if __name__ == '__main__':
            else:
                print "failed"
                sys.exit(-3)
+       elif opt == '-d':
+           disks = get_all_disks()
+           pprint.pprint(disks)
+           sys.exit(0)
+       elif opt == '-b':
+           disks = get_all_disks(True)
+           backing_files = find_isolate_backing_files(disks)
+           pprint.pprint(backing_files)
+           sys.exit(0)
        elif opt == '-c':
            vm_list = value.split()
        elif opt == '-f':
