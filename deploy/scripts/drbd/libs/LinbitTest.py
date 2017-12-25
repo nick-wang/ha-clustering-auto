@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/python3
 
 import sys, os
 import re, shutil
@@ -114,10 +114,10 @@ def check_res_exist(show=False):
     res = [ line.strip() for line in
         os.popen("drbdsetup status |grep \"^\w\" |cut -d ' ' -f 1").readlines() ]
     if len(res) != 0 and show == True:
-        print "Resource existed!!!"
-        print "Get the resource name: %s" % res
+        print("Resource existed!!!")
+        print("Get the resource name: %s" % res)
     else:
-        #print "No resource defined."
+        #print("No resource defined.")
         return 0
 
     if show == True:
@@ -205,7 +205,7 @@ class Testcase(object):
             (self.name, self.result))
 
     def run(self):
-        print "** Start to run case \"%s\" (%d):" % (self.name, self.times)
+        print("** Start to run case \"%s\" (%d):" % (self.name, self.times))
         sys.stdout.flush()
 
         if self.need_clean:
@@ -249,13 +249,13 @@ class Testcase(object):
                 if re.search(e_pa, line):
                     # Sometimes network cause timeout, retry in this case
                     if need_retry and e_pa in retry_logs and self.times <= 3:
-                        print "   %s, case retry..." % e_pa
+                        print("   %s, case retry..." % e_pa)
                         self.need_do = True
                         self.old_output = self.output
                         self.times += 1
                         return
 
-                    print " Found '%s', case '%s' FAILED!" % (e_pa, self.name)
+                    print(" Found '%s', case '%s' FAILED!" % (e_pa, self.name))
                     self.message = "Found '%s' in '%s', case FAILED!"  % \
                         (e_pa,line)
                     self.error = True

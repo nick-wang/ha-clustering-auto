@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 import os, getopt, sys
 sys.path.append(os.path.dirname(os.getcwd())+"/scripts")
@@ -32,7 +32,7 @@ def getOption():
     try:
         opts, args = getopt.getopt(sys.argv[1:], "i:s:f:y:", ["interface=", "stonith_type=", "configuration=", "yamlfile="])
     except getopt.GetoptError:
-        print "Get options Error!"
+        print("Get options Error!")
         sys.exit(1)
 
     for opt, value in opts:

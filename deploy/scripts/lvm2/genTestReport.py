@@ -1,4 +1,4 @@
-#! /usr/bin/python
+#!/usr/bin/python3
 
 # parse the original test_results file, rewrite simplified
 # result into another file.
@@ -17,7 +17,7 @@ def run(test_results, new_file):
 	resDict = {}
 
 	if not os.path.isfile(test_results):
-		print "WARN: %s not found!" % test_results
+		print("WARN: %s not found!" % test_results)
 		exit -1
 
 	f = open(test_results, 'r')
@@ -45,7 +45,7 @@ def run(test_results, new_file):
 
 if __name__ == "__main__":
 	if len(sys.argv) < 2:
-		print "Usage: %s <test_results file> <new file>" % sys.argv[0]
+		print("Usage: %s <test_results file> <new file>" % sys.argv[0])
 		sys.exit(1)
 
 	run(sys.argv[1], sys.argv[2])
