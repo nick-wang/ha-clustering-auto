@@ -1,11 +1,11 @@
-#!/usr/bin/python3
+#! /usr/bin/python
 
 import os
 import sys
 import yaml
 import libvirt
 
-class managerVM(object):
+class managerVM:
     def __init__(self, vmname, path):
         self.vmname = vmname
         self.path = path
@@ -47,7 +47,7 @@ class managerVM(object):
         self.dom.start()
         return 0
 
-    def shutdown(self):
+    def shutdown(self)
         if self.dom is None:
             return -1
         self.dom.shutdown()
@@ -76,7 +76,7 @@ class managerVM(object):
 #************the life cycle***********************
 
 #************the configuration********************
-    def setMaxMemory(self, memory):
+    def setMaxMemory(self, memory)
         if self.dom is None:
             return -1
         self.dom.setMaxMemory(memory)
@@ -113,7 +113,7 @@ class managerVM(object):
         conn = libvirt.open("qemu:///system")
         dom = conn.lookupByName(vmname)
         if dom is None:
-            print('%s does not exist' %vmname)
+            print '%s does not exist' %vmname
             return None
         return dom
 #************the utils library********************

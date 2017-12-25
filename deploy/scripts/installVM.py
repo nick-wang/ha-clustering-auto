@@ -1,14 +1,6 @@
-#!/usr/bin/python3
+#!/usr/bin/python
 
-try:
-    # python3
-    import subprocess, subprocess
-    from urllib.request import urlopen
-except:
-    # python2
-    import commands, subprocess
-    from urllib import urlopen
-
+import commands, subprocess
 import os, sys
 import re
 import multiprocessing
@@ -16,6 +8,13 @@ import time
 
 from parseYAML import GET_VM_CONF
 from getClusterConf import get_vm_info_list, get_interface_info 
+
+try:
+    # python3
+    from urllib.request import urlopen
+except:
+    # python2
+    from urllib import urlopen
 
 MAX_VM_INSTALL_TIMEOUT = 1800
 
@@ -129,10 +128,10 @@ def getSUSEVersionViaURL(repo):
                 suse_release['build'] = reg.groups()[url_pattern[version]['build']]
                 break
         else:
-            print("Not found any pattern in url.")
+            print "Not found any pattern in url."
 
     if len(suse_release) == 0:
-        print("Do not have any patch info. Wrong url?")
+        print "Do not have any patch info. Wrong url?"
         return suse_release
 
     if suse_release['flavor'] == 'S':
@@ -162,14 +161,14 @@ def installVM(VMName, disk, OSType, vcpus, memory, disk_size, source, nic, graph
               %(OSType, VMName, vcpus, memory, disk, disk_size, source, nic, graphics, autoyast)
     # TODO: Detect host OS, using virt-install in SLE12 or later
     cmd = "echo << EOF| vm-install %s%s%s" % (options, "\n\n\n\n\n\n\n", "EOF")
-    print("Install command is: %s" % cmd)
+    print "Install command is: %s" % cmd
     ret = os.system(cmd)
     exit(ret>>8)
     #status, output = commands.getstatusoutput(cmd)
     #p = subprocess.Popen(args=["vm-install", options], \
     #    stdin=subprocess.PIPE, stderr=subprocess.PIPE)
     #p.communicate("\n\n\n\n\n\n\n")
-    #print(p.wait())
+    #print p.wait()
 
 def get_shared_backing_file_name(vm, devices, repo_url):
     suse = getSUSEVersionViaURL(repo_url)
@@ -181,7 +180,7 @@ def get_shared_backing_file_name(vm, devices, repo_url):
 def get_backing_file_name(vm, devices):
      vm_name = vm['name']
 
-     if "disk_dir" in devices and devices["disk_dir"] is not None:
+     if devices.has_key("disk_dir") and devices["disk_dir"] is not None:
          disk = backing_file_disk_pattern % (devices["disk_dir"], vm_name)
      else:
          disk = backing_file_disk_pattern % (default_dev["disk_dir"], vm_name)
@@ -198,7 +197,7 @@ def create_vms_on_backing_file(vm_list, devices, base_image):
         disk_name = disk.split(':')[1]
 
         #create the new image
-        print("qemu-img create -f qcow2 %s -b %s" % (disk_name, base_image))
+        print "qemu-img create -f qcow2 %s -b %s" % (disk_name, base_image)
         if os.path.exists(os.path.dirname(disk_name)) == False:
             os.makedirs(os.path.dirname(disk_name))
         os.system("qemu-img create -f qcow2 %s -b %s" % (disk_name, base_image))
@@ -208,7 +207,7 @@ def create_vms_on_backing_file(vm_list, devices, base_image):
         fill_vm_xml(vm['name'], vm['memory'], vm['memory'], vm['vcpus'], disk_name,
             'bridge', vm['nic'], xmlfile, "../confs/backing_file_template.xml")
 
-        print("virsh define %s with name %s" % (xmlfile, vm['name']))
+        print "virsh define %s with name %s" % (xmlfile, vm['name'])
         os.system("virsh define %s" % xmlfile)
         os.system("virsh start %s" % vm['name'])
 
@@ -262,7 +261,7 @@ def parse_vm_args(vm, devices):
     # get value from vm config
     if vm['disk'] is not None:
         disk = vm['disk']
-    elif "disk_dir" in devices and devices["disk_dir"] is not None:
+    elif devices.has_key("disk_dir") and devices["disk_dir"] is not None:
         disk = disk_pattern % (devices["disk_dir"], vm_name)
     else:
         disk = disk_pattern % (default_dev["disk_dir"], vm_name)
@@ -275,7 +274,7 @@ def parse_vm_args(vm, devices):
         if key in devices_keys:
             if vm[key] is not None:
                 vm[key] = vm[key]
-            elif key in devices and devices[key] is not None:
+            elif devices.has_key(key) and devices[key] is not None:
                 vm[key] = devices[key]
             else:
                 vm[key] = default_vm_install[key]
@@ -344,7 +343,7 @@ def installVMs(vm_list, res, devices, autoyast, os_settings, base_image = ""):
         vm, disk = parse_vm_args(vm, devices)
         if base_image != "" :
             disk = "qcow2:" + base_image
-        print("DEBUG: prepare to install virt-machine %s in disk(base:%s) %s." % ( vm['name'], base_image, disk ))
+        print "DEBUG: prepare to install virt-machine %s in disk(base:%s) %s." % ( vm['name'], base_image, disk )
 
         vm_list[i] = vm
         process = {}
@@ -362,18 +361,18 @@ def installVMs(vm_list, res, devices, autoyast, os_settings, base_image = ""):
         process = processes[vm_name]["process"]
 
         if process.exitcode is None:
-            print("process %d for installing %s timeout\n" %(process.pid, vm_name))
+            print "process %d for installing %s timeout\n" %(process.pid, vm_name)
             exitcode = -1
         elif process.exitcode != 0:
-            print("process %d for installing %s returned error %d\n" %(process.pid, vm_name, process.exitcode))
+            print "process %d for installing %s returned error %d\n" %(process.pid, vm_name, process.exitcode)
             exitcode = -2
 
         if exitcode != 0:
-            print("the installing processes exited with %d" % (exitcode))
+            print "the installing processes exited with %d" % (exitcode)
             for vm1 in processes.keys():
                 process1 = processes[vm1]["process"]
                 if process1.is_alive():
-                    print("terminate process %d with vm %s" %(process1.pid, vm1))
+                    print "terminate process %d with vm %s" %(process1.pid, vm1)
                     process1.terminate()
             sys.exit(exitcode)
 
@@ -387,11 +386,11 @@ def get_config_and_install(deployfile='../confs/vm_list.yaml', autoyast=''):
     prepareVMs(vm_list, resource, devices, autoyast)
 
 def usage():
-    print("usage:")
-    print("\t./installVM.py <yaml-conf> <autoyast>")
-    print("\tDefault yaml file in '../confs/vm_list.yaml'")
-    print("\t        autoyast files in '../confs/autoyast/',")
-    print("\t        will select automatically based on source.")
+    print "usage:"
+    print "\t./installVM.py <yaml-conf> <autoyast>"
+    print "\tDefault yaml file in '../confs/vm_list.yaml'"
+    print "\t        autoyast files in '../confs/autoyast/',"
+    print "\t        will select automatically based on source."
     sys.exit(1)
 
 if __name__ == "__main__":
@@ -402,7 +401,7 @@ if __name__ == "__main__":
 
     if os.path.exists("/var/run/vm-install/") == False:
         os.makedirs("/var/run/vm-install/")
-    os.chmod("/var/run/vm-install/", 0o755)
+    os.chmod("/var/run/vm-install/", 0755)
     if len(sys.argv) > 3:
        usage()
     elif len(sys.argv) == 3:

@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#! /usr/bin/python
 
 import os, sys, re
 from junit_xml import TestSuite, TestCase
@@ -64,7 +64,7 @@ def parseLog(TestSuiteName, xmlfile, caseset, test_results, cluster_env):
 def parseTestResults(result_dir, cluster_env):
 	test_results = result_dir + '/' + "simplified_reprots"
 	if not os.path.isfile(test_results):
-		print("WARN: %s not found!" % test_results)
+		print "WARN: %s not found!" % test_results
 		return -1
 
 	#Name of Test Suite
@@ -94,6 +94,6 @@ def main(cluster_conf, result_dir):
 
 if __name__ == "__main__":
 	if len(sys.argv) < 3:
-		print("Usage: %s <CLUSTER_CONF> <TEST_RESULTS Dir>" % sys.argv[0])
+		print "Usage: %s <CLUSTER_CONF> <TEST_RESULTS Dir>" % sys.argv[0]
 		sys.exit(1)
 	main(sys.argv[1], sys.argv[2])

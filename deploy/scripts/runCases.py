@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#! /usr/bin/python
 
 import sys, getopt, os
 from junit_xml import TestSuite, TestCase

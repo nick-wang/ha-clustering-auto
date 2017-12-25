@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/python
 import sys
 import os
 import socket
@@ -18,7 +18,7 @@ def get_ipaddr_by_interface(interface):
                                   0x8915, \
                                   struct.pack('256s', ifname[:15]))[20:24])
         return ipaddr
-    except Exception as e:
+    except Exception, e:
         return ''
 
 def is_interface_existed(interface):
@@ -48,7 +48,7 @@ def get_net_mask(interface):
                                   0x891b, \
                                   struct.pack('256s',ifname[:15]))[20:24])
         return netmask
-    except Exception as e:
+    except Exception, e:
         return ''
 
 def get_netaddr(interface):
@@ -67,9 +67,9 @@ def get_netaddr(interface):
 if __name__ == "__main__":
     if len(sys.argv) == 2:
         if is_interface_existed(sys.argv[1]):
-            print("The interface %s has ipaddr %s/%s" % (sys.argv[1], get_ipaddr_by_interface(sys.argv[1]), get_net_mask(sys.argv[1])))
-            print("The netaddr is %s " % get_netaddr(sys.argv[1]))
+            print "The interface %s has ipaddr %s/%s" % (sys.argv[1], get_ipaddr_by_interface(sys.argv[1]), get_net_mask(sys.argv[1]))
+            print "The netaddr is %s " % get_netaddr(sys.argv[1])
         else:
-            print("no such a interface %s" % sys.argv[1])
+            print "no such a interface %s" % sys.argv[1]
     else:
-        print("the ip list is", get_ip_list())
+        print "the ip list is", get_ip_list()

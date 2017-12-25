@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python2
 
 import os, subprocess
 import time
@@ -19,12 +19,12 @@ def check_res_exist(show=False):
 
     if len(res) != 0:
         if show == True:
-            print("Resource existed!!!")
-            print("Get the resource name: %s" % res)
+            print "Resource existed!!!"
+            print "Get the resource name: %s" % res
     else:
         if show == True:
-            print("No resource defined.")
-            print("Remove lvs of scratch.")
+            print "No resource defined."
+            print "Remove lvs of scratch."
         return None
 
     # If multiple res exist, previous test case is not clean

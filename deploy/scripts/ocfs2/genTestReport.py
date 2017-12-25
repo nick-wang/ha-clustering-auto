@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/python
 #
 # genTestReport.py <BUILD_LOG_DIR>
 
@@ -29,7 +29,7 @@ def parseSingleLog(log, test_report_dir):
 			priorLine = line
 
 	with open(test_report_dir + "/single_report.txt", "w") as f:
-		for k, v in tblLog.items():
+		for k, v in tblLog.iteritems():
 			row = str(k) + " " + str(v[0]) + " " + str(v[1])
 			f.write(row + "\n")
 
@@ -64,7 +64,7 @@ def parseMultipleLog(log, test_report_dir):
 				pass
 
 	with open(test_report_dir + "/multiple_report.txt", "w") as f:
-		for k, v in tblLog.items():
+		for k, v in tblLog.iteritems():
 			row = str(k) + " " + str(v[0]) + " " + str(v[1])
 			f.write(row + "\n")
 
@@ -89,7 +89,7 @@ def parseDiscontigBgSingleLog(log, test_report_dir):
 			tblLog[case] = [result]
 
 	with open(test_report_dir + "/discontig_bg_single_report.txt", "w") as f:
-		for k, v in tblLog.items():
+		for k, v in tblLog.iteritems():
 			row = str(k) + " " + str(v[0])
 			f.write(row + "\n")
 
@@ -114,7 +114,7 @@ def parseDiscontigBgMultipleLog(log, test_report_dir):
 			tblLog[case] = [result]
 
 	with open(test_report_dir + "/discontig_bg_multiple_report.txt", "w") as f:
-		for k, v in tblLog.items():
+		for k, v in tblLog.iteritems():
 			row = str(k) + " " + str(v[0])
 			f.write(row + "\n")
 
@@ -131,9 +131,9 @@ def main(dir):
 	if p.returncode == 0:
 		if (stdoutdata):
 			single_log = str(stdoutdata).splitlines()[-1]
-		print("Single log file: %s" % single_log)
+		print "Single log file: %s" % single_log
 	else:
-		print(stderrdata)
+		print stderrdata
 
 	p = subprocess.Popen(["find", dir, "-name", "multiple-run-*.log"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 	(stdoutdata, stderrdata) = p.communicate()
@@ -141,9 +141,9 @@ def main(dir):
 	if p.returncode == 0:
 		if (stdoutdata):
 			multiple_log = str(stdoutdata).splitlines()[-1]
-		print("Multiple log file: %s" % multiple_log)
+		print "Multiple log file: %s" % multiple_log
 	else:
-		print(stderrdata)
+		print stderrdata
 
 	p = subprocess.Popen(["find", dir, "-name", "*discontig-bg-single-run.log"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 	(stdoutdata, stderrdata) = p.communicate()
@@ -151,9 +151,9 @@ def main(dir):
 	if p.returncode == 0:
 		if (stdoutdata):
 			discontig_bg_single_log = str(stdoutdata).splitlines()[-1]
-		print("Discontig bg single log file: %s" % discontig_bg_single_log)
+		print "Discontig bg single log file: %s" % discontig_bg_single_log
 	else:
-		print(stderrdata)
+		print stderrdata
 
 	p = subprocess.Popen(["find", dir, "-name", "*discontig-bg-multiple-run.log"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 	(stdoutdata, stderrdata) = p.communicate()
@@ -161,9 +161,9 @@ def main(dir):
 	if p.returncode == 0:
 		if (stdoutdata):
 			discontig_bg_multiple_log = str(stdoutdata).splitlines()[-1]
-		print("Discontig bg multiple log file: %s" % discontig_bg_multiple_log)
+		print "Discontig bg multiple log file: %s" % discontig_bg_multiple_log
 	else:
-		print(stderrdata)
+		print stderrdata
 
 
 	if single_log or multiple_log or discontig_bg_single_log or discontig_bg_multiple_log:
@@ -172,9 +172,9 @@ def main(dir):
 		(stdoutdata, stderrdata) = p.communicate()
 
 		if p.returncode == 0:
-			print("Mkdir -p %s" % test_report_dir)
+			print "Mkdir -p %s" % test_report_dir
 		else:
-			print(stderrdata)
+			print stderrdata
 
 	if single_log:
 		parseSingleLog(single_log, test_report_dir)
@@ -187,7 +187,7 @@ def main(dir):
 
 if __name__ == "__main__":
 	if len(sys.argv) < 2:
-		print("Usage: %s <BUILD_LOG_DIR>" % sys.argv[0])
+		print "Usage: %s <BUILD_LOG_DIR>" % sys.argv[0]
 		sys.exit(1)
 
 	main(sys.argv[1])

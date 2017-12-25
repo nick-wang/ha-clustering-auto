@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#! /usr/bin/python
 
 import yaml
 import os, sys
@@ -66,7 +66,7 @@ iscsi:
     shared_target_ip:
 '''
 
-class GET_VM_CONF(object):
+class GET_VM_CONF:
     def __init__(self, url):
         self.ya = self.get_yaml(url)
         # 'lists' only support the list have one paramater
@@ -94,15 +94,15 @@ class GET_VM_CONF(object):
         '''
             Only for single section, can not use for list.
         '''
-        if section not in self.structs:
-            print("Need to config a new section (%s)." % section)
+        if not self.structs.has_key(section):
+            print "Need to config a new section (%s)." % section
             sys.exit(4)
 
         conf = {}
         struct = self.ya.get(section)
 
         if struct is None:
-            print("Lack of '%s' section in yaml file." % section)
+            print "Lack of '%s' section in yaml file." % section
             return
 
         # So far, only for 'iscsi', 'devices' and 'resources'
@@ -116,14 +116,14 @@ class GET_VM_CONF(object):
             Only for list section with only one option.
             list section in yaml file starts with "-"
         '''
-        if section not in self.lists:
-            print("Need to config a new list section (%s)." % section)
+        if not self.lists.has_key(section):
+            print "Need to config a new list section (%s)." % section
             sys.exit(4)
 
         structs = self.ya.get(section)
 
         if structs is None:
-            print("Lack of '%s' section in yaml file." % section)
+            print "Lack of '%s' section in yaml file." % section
             return []
 
         conf = []
@@ -144,12 +144,12 @@ class GET_VM_CONF(object):
                        'disk_size', 'nic', 'graphics', 'os_settings' )
 
         if nodes is None:
-            print("Lack of 'nodes' section in yaml file.")
+            print "Lack of 'nodes' section in yaml file."
             return
 
         for node in nodes:
             if node.get('name') is None:
-                print("Error! Node name can not empty.")
+                print "Error! Node name can not empty."
                 sys.exit(3)
 
             vm = {}
@@ -159,7 +159,7 @@ class GET_VM_CONF(object):
             if vm not in vms:
                 vms.append(vm)
             else:
-                print("Error! Duplicate node name(%s) detected." % vm['name'])
+                print "Error! Duplicate node name(%s) detected." % vm['name']
                 sys.exit(2)
         return vms
 
@@ -201,12 +201,12 @@ def test(deployfile=""):
     target_list = dp.get_shared_target()
 
     for i in dp.structs.keys():
-        print(dp.get_single_section_conf(i))
+        print dp.get_single_section_conf(i)
     repos=dp.get_list_section_conf("repos")
     if len(repos) > 0:
-        print(" ".join(repos))
-    print(vm_list)
-    print(target_list)
+        print " ".join(repos)
+    print vm_list
+    print target_list
 
 if __name__ == "__main__":
     '''
