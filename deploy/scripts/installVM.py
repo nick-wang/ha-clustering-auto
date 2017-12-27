@@ -38,6 +38,8 @@ default_dev = {'disk_dir':"/mnt/vm/sles_ha_auto/"
 
 default_base_dir = "/mnt/vm/sle_base"
 
+dummy_folder = "../dummy_temp/"
+
 def getSUSEVersionViaURL(repo):
     # http://mirror.suse.asia/dist/install/SLP/SLES-11-SP4-GM/x86_64/DVD1/media.1/build
     #    SLES-11-SP4-DVD-x86_64-Build1221
@@ -211,6 +213,16 @@ def create_vms_on_backing_file(vm_list, devices, base_image):
         os.system("virsh define %s" % xmlfile)
         os.system("virsh start %s" % vm['name'])
 
+def create_base_image_git_entry(base_image):
+    if not os.path.isfile(base_image):
+		return False
+
+    lines = os.popen("git rev-parse HEAD").readlines()
+    commit = lines[0].strip()
+
+    fd = open("%s/baseimage-git-db" % dummy_folder, "a")
+    fd.write(base_image+":\t"+commit+"\n")
+    fd.close()
 
 def prepareVMs(vm_list=[], res={}, devices={}, autoyast=""):
 
@@ -246,6 +258,9 @@ def prepareVMs(vm_list=[], res={}, devices={}, autoyast=""):
                 ipaddr, netaddr, netmask = get_interface_info(vm['nic'])
                 ip_range = "%s/%d" % (ipaddr, netmask)
                 get_vm_info_list(vm_list[:1], ip_range, True)
+
+            create_base_image_git_entry(base_image)
+
             # Destroy and undefine vm to use disk as backing file
             os.system("virsh destroy %s" % vm_list[0]['name'])
             os.system("virsh undefine %s" % vm_list[0]['name'])
@@ -290,17 +305,17 @@ def run_install_cmd(os_settings, vm_name, vm, disk, res):
     conf_str = f.readlines()
     f.close()
 
-    if not os.path.isdir("../dummy_temp"):
-        os.mkdir("../dummy_temp")
+    if not os.path.isdir(dummy_folder):
+        os.mkdir(dummy_folder)
 
-    f = open("../dummy_temp/%s" % vm_name, 'w')
+    f = open("%s/%s" % (dummy_folder, vm_name), 'w')
     for line in conf_str:
         line = _replaceXML(line, "media_url", res['ha_source'])
         line = _replaceXML(line, "hostname", vm_name)
         f.write(line)
     f.close()
 
-    autoyast = "../dummy_temp/%s" % vm_name
+    autoyast = "%s/%s" % (dummy_folder,vm_name)
     parent_fd, child_fd = multiprocessing.Pipe()
     process = multiprocessing.Process(target=installVM,
                             args=(vm_name, disk, vm["ostype"],
