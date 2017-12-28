@@ -145,6 +145,7 @@
       <package>openssh</package>
       <package>vim</package>
       <package>ntp</package>
+      <package>patch</package>
       <package>open-iscsi</package>
       <package>autoyast2</package>
       <package>autoyast2-installation</package>

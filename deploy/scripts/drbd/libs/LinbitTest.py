@@ -221,7 +221,7 @@ class Testcase(object):
         # call/check_output euqal Popen+wait
         worker = subprocess.Popen(args=arg,
             stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-        self.output = worker.stdout.readlines()
+        self.output = [ line.decode("utf-8").strip() for line in worker.stdout.readlines() ]
         worker.wait()
 
         self.check_result()
