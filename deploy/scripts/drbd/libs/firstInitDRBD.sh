@@ -24,13 +24,13 @@ case $(getDRBDVer) in
     # Log the drbd9 version
     infoRun cat /proc/drbd | tee -a ${DRBD_LOGFILE}
 
-    drbdadm status all |grep "done:" >/dev/null 2>&1
+    drbdadm status all |egrep "done:|Inconsistent" >/dev/null 2>&1
     while [ $? -eq 0 ]
     do
       debugRun drbdadm status all
       sleep 90
 
-      drbdadm status all |grep "done:" >/dev/null 2>&1
+      drbdadm status all |egrep "done:|Inconsistent" >/dev/null 2>&1
     done
 
     nextPhase "Finished the first sync." | tee -a ${DRBD_LOGFILE}
