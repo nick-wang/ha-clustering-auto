@@ -29,6 +29,7 @@ do
 done
 
 ssh root@${ip} "mkdir -p ${CLUSTER_DIR}/template; mkdir -p ${CLUSTER_DIR}/scripts"
+ssh root@${ip} "echo `hostname` >${CLUSTER_DIR}/on-which-host"
 
 scp ${CLUSTER_CONF} root@${ip}:${CLUSTER_DIR}
 scp ../template/*_template root@${ip}:${CLUSTER_DIR}/template/
