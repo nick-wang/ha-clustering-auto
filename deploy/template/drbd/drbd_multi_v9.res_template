@@ -5,8 +5,8 @@ resource <RESNAME> {
    }
    disk {
       on-io-error	pass_on;
-      c-plan-ahead 10;
-      c-max-rate 20M;
+      c-plan-ahead 20;
+      c-max-rate 40M;
       c-fill-target 3M;
    }
    volume 0 {

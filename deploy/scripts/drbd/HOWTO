@@ -63,6 +63,14 @@ A. Steps to setup drbd environment via raw disk:
       ...
     }
 
+    # Blog for tuning parameters:
+    https://www.linbit.com/en/drbd-sync-rate-controller/
+    http://www.linbit.com/en/drbd-sync-rate-controller-2/
+
+    And:
+    section: 5.10. Configuring the rate of synchronization
+    http://docs.linbit.com/docs/users-guide-9.0/
+
 B. Using (LVM) to run drbd-test and collect test result:
 LinbitTest.py:
     Run LinbitTest, also can run individual case.
