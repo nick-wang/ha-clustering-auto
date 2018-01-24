@@ -47,7 +47,7 @@ sle_ver=($(echo $(getSLEVersion)))
 #zypper in -y pacemaker-remote
 #disable sbd
 case ${sle_ver[0]} in
-12|42.1|42.2)
+12|42.1|42.2|15)
     systemctl disable sbd
     systemctl enable corosync
     #systemctl disable pacemaker
@@ -83,7 +83,7 @@ new_node_list=`echo ${new_node_list//','/' '}`
 echo "exit 0" > /var/lib/pacemaker/notify.sh
 chmod +x /var/lib/pacemaker/notify.sh
 #update cprpsync and pacemaker
-zypper up -y pacemaker libpacemaker-devel libpacemaker3 pacemaker-cli pacemaker-cts corosync libcorosync-devel libcorosync4
+zypper up -y pacemaker libpacemaker3 pacemaker-cli pacemaker-cts corosync
 
 isMaster "$HOSTNAME_NODE1"
 if [ $? -ne 0 ]
@@ -92,7 +92,7 @@ then
 fi
 
 case ${sle_ver[0]} in
-  12|42.1|42.2)
+  12|42.1|42.2|15)
     systemctl stop pacemaker
     ;;
   11)

@@ -46,6 +46,7 @@ def get_result_of_testcase(testcase, logfile):
             continue
 
         pattern=" *%s: *\{'auditfail': (\d), 'failure': (\d), 'skipped': (\d), 'calls': (\d)\}" % testcase
+        #pattern=" *%s: *\{'calls': (\d), 'failure': (\d), 'skipped': (\d), 'auditfail': (\d)\}" % testcase
         result["output"] = ""
         tmp = re.search(pattern, line)
         if tmp is not None:
@@ -53,6 +54,14 @@ def get_result_of_testcase(testcase, logfile):
             result['failure'] = int(tmp.groups()[1])
             result['skip'] = int(tmp.groups()[2])
             result['calls'] = int(tmp.groups()[3])
+        else:
+            pattern=" *%s: *\{'calls': (\d), 'failure': (\d), 'skipped': (\d), 'auditfail': (\d)\}" % testcase
+            tmp = re.search(pattern, line)
+            if tmp is not None:
+                result['calls'] = int(tmp.groups()[0])
+                result['failure'] = int(tmp.groups()[1])
+                result['skip'] = int(tmp.groups()[2])
+                result['auditfail'] = int(tmp.groups()[3])
         if "FAILED" in line:
             result['output'] = line
 
