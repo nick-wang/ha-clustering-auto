@@ -133,7 +133,8 @@ for i in `seq $START_NUM $NUM_SHARED_TARGETS`; do
     iscsiadm -m node -I default -T $tgt_lun -p $tgt_ip \
          --op=update --name=node.startup --value=automatic
 done
-
+#sync the time
+ntpdate time.nist.gov
 #judge the stonith type
 #create sbd if using sbd as stonith
 if [ $STONITH == "libvirt" ];
