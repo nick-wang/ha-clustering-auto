@@ -6,7 +6,7 @@
       <listentry>
         <media_url>HA_SOURCE</media_url>
         <product>sle-module-ha</product>
-        <product_dir>/Product-HA</product_dir>
+        <product_dir>/Module-HA</product_dir>
       </listentry>
       <listentry>
         <media_url>HA_SOURCE</media_url>
