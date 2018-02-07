@@ -31,7 +31,8 @@ done
 ssh root@${ip} "mkdir -p ${CLUSTER_DIR}/template; mkdir -p ${CLUSTER_DIR}/scripts"
 ssh root@${ip} "echo `hostname` >${CLUSTER_DIR}/on-which-host"
 
-scp ${CLUSTER_CONF} root@${ip}:${CLUSTER_DIR}
+sleep 1
+scp ${CLUSTER_CONF} root@${ip}:${CLUSTER_DIR}/
 scp ../template/*_template root@${ip}:${CLUSTER_DIR}/template/
 scp ../template/*_template_1.4.7 root@${ip}:${CLUSTER_DIR}/template/
 scp ../template/authkey root@${ip}:${CLUSTER_DIR}/template/
