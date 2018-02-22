@@ -140,7 +140,7 @@ case ${sle_ver[0]} in
     systemctl enable chronyd.service
 
     # Add NTP server to /etc/chrony.conf
-    sed -i '$aserver time.nist.gov iburst'
+    sed -i '$aserver time.nist.gov iburst' /etc/chrony.conf
 
     systemctl restart chronyd.service
 
