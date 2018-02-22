@@ -165,7 +165,34 @@ else
     modprobe softdog
     echo "SBD_DEVICE='/dev/disk/by-path/ip-${TARGET_IP}:3260-iscsi-${TARGET_LUN}-lun-0'" > /etc/sysconfig/sbd
     echo "SBD_OPTS='-W'" >> /etc/sysconfig/sbd
-    echo "modprobe softdog" >> /etc/init.d/boot.local
+
+    # Using systemd way to handle startup commands
+    case ${sle_ver[0]} in
+      15|12|42.1|42.2)
+        echo "[Unit]
+After=network.service
+
+[Service]
+ExecStart=/usr/local/bin/start-softdog.sh
+
+[Install]
+WantedBy=default.target
+" > /etc/systemd/system/ci-softdog.service
+
+        echo "#!/bin/bash
+modprobe softdog
+" > /usr/local/bin/start-softdog.sh
+
+        chmod 744 /usr/local/bin/start-softdog.sh
+
+        systemctl enable ci-softdog.service
+        systemctl restart ci-softdog.service
+
+        ;;
+      *)
+        echo "modprobe softdog" >> /etc/init.d/boot.local
+    esac
+
 fi
 
 #Open ports if firewall enabled
