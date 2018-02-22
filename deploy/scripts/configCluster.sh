@@ -134,7 +134,25 @@ for i in `seq $START_NUM $NUM_SHARED_TARGETS`; do
          --op=update --name=node.startup --value=automatic
 done
 #sync the time
-ntpdate time.nist.gov
+sle_ver=($(echo $(getSLEVersion)))
+case ${sle_ver[0]} in
+  15)
+    systemctl enable chronyd.service
+
+    # Add NTP server to /etc/chrony.conf
+    sed -i '$aserver time.nist.gov iburst'
+
+    systemctl restart chronyd.service
+
+    # sync from NTP server
+    chronyc -a makestep
+
+    # Check NTP sync status
+    chronyc sources -v
+    ;;
+  *)
+    ntpdate time.nist.gov
+esac
 #judge the stonith type
 #create sbd if using sbd as stonith
 if [ $STONITH == "libvirt" ];
@@ -155,7 +173,6 @@ fi
 
 #Enable service
 infoLog "Enable services and start pacemaker."
-sle_ver=($(echo $(getSLEVersion)))
 case ${sle_ver[0]} in
   15|12|42.1|42.2)
     zypper in -y systemd-rpm-macros 
