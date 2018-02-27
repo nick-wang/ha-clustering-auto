@@ -26,6 +26,7 @@ default_vm_install = {'ostype': "sles11",
                      'memory': 1024,
                      'disk_size': 15360,
                      'nic': 'br0',
+                     'second_nic': '',
                      'graphics': 'cirrus'
                     }
 
@@ -158,9 +159,14 @@ def _replaceXML(line, key, value):
     else:
         return line
 
-def installVM(VMName, disk, OSType, vcpus, memory, disk_size, source, nic, graphics, autoyast, child_fd):
-    options = "--debug --os-type %s --name %s --vcpus %d --memory %d --disk %s,vda,disk,w,%d,sparse=0, --source %s --nic bridge=%s,model=virtio --graphics %s --os-settings=%s" \
-              %(OSType, VMName, vcpus, memory, disk, disk_size, source, nic, graphics, autoyast)
+def installVM(VMName, disk, OSType, vcpus, memory, disk_size, source, nic, second_nic, graphics, autoyast, child_fd):
+    if second_nic and second_nic != '':
+        nic2 = ' --nic bridge=%s,model=virtio ' % (second_nic)
+    else:
+        nic2 = ''
+
+    options = "--debug --os-type %s --name %s --vcpus %d --memory %d --disk %s,vda,disk,w,%d,sparse=0, --source %s --nic bridge=%s,model=virtio %s --graphics %s --os-settings=%s" \
+              %(OSType, VMName, vcpus, memory, disk, disk_size, source, nic, nic2, graphics, autoyast)
     # TODO: Detect host OS, using virt-install in SLE12 or later
     cmd = "echo << EOF| vm-install %s%s%s" % (options, "\n\n\n\n\n\n\n", "EOF")
     print "Install command is: %s" % cmd
@@ -286,7 +292,7 @@ def parse_vm_args(vm, devices):
 
     # Should exactly the same with devices in parseYAML.py
     # Not necessary to add 'disk_dir' and 'backing_file' here
-    devices_keys=('nic', 'vcpus', 'memory', 'disk_size')
+    devices_keys=('nic', 'second_nic', 'vcpus', 'memory', 'disk_size')
 
     for key in default_vm_install.keys():
         if key in devices_keys:
@@ -324,7 +330,7 @@ def run_install_cmd(os_settings, vm_name, vm, disk, res):
                             args=(vm_name, disk, vm["ostype"],
                                   vm["vcpus"], vm["memory"],
                                   vm["disk_size"], res["sle_source"],
-                                  vm["nic"], vm["graphics"],
+                                  vm["nic"], vm["second_nic"], vm["graphics"],
                                   autoyast, child_fd),
                             name=vm_name)
     return autoyast, parent_fd, process

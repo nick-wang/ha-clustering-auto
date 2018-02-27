@@ -50,6 +50,7 @@ repos:
 devices:
   disk_dir: /mnt/vm/sles_ha_auto/
   nic: br0
+  second_nic: br1
   vcpus:
   memory:
   disk_size:
@@ -74,7 +75,7 @@ class GET_VM_CONF:
         # refer to 'nodes'
         self.lists = {'repos': 'repo'}
         self.structs = {'iscsi': ('target_ip', 'target_lun'),
-                        'devices': ('disk_dir', 'nic', 'vcpus', 'memory', 'disk_size', 'backing_file', 'sharing_backing_file'),
+                        'devices': ('disk_dir', 'nic', 'second_nic', 'vcpus', 'memory', 'disk_size', 'backing_file', 'sharing_backing_file'),
                         'resources': ('sle_source', 'ha_source')}
 
     def is_key_none(self, key):
@@ -141,7 +142,7 @@ class GET_VM_CONF:
             return None
         nodes = self.ya.get('nodes')
         vm_elements = ('name', 'mac', 'ostype', 'disk', 'vcpus', 'memory',
-                       'disk_size', 'nic', 'graphics', 'os_settings' )
+                       'disk_size', 'nic', 'second_nic', 'graphics', 'os_settings' )
 
         if nodes is None:
             print "Lack of 'nodes' section in yaml file."
