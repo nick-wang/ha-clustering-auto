@@ -260,7 +260,7 @@ then
     else
         crm configure primitive libvirt_stonith stonith:external/libvirt \
                   params hostlist="$NODE_LIST" \
-                  hypervisor_uri="qemu+tcp://$IPADDR/system" \
+                  hypervisor_uri="qemu+tcp://$HOST_IPADDR/system" \
                   op monitor interval="60"
     fi
     infoRun crm configure show

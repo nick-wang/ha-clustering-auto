@@ -3,6 +3,7 @@
 import subprocess, getopt
 import xml.etree.ElementTree as ET
 import sys, os, time
+import socket
 from multiprocessing import Process
 
 from parseYAML import GET_VM_CONF
@@ -178,8 +179,11 @@ def write_conf_file(vm_list, dp, interface, recursive, stonith):
         if target_ip is None:
             target_ip = "10.67.17.75"
 
+    hostname = socket.gethostname()
+
     contents += "NETADDR=%s\n" % (netaddr)
-    contents += "IPADDR=%s\n" % (ipaddr)
+    contents += "ON_HOST=%s\n" % (hostname)
+    contents += "HOST_IPADDR=%s\n" % (ipaddr)
     contents += "STONITH=%s\n" % (stonith)
     contents += "NODE_LIST=%s\n" % (node_list)
 

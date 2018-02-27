@@ -17,7 +17,7 @@ ip_base=$NETADDR
 stonith_type="external/$STONITH"
 stonith_args=""
 #host_ip=$HOST_IP
-host_ip=$IPADDR
+host_ip=$HOST_IPADDR
 node=`hostname`
 
 #remove local node from node list
