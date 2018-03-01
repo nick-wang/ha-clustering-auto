@@ -89,13 +89,12 @@
       <package>drbd</package>
       <package>drbd-utils</package>
       <package>ha-cluster-bootstrap</package>
-      <package>hawk</package>
+      <package>hawk2</package>
       <package>ldirectord</package>
       <package>lvm2-clvm</package>
       <package>ocfs2-tools</package>
       <package>pacemaker</package>
       <package>pssh</package>
-      <package>python-dateutil</package>
       <package>python-pssh</package>
       <package>resource-agents</package>
       <package>sbd</package>
