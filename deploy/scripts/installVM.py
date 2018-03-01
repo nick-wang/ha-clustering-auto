@@ -78,7 +78,7 @@ def getSUSEVersionViaURL(repo):
                             'arch' : 2,
                             'build' : 3
                            },
-                   '-Leap': {'postfix' : '/media.1/build',
+                   'Leap': {'postfix' : '/media.1/build',
                             'pattern' : 'openSUSE-Leap-(\w+\.\w)-DVD-(\w+)-Build([\w\.]+)',
                             'flavor' : 'openSUSE',
                             'version' : 'Leap',
@@ -86,7 +86,7 @@ def getSUSEVersionViaURL(repo):
                             'arch' : 1,
                             'build' : 2
                            },
-                   '-Tumbleweed': {'postfix' : '/media.1/build',
+                   'Tumbleweed': {'postfix' : '/media.1/build',
                             'pattern' : 'openSUSE-(\w+)-(\w+)-(\w+)-Build([\w\.]+)',
                             'flavor' : 'openSUSE',
                             'version' : 'Tumbleweed',
@@ -124,10 +124,16 @@ def getSUSEVersionViaURL(repo):
                 #('42.3', 'x86_64', '0331')
                 #openSUSE-20171125-i586-x86_64-Build0001
                 #('20171125', 'i586', 'x86_64', '0001')
-                suse_release['flavor'] = reg.groups()[url_pattern[version]['flavor']]
+                try:
+                    suse_release['flavor'] = reg.groups()[url_pattern[version]['flavor']]
+                except TypeError:
+                    suse_release['flavor'] = url_pattern[version]['flavor']
                 suse_release['version'] = url_pattern[version]['version']
                 suse_release['patch'] = reg.groups()[url_pattern[version]['patch']]
-                suse_release['arch'] = reg.groups()[url_pattern[version]['arch']]
+                try:
+                    suse_release['arch'] = reg.groups()[url_pattern[version]['arch']]
+                except TypeError:
+                    suse_release['arch'] = url_pattern[version]['arch']
                 suse_release['build'] = reg.groups()[url_pattern[version]['build']]
                 break
         else:
