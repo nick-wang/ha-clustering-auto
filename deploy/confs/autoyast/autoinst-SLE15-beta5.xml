@@ -189,6 +189,14 @@
 		<source><![CDATA[mkdir -p /root/.ssh/
 echo "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC6LKxNNRsAhR1Ov7KsoijAaVu3VuNu08llrS7q/m+wLqAabx0XB+8iSkjo+WBblpqdanPYJ55Z2I7GpOWdMu/0+Rv2XP0w2yr8BXxnMSxYDZuxGXpG4P1YbZMCK1Z/Hxbts+Mcsr/IaUYllGEwkxG6cONMAQxA5bkyIilp1UMymPjWvPNqXcoLrMmiLXdPxynn10WSIbbO1ZTPw8ewpV155I1RdN9+SfiIGlM8B7Y2pHEOVCKnJfYWp8OQtJVI+rbEwD9JHutxn7w8yrPFbhSUMyYSsf7AarYVvJ7FXNMlmqLgImp0LBINuvEtbSne9WychbvzL21LUzcezkWKZEMZ root@bj-ha-4" >> /root/.ssh/authorized_keys]]></source>
       </script>
+      <script>
+        <debug config:type="boolean">true</debug>
+        <filename>enableSecondNICIfExist.sh</filename>
+        <location><![CDATA[]]></location>
+		<source><![CDATA[echo "BOOTPROTO='dhcp'\nSTARTMODE='auto'" >> /etc/sysconfig/network/ifcfg-eth1
+chmod 0644 /etc/sysconfig/network/ifcfg-eth1
+rcwicked restart]]></source>
+      </script>
     </init-scripts>
   </scripts>
 </profile>
