@@ -133,7 +133,7 @@
   </services-manager>
   <software>
     <products config:type="list">
-     <product>SLES15</product>
+     <product>SLES</product>
     </products>
     <patterns config:type="list">
       <pattern>base</pattern>
