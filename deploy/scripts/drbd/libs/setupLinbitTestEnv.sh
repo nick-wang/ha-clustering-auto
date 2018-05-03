@@ -47,7 +47,7 @@ sle_ver=($(echo $(getSLEVersion)))
 case ${sle_ver[0]} in
   42.1|42.2)
     # Need to install patch and rsyslog in leap42.2
-    ins_packages=(exxe fio logscan drbd-test patch rsyslog)
+    ins_packages=(exxe fio logscan drbd-test patch rsyslog python3)
     ins_src_packages=(drbd-test)
 
     # Install all needed packages
@@ -55,7 +55,7 @@ case ${sle_ver[0]} in
     infoRun zypper --non-interactive install --force-resolution ${ins_packages[*]}
     ;;
   11|12|15)
-    ins_packages=(exxe fio logscan drbd-test)
+    ins_packages=(exxe fio logscan drbd-test python3)
     ins_src_packages=(drbd-test)
 
     # Install all needed packages
