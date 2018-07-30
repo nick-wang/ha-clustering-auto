@@ -28,6 +28,21 @@ Q. How to deploy a host server?
       ./email-templates/template.jelly
       (./plugins/emailext-template/templates/template.jelly)
 
+Q. How to deploy a virtual host (jenkins guest)?
+  1. Configure ntp-client:
+     server address: "clock.via.net"
+     or 
+     China ntp server: "cn.pool.ntp.org"
+  2. Install package "java..." to connect to jenkins host
+  3. Install git, gcc.
+     git clone root@10.67.160.200:/root/ha-share /tmp/jenkins-work/ha-share
+     (Use the master branch)
+  4. Install libvirt, kvm, vm-install, virt-manager.
+  5. Configure a virbr0 for NAT and a bridge.
+  6. Install python libs like psutil, junit-xml
+     (Could use python-setuptools for pip or easy_install)
+  7. Copy ha-share/deploy/ssh_keys/* to ~/.ssh/
+
 A.To make the cmd on the guest
 "virsh -c qemu+tcp://host_ip/system", we have to modify
 
