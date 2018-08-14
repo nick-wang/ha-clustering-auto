@@ -1,0 +1,83 @@
+#!/bin/bash
+
+#echo "update home cluster test start."
+create_raid cluster "--assume-clean"
+sleep 2
+fetch_md_info
+check_proc_mdstat "nosync"
+check_proc_mdstat "wait"
+check_proc_mdstat raid1
+check_proc_mdstat bitmap
+md_final_check
+
+clustername=$(grep cluster_name /etc/corosync/corosync.conf \
+		| awk -F' ' '{print $2}')
+testname="testmd"
+mdcname=$($MDADM -D $MD \
+		| grep "Cluster Name" | awk -F' ' '{print $4}')
+[ $mdcname == $clustername ] ||
+	die "cluster-md cluster name isn't same as
+		the cluster_name in corosync.conf"
+[ $testname == $clustername ] &&
+	testname="testmdtest"
+for i in ${onlines[@]}
+do
+	ssh $i mdadm -Ssq
+done
+sed -i "s/cluster_name:\t$clustername/cluster_name:\t$testname/" /etc/corosync/corosync.conf
+for i in ${nodes[@]}
+do
+	scp /etc/corosync/corosync.conf $i:/etc/corosync
+done
+for i in ${onlines[@]}
+do
+	ssh $i killall -9 corosync &
+	ssh $i rcpacemaker restart &
+done
+sleep 30
+crm status -r -n | grep -i -q "fail\|error"
+[ $? -ne 0 ] ||
+	die_err "resources error status, check via to
+		#crm status -r -n"
+mdadm --assemble $MD --update=home-cluster \
+	--home-cluster=$testname ${disks[0]} ${disks[1]} &> /dev/null
+sleep 0.5
+for i in ${nodes[@]}
+do
+	ssh $i mdadm -A $MD ${disks[0]} ${disks[1]} &> /dev/null &
+done
+sleep 0.2
+fetch_md_info
+check_proc_mdstat pending
+check_proc_mdstat "wait"
+check_proc_mdstat raid1
+check_proc_mdstat bitmap
+md_final_check
+
+tmpname=$(ssh ${onlines[1]} $MDADM -D $MD \
+		| grep "Cluster Name" | awk -F' ' '{print $4}')
+current=$($MDADM -D $MD \
+		| grep "Cluster Name" | awk -F' ' '{print $4}')
+[ $current == $tmpname -a $tmpname == $testname ] ||
+	die "cluster name update failed."
+
+#echo -e "\ncluster-md: update home cluster got pass!\n"
+log_save $_basename
+
+for i in ${onlines[@]}
+do
+	ssh $i mdadm -Ssq
+done
+sed -i "s/cluster_name:\t$testname/cluster_name:\t$clustername/" /etc/corosync/corosync.conf
+for i in ${nodes[@]}
+do
+	scp /etc/corosync/corosync.conf $i:/etc/corosync
+done
+for i in ${onlines[@]}
+do
+	ssh $i killall -9 corosync &
+	ssh $i rcpacemaker restart &
+done
+sleep 30
+
+exit 0
