@@ -261,7 +261,7 @@ def prepareVMs(vm_list=[], res={}, devices={}, autoyast=""):
             # Get the disk_size based on the first node's configuration
             vm, _ = parse_vm_args(vm_list[0], devices)
             base_image = get_shared_backing_file_name(vm, devices, res["sle_source"])
-        else:
+        else: #"backing_file" won't share with others, also won't be tracked by cleanVM.py
             base_image = get_backing_file_name(vm_list[0], devices)
 
         if not find_an_exist_backing_file(base_image):
