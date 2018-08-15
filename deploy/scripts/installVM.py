@@ -50,10 +50,14 @@ def getSUSEVersionViaURL(repo):
     #    SUSE - SLE-15-Installer-DVD-x86_64-Build333.4-Media
     #    SLE-15-Installer-DVD-x86_64-Build333.4
     #    2
-    # http://mirror.bej.suse.com/dist/install/SLP/openSUSE-Leap-LATEST/x86_64/DVD1/media.1/build
+    # (obsolete - no build file) http://mirror.bej.suse.com/dist/install/SLP/openSUSE-Leap-LATEST/x86_64/DVD1/media.1/build
     #    openSUSE-Leap-42.3-DVD-x86_64-Build0331
-    # http://dist.suse.de/install/SLP/openSUSE-Tumbleweed/media.1/build
+    # (obsolete - no build file) http://dist.suse.de/install/SLP/openSUSE-Tumbleweed/media.1/build
     #    openSUSE-20171125-i586-x86_64-Build0001
+	# http://mirror.bej.suse.com/dist/install/SLP/openSUSE-Leap-LATEST/x86_64/DVD1/media.1/media
+    #    openSUSE-Leap-15.0-DVD-x86_64-Build267.2
+    # http://dist.suse.de/install/SLP/openSUSE-Tumbleweed/media.1/media
+    #    openSUSE-20180812-i586-x86_64-Build435.1
     url_pattern = {'-11-': {'postfix' : '/media.1/build',
                             'pattern' : 'SLE(\w)-11-(SP[1-4]-)*DVD-(\w*)-Build([\w\.]+)',
                             'flavor' : 0,
@@ -78,7 +82,7 @@ def getSUSEVersionViaURL(repo):
                             'arch' : 2,
                             'build' : 3
                            },
-                   'Leap': {'postfix' : '/media.1/build',
+                   'Leap': {'postfix' : '/media.1/media',
                             'pattern' : 'openSUSE-Leap-(\w+\.\w)-DVD-(\w+)-Build([\w\.]+)',
                             'flavor' : 'openSUSE',
                             'version' : 'Leap',
@@ -86,7 +90,7 @@ def getSUSEVersionViaURL(repo):
                             'arch' : 1,
                             'build' : 2
                            },
-                   'Tumbleweed': {'postfix' : '/media.1/build',
+                   'Tumbleweed': {'postfix' : '/media.1/media',
                             'pattern' : 'openSUSE-(\w+)-(\w+)-(\w+)-Build([\w\.]+)',
                             'flavor' : 'openSUSE',
                             'version' : 'Tumbleweed',
