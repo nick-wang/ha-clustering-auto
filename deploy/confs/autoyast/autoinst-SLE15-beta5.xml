@@ -151,6 +151,7 @@
       <package>autoyast2-installation</package>
       <package>patterns-ha-ha_sles</package>
       <package>iputils</package>
+      <package>haveged</package>
     </packages>
   </software>
   <timezone>

@@ -102,6 +102,8 @@
       <package>yast2-drbd</package>
       <package>yast2-iplb</package>
       <!--package>systemd-rpm-macros</package-->
+      <!--package>bsc#1096375 haveged can drain the entropy</package-->
+      <package>haveged</package>
     </packages>
     <patterns config:type="list">
       <pattern>yast2_basis</pattern>
