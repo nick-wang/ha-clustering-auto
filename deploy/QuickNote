@@ -42,6 +42,7 @@ Q. How to deploy a virtual host (jenkins guest)?
   6. Install python libs like psutil, junit-xml
      (Could use python-setuptools for pip or easy_install)
   7. Copy ha-share/deploy/ssh_keys/* to ~/.ssh/
+  8. Create lvm pool for image, saved in /mnt/vm
 
 A.To make the cmd on the guest
 "virsh -c qemu+tcp://host_ip/system", we have to modify
