@@ -11,7 +11,7 @@ function usage()
 CLUSTER_CONF=$1
 ips=($(grep IP_NODE $CLUSTER_CONF | cut -d '=' -f2))
 
-cp -f $CLUSTER_CONF ../clustermd/clustermd-autotest/clustermd_tests/
+cp -f $CLUSTER_CONF ./clustermd/clustermd-autotest/clustermd_tests/
 
 for node in ${ips[@]}
 do
@@ -30,8 +30,8 @@ wait
 sleep 10
 
 node=$(grep IP_NODE1 $CLUSTER_CONF | cut -d '=' -f2)
-scp ../clustermd/run.sh root@$node:/tmp
-scp -r ../clustermd/clustermd-autotest root@$node:/tmp/
+scp clustermd/run.sh root@$node:/tmp
+scp -r clustermd/clustermd-autotest root@$node:/tmp/
 
 ssh root@$node "chmod 0600 /root/.ssh/id_rsa; bash /tmp/run.sh"
 
