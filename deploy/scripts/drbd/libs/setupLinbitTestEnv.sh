@@ -55,7 +55,13 @@ case ${sle_ver[0]} in
     infoRun zypper --non-interactive install --force-resolution ${ins_packages[*]}
     ;;
   11|12|15)
-    ins_packages=(exxe fio logscan drbd-test python3)
+    if [ "$sle_ver[0]" = "15" ]
+    then
+        ins_packages=(exxe fio logscan drbd-test python3 python3-PyYAML)
+    else
+        ins_packages=(exxe fio logscan drbd-test python-PyYAML)
+    fi
+
     ins_src_packages=(drbd-test)
 
     # Install all needed packages
