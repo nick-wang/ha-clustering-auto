@@ -281,6 +281,7 @@ def prepareVMs(vm_list=[], res={}, devices={}, autoyast=""):
             create_base_image_git_entry(base_image)
 
             # Destroy and undefine vm to use disk as backing file
+            time.sleep(100)
             os.system("virsh destroy %s" % vm_list[0]['name'])
             os.system("virsh undefine %s" % vm_list[0]['name'])
 
