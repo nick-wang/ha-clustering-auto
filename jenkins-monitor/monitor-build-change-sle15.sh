@@ -28,6 +28,10 @@ die()
 
 download_file()
 {
+    #wget won't redownload if N_K_FILE exist
+    #The file is already fully retrieved; nothing to do.
+    rm -rf $N_K_FILE
+
     wget $SLP_URL/$KERNEL_MILESTONE/$MEDIA/media -O $N_K_FILE &> /dev/null
     [ $? -eq 0 ] ||
         die "download $N_K_FILE failed."
