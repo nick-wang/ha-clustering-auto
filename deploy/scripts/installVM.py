@@ -246,11 +246,13 @@ def prepareVMs(vm_list=[], res={}, devices={}, autoyast=""):
         suse = getSUSEVersionViaURL(res["sle_source"])
         if suse['flavor'] == 'openSUSE':
             os_settings = '%s/%s' % (os.getcwd(), '../confs/autoyast/autoinst-openSUSE_leap.xml')
-        elif suse['version'] == '15':
+        elif suse['version'] == '15' and suse['patch'] == 'SP0':
             if int(suse['build'].split(".")[0]) < 438:
                 os_settings = '%s/%s' % (os.getcwd(), '../confs/autoyast/autoinst-SLE15-beta5.xml')
             else:
                 os_settings = '%s/%s' % (os.getcwd(), '../confs/autoyast/autoinst-SLE15.xml')
+        elif suse['version'] == '15' and suse['patch'] == 'SP1':
+            os_settings = '%s/%s' % (os.getcwd(), '../confs/autoyast/autoinst-SLE15-SP1.xml')
         else:
             os_settings = '%s/%s' % (os.getcwd(), '../confs/autoyast/autoinst-SLE11-SLE12.xml')
     else:
