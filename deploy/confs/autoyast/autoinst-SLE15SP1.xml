@@ -134,6 +134,7 @@
   <software>
     <products config:type="list">
      <product>SLES</product>
+     <product>sle-ha</product>
     </products>
     <patterns config:type="list">
       <pattern>base</pattern>
