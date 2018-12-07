@@ -283,7 +283,7 @@ def prepareVMs(vm_list=[], res={}, devices={}, autoyast=""):
             create_base_image_git_entry(base_image)
 
             # Destroy and undefine vm to use disk as backing file
-            time.sleep(100)
+            time.sleep(50)
             os.system("virsh destroy %s" % vm_list[0]['name'])
             os.system("virsh undefine %s" % vm_list[0]['name'])
 
@@ -387,6 +387,7 @@ def installVMs(vm_list, res, devices, autoyast, os_settings, base_image = ""):
         process["autoyast"], process["pipe"], process['process'] = run_install_cmd(os_settings, vm_name, vm, disk, res)
         processes[vm_name] = process
         process["process"].start()
+        time.sleep(10)
 
     for vm in vm_list:
         vm_name = vm['name']
