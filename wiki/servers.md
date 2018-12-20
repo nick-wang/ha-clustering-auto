@@ -1,7 +1,8 @@
 ### bj-ha-6
 10.67.160.106
 10.67.161.106
-root suse
+root
+suse
 
 ### HA-5
 10.67.160.105
@@ -39,21 +40,42 @@ novell
 ask Malin for help...
 
 
-### HA dhcp and dns server
+### HA200 (Intel blue machine)
+10.67.160.200
+10.67.161.200
+ask Malin for help...
+
+jenkins server deployed on this machine
+
+
+### HA dhcp and dns server (VM deployed by infra@ team)
 10.67.160.10
+root
+suse
 
-use yast to configure
+use yast to configure dhcp/dns
 
-for our servers ip range
+All ip range for HA team is from 
+10.67.160.0/21 (8*254)
+
+for our servers ip range, dhcp fixed:
 10.67.160.0/24 and 10.67.161.0/24
 
 other host like virtual machines use dhcp for an ip address
 these addresses start from 10.67.162.0, but I do not know the
 upper limit
+So far, only 160.0/24 is assigned via dhcp. May possible to
+extend via modify range in dhpd.conf
 
-root
-suse
 
 ### racktable
 http://racktable.suse.de/
 This site is totally different from what it was
+
+So useless based on the comment...
+
+
+### Admin
+infra@suse.de
+or
+Martin Caj mcaj@suse.de
