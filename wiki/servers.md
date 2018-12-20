@@ -69,6 +69,8 @@ extend via modify range in dhpd.conf
 
 
 ### racktable
+https://racktables.nue.suse.com
+(Using mail box uname/passwd)
 http://racktable.suse.de/
 This site is totally different from what it was
 
@@ -79,3 +81,8 @@ So useless based on the comment...
 infra@suse.de
 or
 Martin Caj mcaj@suse.de
+
+
+### Others
+Now "L" port on R&D can enter the same subnet of server room.
+Send mail to infra@ if necessary
