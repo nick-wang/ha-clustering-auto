@@ -45,6 +45,9 @@ Q. How to deploy a virtual host (jenkins guest)?
   8. Create lvm pool for image, saved in /mnt/vm
 
 A.To make the cmd on the guest
+https://hawk-guide.readthedocs.io/en/latest/stonith.html
+For libvirt via qemu+tcp:
+https://www.chenyudong.com/archives/libvirt-connect-to-libvirtd-with-tcp-qemu.html
 "virsh -c qemu+tcp://host_ip/system", we have to modify
 
 On host /etc/libvirt/libvirtd.conf
