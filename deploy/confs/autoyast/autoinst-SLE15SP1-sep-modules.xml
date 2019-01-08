@@ -7,35 +7,35 @@
         <media_url>Product-HA</media_url>
         <!-->
         <product>sle-module-ha</product>
-        <product_dir>/SP1-Product-HA</product_dir>
+        <product_dir>/</product_dir>
         <-->
       </listentry>
       <listentry>
         <media_url>Module-Basesystem</media_url>
         <!-->
         <product>sle-module-basesystem</product>
-        <product_dir>/SP1-Module-Basesystem</product_dir>
+        <product_dir>/</product_dir>
         <-->
       </listentry>
       <listentry>
         <media_url>Module-Server-Applications</media_url>
         <!-->
         <product>sle-module-server-applications</product>
-        <product_dir>/SP1-Module-Server-Applications</product_dir>
+        <product_dir>/</product_dir>
         <-->
       </listentry>
       <listentry>
         <media_url>Module-Web-Scripting</media_url>
         <!-->
         <product>sle-module-web-scripting</product>
-        <product_dir>/SP1-Module-Web-Scripting</product_dir>
+        <product_dir>/</product_dir>
         <-->
       </listentry>
       <listentry>
         <media_url>Module-Development-Tools</media_url>
         <!-->
         <product>sle-module-development-tools</product>
-        <product_dir>/SP1-Module-Development-Tools</product_dir>
+        <product_dir>/</product_dir>
         <-->
       </listentry>
     </add_on_products>
