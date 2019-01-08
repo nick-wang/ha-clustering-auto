@@ -41,6 +41,11 @@ default_base_dir = "/mnt/vm/sle_base"
 
 dummy_folder = "../dummy_temp/"
 
+clean_up = True
+
+# Check mirror.suse.asia/dist/slp to see whether modules/products are saved seperately
+seperate = False
+
 def getSUSEVersionViaURL(repo):
     # http://mirror.suse.asia/dist/install/SLP/SLES-11-SP4-GM/x86_64/DVD1/media.1/build
     #    SLES-11-SP4-DVD-x86_64-Build1221
@@ -169,6 +174,18 @@ def _replaceXML(line, key, value):
     else:
         return line
 
+def _replaceMediaURL(line, value):
+    pattern = "( *<media_url>)(.*)(</media_url> *)"
+    result = re.match(pattern, line)
+    if result is not None:
+        #line like:   http://mirror.suse.asia/dist/install/SLP/SLE-15-SP1-Packages-Beta1/x86_64/DVD1/
+        #result.groups()[1] like:  Module-Basesystem
+        #output like:  http://mirror.suse.asia/dist/install/SLP/SLE-15-SP1-Module-Basesystem-Beta1/x86_64/DVD1/
+        newURL = value.replace("-Packages-", "-"+result.groups()[1]+"-")
+        return "%s%s%s\n" % (result.groups()[0], newURL, result.groups()[2])
+    else:
+        return line
+
 def installVM(VMName, disk, OSType, vcpus, memory, disk_size, source, nic, second_nic, graphics, autoyast, child_fd):
     if second_nic and second_nic != '':
         nic2 = ' --nic bridge=%s,model=virtio ' % (second_nic)
@@ -241,6 +258,7 @@ def create_base_image_git_entry(base_image):
     fd.close()
 
 def prepareVMs(vm_list=[], res={}, devices={}, autoyast=""):
+    global seperate
 
     if (autoyast.strip() == '') or (os.path.exists(autoyast) == False):
         suse = getSUSEVersionViaURL(res["sle_source"])
@@ -252,7 +270,16 @@ def prepareVMs(vm_list=[], res={}, devices={}, autoyast=""):
             else:
                 os_settings = '%s/%s' % (os.getcwd(), '../confs/autoyast/autoinst-SLE15.xml')
         elif suse['version'] == '15' and suse['patch'] == 'SP1':
-            os_settings = '%s/%s' % (os.getcwd(), '../confs/autoyast/autoinst-SLE15SP1.xml')
+            if int(suse['build'].split(".")[0]) < 125:
+                os_settings = '%s/%s' % (os.getcwd(), '../confs/autoyast/autoinst-SLE15SP1.xml')
+            else:
+                # Since beta1, modules seperate from packages
+                # eg: original repo:
+                #   http://mirror.suse.asia/dist/install/SLP/SLE-15-Packages-LATEST/x86_64/DVD1/Module-Basesystem/
+                # new:
+                #   http://mirror.suse.asia/dist/install/SLP/SLE-15-SP1-Module-Basesystem-LATEST/x86_64/DVD1/
+                seperate = True
+                os_settings = '%s/%s' % (os.getcwd(), '../confs/autoyast/autoinst-SLE15SP1-sep-modules.xml')
         else:
             os_settings = '%s/%s' % (os.getcwd(), '../confs/autoyast/autoinst-SLE11-SLE12.xml')
     else:
@@ -332,7 +359,10 @@ def run_install_cmd(os_settings, vm_name, vm, disk, res):
 
     f = open("%s/%s" % (dummy_folder, vm_name), 'w')
     for line in conf_str:
-        line = _replaceXML(line, "media_url", res['ha_source'])
+        if not seperate:
+            line = _replaceXML(line, "media_url", res['ha_source'])
+        else:
+            line = _replaceMediaURL(line, res['ha_source'])
         line = _replaceXML(line, "hostname", vm_name)
         f.write(line)
     f.close()
@@ -392,7 +422,8 @@ def installVMs(vm_list, res, devices, autoyast, os_settings, base_image = ""):
     for vm in vm_list:
         vm_name = vm['name']
         processes[vm_name]["process"].join(MAX_VM_INSTALL_TIMEOUT)
-        os.remove(processes[vm_name]["autoyast"])
+        if clean_up:
+            os.remove(processes[vm_name]["autoyast"])
 
     for vm in vm_list:
         vm_name = vm['name']
