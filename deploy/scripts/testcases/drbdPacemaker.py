@@ -196,7 +196,7 @@ def switchDRBD(args=None):
             # Example:
             # Succeed: INFO: Move constraint created for ms_1-multi-0 to Leap42_2-test-node1\n
             # Fail: Error performing operation: ms_1-multi-0 is already active on Leap42_2-test-node2\n
-            if "is already active on" in tmp:
+            if "is already active on" in tmp or "Situation already as requested" in tmp:
                 # Already master, try the next node
                 continue
             elif  "INFO: Move constraint created" in tmp:
