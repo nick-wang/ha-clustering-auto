@@ -17,6 +17,7 @@ ARCH=x86_64
 
 SLP_URL="http://147.2.207.1/dist/install/SLP"
 DIR="/tmp/jenkins-dummy/build-change/"
+TIMEOUT=5
 
 if [ ${PATCHLEVEL} != 0 ]
 then
@@ -36,7 +37,7 @@ download_file()
     #wget won't redownload if N_K_FILE exist
     #The file is already fully retrieved; nothing to do.
     rm -rf $N_K_FILE
-    wget -c $SLP_URL/$KERNEL_MILESTONE/$MEDIA/build -O $N_K_FILE &> /dev/null
+    wget -T ${TIMEOUT} -c $SLP_URL/$KERNEL_MILESTONE/$MEDIA/build -O $N_K_FILE &> /dev/null
     [ $? -eq 0 ] ||
         die "download $N_K_FILE failed."
 }

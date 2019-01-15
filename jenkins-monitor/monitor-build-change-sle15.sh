@@ -12,6 +12,7 @@ ARCH=x86_64
 
 SLP_URL="http://mirror.suse.asia/dist/install/SLP/"
 DIR="/tmp/jenkins-dummy/build-change/"
+TIMEOUT=5
 
 if [ ${PATCHLEVEL} != 0 ]
 then
@@ -32,7 +33,7 @@ download_file()
     #The file is already fully retrieved; nothing to do.
     rm -rf $N_K_FILE
 
-    wget $SLP_URL/$KERNEL_MILESTONE/$MEDIA/media -O $N_K_FILE &> /dev/null
+    wget -T ${TIMEOUT} -c $SLP_URL/$KERNEL_MILESTONE/$MEDIA/media -O $N_K_FILE &> /dev/null
     [ $? -eq 0 ] ||
         die "download $N_K_FILE failed."
     sle15_adapt $N_K_FILE
