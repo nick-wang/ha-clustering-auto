@@ -72,7 +72,7 @@ def getSUSEVersionViaURL(repo):
                             'build' : 3
                            },
                    '-12-': {'postfix' : '/media.1/build',
-                            'pattern' : 'SLE-12-(SP[1-4]-)*(\w+)-DVD-(\w*)-Build([\w\.]+)',
+                            'pattern' : 'SLE-12-(SP[1-5]-)*(\w+)-DVD-(\w*)-Build([\w\.]+)',
                             'flavor' : 1,
                             'version' : '12',
                             'patch' : 0,
