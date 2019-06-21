@@ -50,7 +50,10 @@ def readFromYaml(yml_file):
     #     result: PASSED
 
     with open(yml_file, "r") as fd:
-        result_list=yaml.load(fd)
+        try:
+            result_list = yaml.load(fd, Loader=yaml.FullLoader)
+        except AttributeError:
+            result_list=yaml.load(fd)
 
     # return the hash list
     return result_list

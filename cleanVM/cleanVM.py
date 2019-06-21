@@ -157,7 +157,10 @@ def getVMList():
 
 def removeVMViaYaml(yamlfile, remove=True):
     with open(yamlfile,'r') as f:
-        ya = yaml.load(f)
+        try:
+            ya = yaml.load(f, Loader=yaml.FullLoader)
+        except AttributeError:
+            ya = yaml.load(f)
     vms = ya.get('nodes')
     for vm in vms:
         if checkVMExists(vm["name"]):

@@ -88,7 +88,11 @@ class GET_VM_CONF:
             Get group infomation from client.yaml
         '''
         with open(url,'r') as f:
-            ya = yaml.load(f)
+            try:
+                ya = yaml.load(f, Loader=yaml.FullLoader)
+            except AttributeError:
+                ya = yaml.load(f)
+
         return ya
 
     def get_single_section_conf(self, section):
