@@ -332,7 +332,7 @@ def parse_vm_args(vm, devices):
 
     # Should exactly the same with devices in parseYAML.py
     # Not necessary to add 'disk_dir' and 'backing_file' here
-    devices_keys=('nic', 'second_nic', 'vcpus', 'memory', 'disk_size')
+    devices_keys=('ostype', 'nic', 'second_nic', 'vcpus', 'memory', 'disk_size')
 
     for key in default_vm_install.keys():
         if key in devices_keys:

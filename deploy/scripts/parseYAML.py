@@ -75,7 +75,7 @@ class GET_VM_CONF:
         # refer to 'nodes'
         self.lists = {'repos': 'repo'}
         self.structs = {'iscsi': ('target_ip', 'target_lun'),
-                        'devices': ('disk_dir', 'nic', 'second_nic', 'vcpus', 'memory', 'disk_size', 'backing_file', 'sharing_backing_file'),
+                        'devices': ('disk_dir', 'ostype', 'nic', 'second_nic', 'vcpus', 'memory', 'disk_size', 'backing_file', 'sharing_backing_file'),
                         'resources': ('sle_source', 'ha_source')}
 
     def is_key_none(self, key):
