@@ -15,7 +15,7 @@ cp -f $CLUSTER_CONF ./clustermd/clustermd-autotest/clustermd_tests/
 
 for node in ${ips[@]}
 do
-{	
+{
 	pkgs=(mdadm dlm-kmp-default cluster-md-kmp-default )
 	for pkg in ${pkgs[@]}
 	do
@@ -23,6 +23,7 @@ do
 		[ $? -eq 0 ] ||
 			ssh $node zypper install -y $pkg
 	done
+	ssh $node "modprobe dlm"
 	ssh $node "rcpacemaker restart"
 } &
 done
