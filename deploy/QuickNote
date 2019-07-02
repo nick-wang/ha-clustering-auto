@@ -45,14 +45,20 @@ Q. How to deploy a virtual host (jenkins guest)?
   8. Create lvm pool for image, saved in /mnt/vm
 
 A.To make the cmd on the guest
-https://hawk-guide.readthedocs.io/en/latest/stonith.html
-For libvirt via qemu+tcp:
-https://www.chenyudong.com/archives/libvirt-connect-to-libvirtd-with-tcp-qemu.html
-"virsh -c qemu+tcp://host_ip/system", we have to modify
+  https://hawk-guide.readthedocs.io/en/latest/stonith.html
+  For libvirt via qemu+tcp:
+  https://www.chenyudong.com/archives/libvirt-connect-to-libvirtd-with-tcp-qemu.html
+  "virsh -c qemu+tcp://host_ip/system", we have to modify
 
-On host /etc/libvirt/libvirtd.conf
-listen_tls = 0
-listen_tcp = 1
-tcp_port = "16509"
-listen_addr = "0.0.0.0"
-auth_tcp = "none"
+  On host /etc/libvirt/libvirtd.conf
+  listen_tls = 0
+  listen_tcp = 1
+  tcp_port = "16509"
+  listen_addr = "0.0.0.0"
+  auth_tcp = "none"
+
+  # if fail to connect with libvirtd, need to start with "--listen"
+  # https://wiki.libvirt.org/page/Libvirt_daemon_is_not_listening_on_tcp_ports_although_configured_to
+  On host /etc/libvirt/libvirtd.conf
+  LIBVIRTD_ARGS="--listen"
+
