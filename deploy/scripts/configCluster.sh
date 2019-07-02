@@ -136,7 +136,7 @@ done
 #sync the time
 sle_ver=($(echo $(getSLEVersion)))
 case ${sle_ver[0]} in
-  15)
+  15|tumbleweed*)
     systemctl enable chronyd.service
 
     # Add NTP server to /etc/chrony.conf
@@ -168,7 +168,7 @@ else
 
     # Using systemd way to handle startup commands
     case ${sle_ver[0]} in
-      15|12|42.1|42.2)
+      15|12|42.1|42.2|tumbleweed*)
         echo "[Unit]
 After=network.service
 
@@ -201,7 +201,7 @@ fi
 #Enable service
 infoLog "Enable services and start pacemaker."
 case ${sle_ver[0]} in
-  15|12|42.1|42.2)
+  15|12|42.1|42.2|tumbleweed*)
     zypper in -y systemd-rpm-macros 
     systemctl enable iscsid.socket
     systemctl enable iscsiuio.socket
