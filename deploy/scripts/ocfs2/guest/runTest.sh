@@ -136,9 +136,9 @@ for tm in $(echo ${TESTMODE} | sed 's:,: :g'); do
 		echo -e "\n\n\n"
 		f_info "Start single node testing..."
 
-		f_log "single_run-WIP.sh -k ${KERNEL_SOURCE} -l /usr/local/ocfs2-test/log -m ${MOUNT_POINT} -d ${SHARED_DISK} ${BLOCKSIZE} ${CLUSTERSIZE} -s ${CLUSTER_STACK} -n ${CLUSTER_NAME} -t ${SINGLE_CASES}"
+		f_log "single_run-WIP.sh -f 1 -k ${KERNEL_SOURCE} -l /usr/local/ocfs2-test/log -m ${MOUNT_POINT} -d ${SHARED_DISK} ${BLOCKSIZE} ${CLUSTERSIZE} -s ${CLUSTER_STACK} -n ${CLUSTER_NAME} -t ${SINGLE_CASES}"
 
-		single_run-WIP.sh -k  ${KERNEL_SOURCE} -l /usr/local/ocfs2-test/log -m ${MOUNT_POINT} -d ${SHARED_DISK} ${BLOCKSIZE} ${CLUSTERSIZE}  -s ${CLUSTER_STACK} -n ${CLUSTER_NAME} -t ${SINGLE_CASES}
+		single_run-WIP.sh -f 1 -k ${KERNEL_SOURCE} -l /usr/local/ocfs2-test/log -m ${MOUNT_POINT} -d ${SHARED_DISK} ${BLOCKSIZE} ${CLUSTERSIZE}  -s ${CLUSTER_STACK} -n ${CLUSTER_NAME} -t ${SINGLE_CASES}
 
 		f_info "DONE: single node testing"
 		continue
@@ -148,9 +148,9 @@ for tm in $(echo ${TESTMODE} | sed 's:,: :g'); do
 		echo -e "\n\n\n"
 		f_info "Start multiple nodes testing..."
 
-		f_log "multiple_run.sh -k ${KERNEL_SOURCE} -n ${NODE_LIST} -d ${SHARED_DISK} ${BLOCKSIZE} ${CLUSTERSIZE}  -s ${CLUSTER_STACK} -C ${CLUSTER_NAME} -t ${MULTIPLE_CASES}  ${MOUNT_POINT}"
+		f_log "multiple_run.sh -f 1 -k ${KERNEL_SOURCE} -n ${NODE_LIST} -d ${SHARED_DISK} ${BLOCKSIZE} ${CLUSTERSIZE}  -s ${CLUSTER_STACK} -C ${CLUSTER_NAME} -t ${MULTIPLE_CASES}  ${MOUNT_POINT}"
 
-		multiple_run.sh -k ${KERNEL_SOURCE} -n ${NODE_LIST} -d ${SHARED_DISK} ${BLOCKSIZE} ${CLUSTERSIZE} -t ${MULTIPLE_CASES}  -s ${CLUSTER_STACK} -C ${CLUSTER_NAME}  ${MOUNT_POINT}
+		multiple_run.sh -f 1 -k ${KERNEL_SOURCE} -n ${NODE_LIST} -d ${SHARED_DISK} ${BLOCKSIZE} ${CLUSTERSIZE} -t ${MULTIPLE_CASES}  -s ${CLUSTER_STACK} -C ${CLUSTER_NAME}  ${MOUNT_POINT}
 
 		f_info "DONE: multiple nodes testing"
 		continue
@@ -160,9 +160,9 @@ for tm in $(echo ${TESTMODE} | sed 's:,: :g'); do
 		echo -e "\n\n\n"
 		f_info "Start single-node discontig block group testing..."
 
-		f_log "discontig_runner.sh -d ${SHARED_DISK} ${BLOCKSIZE} ${CLUSTERSIZE}  -s ${CLUSTER_STACK} -n ${CLUSTER_NAME} ${MOUNT_POINT}"
+		f_log "discontig_runner.sh -f 1 -d ${SHARED_DISK} ${BLOCKSIZE} ${CLUSTERSIZE}  -s ${CLUSTER_STACK} -n ${CLUSTER_NAME} ${MOUNT_POINT}"
 
-		discontig_runner.sh -d ${SHARED_DISK} ${BLOCKSIZE} ${CLUSTERSIZE}  -s ${CLUSTER_STACK} -n ${CLUSTER_NAME} ${MOUNT_POINT}
+		discontig_runner.sh -f 1 -d ${SHARED_DISK} ${BLOCKSIZE} ${CLUSTERSIZE}  -s ${CLUSTER_STACK} -n ${CLUSTER_NAME} ${MOUNT_POINT}
 
 		f_info "DONE: single-node discontig block group testing"
 		continue
@@ -172,9 +172,9 @@ for tm in $(echo ${TESTMODE} | sed 's:,: :g'); do
 		echo -e "\n\n\n"
 		f_info "Start multiple-node discontig block group testing..."
 
-		f_log "discontig_runner.sh -m ${NODE_LIST} -d ${SHARED_DISK} ${BLOCKSIZE} ${CLUSTERSIZE}  -s ${CLUSTER_STACK} -n ${CLUSTER_NAME} ${MOUNT_POINT}"
+		f_log "discontig_runner.sh -m ${NODE_LIST} -f 1 -d ${SHARED_DISK} ${BLOCKSIZE} ${CLUSTERSIZE}  -s ${CLUSTER_STACK} -n ${CLUSTER_NAME} ${MOUNT_POINT}"
 
-		discontig_runner.sh -m ${NODE_LIST} -d ${SHARED_DISK} ${BLOCKSIZE} ${CLUSTERSIZE}  -s ${CLUSTER_STACK} -n ${CLUSTER_NAME} ${MOUNT_POINT}
+		discontig_runner.sh -m ${NODE_LIST} -f 1 -d ${SHARED_DISK} ${BLOCKSIZE} ${CLUSTERSIZE}  -s ${CLUSTER_STACK} -n ${CLUSTER_NAME} ${MOUNT_POINT}
 
 		f_info "DONE: multiple-node discontig block group testing"
 	fi

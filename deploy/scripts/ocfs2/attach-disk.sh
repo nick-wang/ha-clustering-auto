@@ -1,20 +1,22 @@
 #! /bin/bash
+
 function attach_raw_disk()
 {
 	raw_file=$1
 	device_in_guest=$2
 
-	raw_file_size_GB=40
+	raw_file_size_GB=80g
 
 	if [ ! -e $raw_file ]
 	then
-		dd if=/dev/zero of=$raw_file bs=1G count=$raw_file_size_GB
+		qemu-img create -f raw $raw_file $raw_file_size_GB
+		sleep 3
 	fi
 
 	for domain in `cat ${CLUSTER_FILE} | grep HOSTNAME | cut -d"=" -f2`
 	do
-		virsh attach-disk $domain $raw_file $device_in_guest --live --type disk \
-		|| virsh attach-disk $domain $raw_file $device_in_guest  --type disk
+		virsh attach-disk $domain $raw_file $device_in_guest --live --type disk --mode shareable \
+		|| virsh attach-disk $domain $raw_file $device_in_guest  --type disk --mode shareable
 		if [ "$?" == "0" ];then
 			echo "attach disk [OK]";
 		else
@@ -23,8 +25,6 @@ function attach_raw_disk()
 	done
 	
 }
-
-
 
 function attach_iscsi()
 {
