@@ -275,8 +275,8 @@ def prepareVMs(vm_list=[], res={}, devices={}, autoyast=""):
                 os_settings = '%s/%s' % (os.getcwd(), '../confs/autoyast/autoinst-SLE15-beta5.xml')
             else:
                 os_settings = '%s/%s' % (os.getcwd(), '../confs/autoyast/autoinst-SLE15.xml')
-        elif suse['version'] == '15' and suse['patch'] == 'SP1':
-            if int(suse['build'].split(".")[0]) < 125:
+        elif suse['version'] == '15':
+            if suse['patch'] == 'SP1' and int(suse['build'].split(".")[0]) < 125:
                 os_settings = '%s/%s' % (os.getcwd(), '../confs/autoyast/autoinst-SLE15SP1.xml')
             else:
                 # Since beta1, modules seperate from packages
