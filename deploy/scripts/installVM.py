@@ -80,12 +80,12 @@ def getSUSEVersionViaURL(repo):
                             'build' : 3
                            },
                    '-15-': {'postfix' : '/media.1/media',
-                            'pattern' : 'SLE-15-(SP[1-4]-)*(\w+)-DVD-(\w*)-Build([\w\.]+)',
+                            'pattern' : 'SLE-15-(SP[1-4]-)*(\w+)-(DVD|OnlineOnly)-(\w*)-Build([\w\.]+)',
                             'flavor' : 1,
                             'version' : '15',
                             'patch' : 0,
-                            'arch' : 2,
-                            'build' : 3
+                            'arch' : 3,
+                            'build' : 4
                            },
                    'Leap': {'postfix' : '/media.1/media',
                             'pattern' : 'openSUSE-Leap-(\w+\.\w)-DVD-(\w+)-Build([\w\.]+)',
@@ -123,6 +123,8 @@ def getSUSEVersionViaURL(repo):
         for line in lines:
             reg = re.search(url_pattern[version]['pattern'], line)
             if reg is not None:
+                print "Pattern matched: %s" % line
+
                 #SLES-11-SP4-DVD-x86_64-Build1221
                 #('S', 'SP4-', 'x86_64', '1221')
                 #SLE-12-SP3-Server-DVD-x86_64-Build0473
@@ -144,6 +146,10 @@ def getSUSEVersionViaURL(repo):
                 except TypeError:
                     suse_release['arch'] = url_pattern[version]['arch']
                 suse_release['build'] = reg.groups()[url_pattern[version]['build']]
+
+                if "OnlineOnly" in line:
+                    print "Using OnlineOnly installer, may not work!"
+
                 break
         else:
             print "Not found any pattern in url."
@@ -296,6 +302,8 @@ def prepareVMs(vm_list=[], res={}, devices={}, autoyast=""):
             base_image = get_shared_backing_file_name(vm, devices, res["sle_source"])
         else: #"backing_file" won't share with others, also won't be tracked by cleanVM.py
             base_image = get_backing_file_name(vm_list[0], devices)
+
+        print "Using base image: %s" % base_image
 
         if not find_an_exist_backing_file(base_image):
             # Only installed one(1st) vm as backing file
