@@ -55,6 +55,10 @@ def getSUSEVersionViaURL(repo):
     #    SUSE - SLE-15-Installer-DVD-x86_64-Build333.4-Media
     #    SLE-15-Installer-DVD-x86_64-Build333.4
     #    2
+    # http://mirror.suse.asia/dist/install/SLP/SLE-15-SP2-Full-Beta1/x86_64/DVD1//media.1/media
+    #    SUSE - SLE-15-SP2-Full-x86_64-Build101.1-Media
+    #    SLE-15-SP2-Full-x86_64-Build101.1
+    #    1
     # (obsolete - no build file) http://mirror.bej.suse.com/dist/install/SLP/openSUSE-Leap-LATEST/x86_64/DVD1/media.1/build
     #    openSUSE-Leap-42.3-DVD-x86_64-Build0331
     # (obsolete - no build file) http://dist.suse.de/install/SLP/openSUSE-Tumbleweed/media.1/build
@@ -80,7 +84,7 @@ def getSUSEVersionViaURL(repo):
                             'build' : 3
                            },
                    '-15-': {'postfix' : '/media.1/media',
-                            'pattern' : 'SLE-15-(SP[1-4]-)*(\w+)-(DVD|OnlineOnly)-(\w*)-Build([\w\.]+)',
+                            'pattern' : 'SLE-15-(SP[1-4]-)*(\w+)-(DVD|OnlineOnly|Full)-(\w*)-Build([\w\.]+)',
                             'flavor' : 1,
                             'version' : '15',
                             'patch' : 0,
@@ -131,6 +135,8 @@ def getSUSEVersionViaURL(repo):
                 #('SP3-', 'Server', 'x86_64', '0473')
                 #SUSE - SLE-15-Installer-DVD-x86_64-Build349.1-Media
                 #(None, 'Installer', 'x86_64', '349.1')
+                #SLE-15-SP2-Full-x86_64-Build101.1
+                #('SP2-', 'Full', 'x86_64', '101.1')
                 #openSUSE-Leap-42.3-DVD-x86_64-Build0331
                 #('42.3', 'x86_64', '0331')
                 #openSUSE-20171125-i586-x86_64-Build0001
@@ -184,10 +190,17 @@ def _replaceMediaURL(line, value):
     pattern = "( *<media_url>)(.*)(</media_url> *)"
     result = re.match(pattern, line)
     if result is not None:
-        #line like:   http://mirror.suse.asia/dist/install/SLP/SLE-15-SP1-Packages-Beta1/x86_64/DVD1/
-        #result.groups()[1] like:  Module-Basesystem
-        #output like:  http://mirror.suse.asia/dist/install/SLP/SLE-15-SP1-Module-Basesystem-Beta1/x86_64/DVD1/
-        newURL = value.replace("-Packages-", "-"+result.groups()[1]+"-")
+        if "-Full-" in value:
+            #since sle15 sp2 alpha6, the moudles/packages are moved to installer repo. Then combine to a "Full" repo
+            #line(value) like:   http://mirror.suse.asia/dist/install/SLP/SLE-15-SP2-Full-Beta1/x86_64/DVD1/
+            #result.groups()[1] like:  Module-Basesystem
+            #output like:  http://mirror.suse.asia/dist/install/SLP/SLE-15-SP2-Full-Beta1/x86_64/DVD1/Module-Basesystem
+            newURL = value + "/" + result.groups()[1]
+        else:
+            #line(value) like:   http://mirror.suse.asia/dist/install/SLP/SLE-15-SP1-Packages-Beta1/x86_64/DVD1/
+            #result.groups()[1] like:  Module-Basesystem
+            #output like:  http://mirror.suse.asia/dist/install/SLP/SLE-15-SP1-Module-Basesystem-Beta1/x86_64/DVD1/
+            newURL = value.replace("-Packages-", "-"+result.groups()[1]+"-")
         return "%s%s%s\n" % (result.groups()[0], newURL, result.groups()[2])
     else:
         return line
