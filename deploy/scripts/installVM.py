@@ -84,7 +84,7 @@ def getSUSEVersionViaURL(repo):
                             'build' : 3
                            },
                    '-15-': {'postfix' : '/media.1/media',
-                            'pattern' : 'SLE-15-(SP[1-4]-)*(\w+)-(DVD|OnlineOnly|Full)-(\w*)-Build([\w\.]+)',
+                            'pattern' : 'SLE-15-(SP[1-4])*-*(\w+)*(-DVD|-OnlineOnly)*-(\w*)-Build([\w\.]+)',
                             'flavor' : 1,
                             'version' : '15',
                             'patch' : 0,
@@ -128,6 +128,7 @@ def getSUSEVersionViaURL(repo):
             reg = re.search(url_pattern[version]['pattern'], line)
             if reg is not None:
                 print "Pattern matched: %s" % line
+                print(reg.groups())
 
                 #SLES-11-SP4-DVD-x86_64-Build1221
                 #('S', 'SP4-', 'x86_64', '1221')
@@ -153,7 +154,7 @@ def getSUSEVersionViaURL(repo):
                     suse_release['arch'] = url_pattern[version]['arch']
                 suse_release['build'] = reg.groups()[url_pattern[version]['build']]
 
-                if "OnlineOnly" in line:
+                if "-OnlineOnly" in line:
                     print "Using OnlineOnly installer, may not work!"
 
                 break
@@ -303,6 +304,8 @@ def prepareVMs(vm_list=[], res={}, devices={}, autoyast=""):
             os_settings = '%s/%s' % (os.getcwd(), '../confs/autoyast/autoinst-SLE11-SLE12.xml')
     else:
         os_settings = autoyast
+
+    print("Autoyast template from: %s" % os_settings)
 
     for key in default_res.keys():
         if res[key] is None:
@@ -488,6 +491,7 @@ if __name__ == "__main__":
     #getSUSEVersionViaURL("http://mirror.suse.asia/dist/install/SLP/SLE-12-SP3-Server-GM/x86_64/DVD1/")
     #getSUSEVersionViaURL("http://mirror.suse.asia/dist/install/SLP/SLE-15-Installer-LATEST/x86_64/DVD1/")
     #getSUSEVersionViaURL("http://mirror.suse.asia/dist/install/SLP/SLE-16-Installer-LATEST/x86_64/DVD1/")
+    #getSUSEVersionViaURL("http://mirror.suse.asia/dist/install/SLP/SLE-15-SP2-Full-Beta1/x86_64/DVD1")
 
     if os.path.exists("/var/run/vm-install/") == False:
         os.makedirs("/var/run/vm-install/")
