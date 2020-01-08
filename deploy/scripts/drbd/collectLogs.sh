@@ -24,13 +24,14 @@ do
   mkdir -p ${LOG_DIR}/${ip}_drbd
   ssh root@${ip} "mkdir -p ${TEMP_DIR}"
   ssh root@${ip} "rpm -qa|grep drbd>${TEMP_DIR}/drbd-rpm"
-  sle_ver=($(echo $(getSLEVersion)))
+  sle_ver=($(ssh root@${ip} ". /tmp/cluster-configuration/scripts/functions; getSLEVersion"))
   case ${sle_ver[0]} in
-    15)
-      ssh root@${ip} "cat /proc/drbd>${TEMP_DIR}/drbd-proc; drbdsetup status -vs >${TEMP_DIR}/drbdsetup-status; drbdadm dump >${TEMP_DIR}/drbdadm-dump"
+    12)
+      ssh root@${ip} "cat /proc/drbd>${TEMP_DIR}/drbd-proc; drbd-overview>${TEMP_DIR}/drbd-overview; drbdadm dump >${TEMP_DIR}/drbdadm-dump"
       ;;
     *)
-      ssh root@${ip} "cat /proc/drbd>${TEMP_DIR}/drbd-proc; drbd-overview>${TEMP_DIR}/drbd-overview; drbdadm dump >${TEMP_DIR}/drbdadm-dump"
+      ssh root@${ip} "cat /proc/drbd>${TEMP_DIR}/drbd-proc; drbdsetup status -vs >${TEMP_DIR}/drbdsetup-status; drbdadm dump >${TEMP_DIR}/drbdadm-dump"
+      ;;
   esac
   ssh root@${ip} "crm configure show>${TEMP_DIR}/crm-ra; crm_mon -1>${TEMP_DIR}/crm_mon"
   ssh root@${ip} "drbdadm status all>${TEMP_DIR}/drbd9-status 2>&1"

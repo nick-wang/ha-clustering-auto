@@ -43,7 +43,7 @@ nextPhase "Launch $0"
 vgname="scratch"
 NUM=$1
 
-sle_ver=($(echo $(getSLEVersion)))
+sle_ver=($(getSLEVersion))
 case ${sle_ver[0]} in
   42.1|42.2)
     # Need to install patch and rsyslog in leap42.2

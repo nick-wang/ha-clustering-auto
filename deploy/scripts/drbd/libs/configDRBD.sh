@@ -239,8 +239,9 @@ cp drbd_drbd.conf_template /etc/drbd.conf
 drbdadm create-md all
 sleep 5
 
-#Stop the susefirewall2
-rcSuSEfirewall2 stop
+# Stop the susefirewall2
+# Since SLE15, change to firewalld which is disable by default
+rcSuSEfirewall2 stop 2>/dev/null
 
 # Start the drbd service for the first sync
 # Starting res one by one instead of using `rcdrbd start`

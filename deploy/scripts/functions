@@ -26,7 +26,7 @@ function isMaster()
 function getSLEVersion()
 {
     # Usage:
-    #     INFO=($(echo $(getSLEVersion)))
+    #     INFO=($(getSLEVersion))
     #     INFO[0] is Version
     #     INFO[1] is PatchLevel
     if [ -f /etc/SuSE-release ]

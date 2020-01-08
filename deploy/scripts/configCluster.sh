@@ -136,7 +136,7 @@ for i in `seq $START_NUM $NUM_SHARED_TARGETS`; do
          --op=update --name=node.startup --value=automatic
 done
 #sync the time
-sle_ver=($(echo $(getSLEVersion)))
+sle_ver=($(getSLEVersion))
 case ${sle_ver[0]} in
   15|tumbleweed*)
     systemctl enable chronyd.service
