@@ -41,8 +41,9 @@ f_info "Install ocfs2-test packages"
 f_log "zypper --non-interactive refresh"
 zypper --non-interactive refresh
 
-f_log "zypper --non-interactive install  ocfs2-test ocfs2-test-debuginfo ocfs2-test-debugsource"
-zypper --non-interactive install  ocfs2-test ocfs2-test-debuginfo ocfs2-test-debugsource
+f_log "zypper --non-interactive install openmpi ocfs2-test"
+zypper --non-interactive install  openmpi
+zypper --non-interactive install  ocfs2-test
 
 # it's time to complete the tricky started in sshTestUsr.sh
 f_log "chown -R ocfs2test:users /home/ocfs2test/"
