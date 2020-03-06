@@ -16,7 +16,7 @@ except:
     # python2
     from urllib import urlopen
 
-MAX_VM_INSTALL_TIMEOUT = 1800
+MAX_VM_INSTALL_TIMEOUT = 3600
 
 disk_pattern = "qcow2:%s/SUSE-HA-%s.qcow2"
 backing_file_disk_pattern = "qcow2:%s/SUSE-HA-%s-base.qcow2"
