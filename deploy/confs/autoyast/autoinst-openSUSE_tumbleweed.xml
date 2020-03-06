@@ -1,6 +1,16 @@
 <?xml version="1.0"?>
 <!DOCTYPE profile>
 <profile xmlns="http://www.suse.com/1.0/yast2ns" xmlns:config="http://www.suse.com/1.0/configns">
+  <add-on>
+    <add_on_products config:type="list">
+      <listentry>
+        <!--media_url><![CDATA[https://download.opensuse.org/tumbleweed/repo/oss/]]></media_url-->
+        <media_url>HA_RESOURCE</media_url>
+        <product>openSUSE-tumbleweed</product>
+        <product_dir>/</product_dir>
+      </listentry>
+    </add_on_products>
+  </add-on>
   <deploy_image>
     <image_installation config:type="boolean">false</image_installation>
   </deploy_image>
@@ -69,6 +79,10 @@
          </enable>
     </services>
   </services-manager>
+  <firewall>
+    <start_firewall>false</start_firewall>
+    <enable_firewall>false</enable_firewall>
+  </firewall>
   <software>
     <products config:type="list">
       <product>openSUSE</product>
@@ -85,11 +99,8 @@
       <package>ha-cluster-bootstrap</package>
       <package>hawk2</package>
       <package>ldirectord</package>
-      <package>lvm2-clvm</package>
       <package>ocfs2-tools</package>
       <package>pacemaker</package>
-      <package>pssh</package>
-      <package>python-pssh</package>
       <package>resource-agents</package>
       <package>sbd</package>
       <package>yast2-cluster</package>
