@@ -46,6 +46,22 @@ clean_up = True
 # Check mirror.suse.asia/dist/slp to see whether modules/products are saved seperately
 seperate = False
 
+autoyast_dic = { "openSUSE": {"Full_tw_outdate": "autoinst-openSUSE_tumbleweed-full.xml",
+                              "Leap": "autoinst-openSUSE_leap.xml",
+                              "Tumbleweed": "autoinst-openSUSE_tumbleweed.xml",
+                             },
+                "SLE": {"SLE11_12": "autoinst-SLE11-SLE12.xml",
+                        "SLE15SP0_v1": "autoinst-SLE15-beta5.xml",
+                        "SLE15SP0_v2": "autoinst-SLE15.xml",
+                        "SLE15SP1_v1": "autoinst-SLE15SP1.xml",
+                        "SLE15SP1_SP2_sep": "autoinst-SLE15SP1-sep-modules.xml",
+                        }
+               }
+latest_openSUSE_autoyast = autoyast_dic['openSUSE']["Tumbleweed"]
+latest_SLE_autoyast = autoyast_dic['SLE']['SLE15SP1_SP2_sep']
+
+
+
 def getSUSEVersionViaURL(repo):
     # http://mirror.suse.asia/dist/install/SLP/SLES-11-SP4-GM/x86_64/DVD1/media.1/build
     #    SLES-11-SP4-DVD-x86_64-Build1221
@@ -175,6 +191,7 @@ def getSUSEVersionViaURL(repo):
     else:
        suse_release['patch'] = suse_release['patch'].strip("-")
 
+    print(suse_release)
     return suse_release
 
 def _replaceXML(line, key, value):
@@ -245,6 +262,64 @@ def get_backing_file_name(vm, devices):
 def find_an_exist_backing_file(base_image):
     return os.path.isfile(base_image)
 
+def get_autoyast_openSUSE(suse, autoyast):
+    if suse['version'] == 'Leap':
+        filename = autoyast['Leap']
+    # Outdate: all packages in one repo
+    # Pattern matched: openSUSE - openSUSE-20191206-i586-x86_64-Build1878.2-Media
+    # {'flavor': 'openSUSE', 'version': 'Tumbleweed', 'arch': 'i586-x86_64',
+    # 'build': '1878.2', 'patch': '20191206'}
+    elif suse['version'] == 'Tumbleweed' and suse['patch'] != 'Tumbleweed':
+        filename = autoyast['Full_tw_outdate']
+    # Pattern matched: openSUSE - openSUSE-Tumbleweed-DVD-x86_64-Build2147.2-Media
+    else:
+        filename = latest_openSUSE_autoyast
+
+    return filename
+
+def get_autoyast_SLE(suse, autoyast):
+    global seperate
+
+    if suse['version'] == '11' or suse['version'] == '12':
+        filename = autoyast['SLE11_12']
+    elif suse['version'] == '15' and suse['patch'] == 'SP0':
+        if int(suse['build'].split(".")[0]) < 438:
+            filename = autoyast['SLE15SP0_v1']
+        else:
+            filename = autoyast['SLE15SP0_v2']
+    elif suse['version'] == '15'and suse['patch'] == 'SP1':
+        if int(suse['build'].split(".")[0]) < 125:
+            filename = autoyast['SLE15SP1_v1']
+        else:
+            # Since beta1, modules seperate from packages
+            # eg: original repo:
+            #   http://mirror.suse.asia/dist/install/SLP/SLE-15-Packages-LATEST/x86_64/DVD1/Module-Basesystem/
+            # new:
+            #   http://mirror.suse.asia/dist/install/SLP/SLE-15-SP1-Module-Basesystem-LATEST/x86_64/DVD1/
+            seperate = True
+            filename = autoyast['SLE15SP1_SP2_sep']
+    elif suse['version'] == '15'and suse['patch'] == 'SP2':
+            seperate = True
+            filename = autoyast['SLE15SP1_SP2_sep']
+    else:
+        # Need set seperate for modules based autoyast
+        seperate = True
+        filename = latest_SLE_autoyast
+
+    return filename
+
+def find_autoyast_file(url):
+    suse = getSUSEVersionViaURL(url)
+
+    abspath = '%s/%s' % (os.getcwd(), '../confs/autoyast/')
+
+    if suse['flavor'] == 'openSUSE':
+        filename = get_autoyast_openSUSE(suse, autoyast_dic["openSUSE"])
+    else:
+        filename = get_autoyast_SLE(suse, autoyast_dic["SLE"])
+
+    return abspath + filename
+
 def create_vms_on_backing_file(vm_list, devices, base_image):
     for i in range(len(vm_list)):
         vm = vm_list[i]
@@ -278,30 +353,8 @@ def create_base_image_git_entry(base_image):
     fd.close()
 
 def prepareVMs(vm_list=[], res={}, devices={}, autoyast=""):
-    global seperate
-
     if (autoyast.strip() == '') or (os.path.exists(autoyast) == False):
-        suse = getSUSEVersionViaURL(res["sle_source"])
-        if suse['flavor'] == 'openSUSE':
-            os_settings = '%s/%s' % (os.getcwd(), '../confs/autoyast/autoinst-openSUSE_leap.xml')
-        elif suse['version'] == '15' and suse['patch'] == 'SP0':
-            if int(suse['build'].split(".")[0]) < 438:
-                os_settings = '%s/%s' % (os.getcwd(), '../confs/autoyast/autoinst-SLE15-beta5.xml')
-            else:
-                os_settings = '%s/%s' % (os.getcwd(), '../confs/autoyast/autoinst-SLE15.xml')
-        elif suse['version'] == '15':
-            if suse['patch'] == 'SP1' and int(suse['build'].split(".")[0]) < 125:
-                os_settings = '%s/%s' % (os.getcwd(), '../confs/autoyast/autoinst-SLE15SP1.xml')
-            else:
-                # Since beta1, modules seperate from packages
-                # eg: original repo:
-                #   http://mirror.suse.asia/dist/install/SLP/SLE-15-Packages-LATEST/x86_64/DVD1/Module-Basesystem/
-                # new:
-                #   http://mirror.suse.asia/dist/install/SLP/SLE-15-SP1-Module-Basesystem-LATEST/x86_64/DVD1/
-                seperate = True
-                os_settings = '%s/%s' % (os.getcwd(), '../confs/autoyast/autoinst-SLE15SP1-sep-modules.xml')
-        else:
-            os_settings = '%s/%s' % (os.getcwd(), '../confs/autoyast/autoinst-SLE11-SLE12.xml')
+        os_settings = find_autoyast_file(res["sle_source"])
     else:
         os_settings = autoyast
 
@@ -492,6 +545,9 @@ if __name__ == "__main__":
     #getSUSEVersionViaURL("http://mirror.suse.asia/dist/install/SLP/SLE-15-Installer-LATEST/x86_64/DVD1/")
     #getSUSEVersionViaURL("http://mirror.suse.asia/dist/install/SLP/SLE-16-Installer-LATEST/x86_64/DVD1/")
     #getSUSEVersionViaURL("http://mirror.suse.asia/dist/install/SLP/SLE-15-SP2-Full-Beta1/x86_64/DVD1")
+    #getSUSEVersionViaURL("http://mirror.suse.asia/dist/install/SLP/openSUSE-Leap-15.1/x86_64/DVD1/")
+    #getSUSEVersionViaURL("http://download.suse.de/install/SLP/openSUSE-Tumbleweed/x86_64/DVD1/")
+    #find_autoyast_file("http://mirror.suse.asia/dist/install/SLP/SLE-15-SP2-Full-Beta4/x86_64/DVD1/")
 
     if os.path.exists("/var/run/vm-install/") == False:
         os.makedirs("/var/run/vm-install/")
