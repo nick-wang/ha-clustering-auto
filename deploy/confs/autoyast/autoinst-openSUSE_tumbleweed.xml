@@ -14,6 +14,11 @@
   <deploy_image>
     <image_installation config:type="boolean">false</image_installation>
   </deploy_image>
+  <firewall>
+    <enable_firewall config:type="boolean">false</enable_firewall>
+    <log_denied_packets>off</log_denied_packets>
+    <start_firewall config:type="boolean">false</start_firewall>
+  </firewall>
   <general>
     <ask-list config:type="list"/>
     <mode>
@@ -79,10 +84,6 @@
          </enable>
     </services>
   </services-manager>
-  <firewall>
-    <start_firewall>false</start_firewall>
-    <enable_firewall>false</enable_firewall>
-  </firewall>
   <software>
     <products config:type="list">
       <product>openSUSE</product>
