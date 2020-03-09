@@ -100,6 +100,7 @@
       <package>ha-cluster-bootstrap</package>
       <package>hawk2</package>
       <package>ldirectord</package>
+      <package>lvm2-lockd</package>
       <package>ocfs2-tools</package>
       <package>pacemaker</package>
       <package>resource-agents</package>
