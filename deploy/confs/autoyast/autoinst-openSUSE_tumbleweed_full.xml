@@ -1,0 +1,149 @@
+<?xml version="1.0"?>
+<!DOCTYPE profile>
+<profile xmlns="http://www.suse.com/1.0/yast2ns" xmlns:config="http://www.suse.com/1.0/configns">
+  <deploy_image>
+    <image_installation config:type="boolean">false</image_installation>
+  </deploy_image>
+  <general>
+    <ask-list config:type="list"/>
+    <mode>
+      <confirm config:type="boolean">false</confirm>
+      <final_halt config:type="boolean">false</final_halt>
+      <final_reboot config:type="boolean">false</final_reboot>
+      <halt config:type="boolean">false</halt>
+      <second_stage config:type="boolean">true</second_stage>
+    </mode>
+    <proposals config:type="list"/>
+    <signature-handling>
+      <accept_file_without_checksum config:type="boolean">true</accept_file_without_checksum>
+      <accept_non_trusted_gpg_key config:type="boolean">true</accept_non_trusted_gpg_key>
+      <accept_unknown_gpg_key config:type="boolean">true</accept_unknown_gpg_key>
+      <accept_unsigned_file config:type="boolean">false</accept_unsigned_file>
+      <accept_verification_failed config:type="boolean">false</accept_verification_failed>
+      <import_gpg_key config:type="boolean">true</import_gpg_key>
+    </signature-handling>
+    <storage/>
+  </general>
+  <groups config:type="list"/>
+  <login_settings/>
+  <networking>
+    <dns>
+      <dhcp_hostname config:type="boolean">false</dhcp_hostname>
+      <hostname>HOSTNAME</hostname>
+      <nameservers config:type="list">
+        <nameserver>147.2.136.1</nameserver>
+        <nameserver>203.192.163.124</nameserver>
+      </nameservers>
+      <resolv_conf_policy>auto</resolv_conf_policy>
+      <write_hostname config:type="boolean">false</write_hostname>
+    </dns>
+    <interfaces config:type="list">
+        <interface>
+        <bootproto>dhcp</bootproto>
+        <device>ens3</device>
+        <startmode>auto</startmode>
+        </interface>
+    </interfaces>
+    <ipv6 config:type="boolean">true</ipv6>
+    <keep_install_network config:type="boolean">false</keep_install_network>
+    <managed config:type="boolean">false</managed>
+    <routing>
+      <ipv4_forward config:type="boolean">false</ipv4_forward>
+      <ipv6_forward config:type="boolean">false</ipv6_forward>
+    </routing>
+  </networking>
+  <partitioning config:type="list">
+    <drive>
+      <initialize config:type="boolean">true</initialize>
+      <partitions config:type="list"/>
+      <type config:type="symbol">CT_DISK</type>
+      <use>all</use>
+    </drive>
+  </partitioning>
+  <services-manager>
+      <!--default_target>graphical</default_target-->
+    <services>
+      <disable config:type="list"/>
+         <enable config:type="list">
+             <service>sshd</service>
+         </enable>
+    </services>
+  </services-manager>
+  <software>
+    <products config:type="list">
+      <product>openSUSE</product>
+    </products>
+    <packages config:type="list">
+      <package>autoyast2-installation</package>
+      <package>conntrack-tools</package>
+      <package>corosync</package>
+      <package>crmsh</package>
+      <package>csync2</package>
+      <package>ctdb</package>
+      <package>drbd</package>
+      <package>drbd-utils</package>
+      <package>ha-cluster-bootstrap</package>
+      <package>hawk2</package>
+      <package>ldirectord</package>
+      <package>lvm2-clvm</package>
+      <package>ocfs2-tools</package>
+      <package>pacemaker</package>
+      <package>pssh</package>
+      <package>python-pssh</package>
+      <package>resource-agents</package>
+      <package>sbd</package>
+      <package>yast2-cluster</package>
+      <package>yast2-drbd</package>
+      <package>yast2-iplb</package>
+      <!--package>systemd-rpm-macros</package-->
+      <!--package>bsc#1096375 haveged can drain the entropy</package-->
+      <package>haveged</package>
+    </packages>
+    <patterns config:type="list">
+      <pattern>yast2_basis</pattern>
+      <pattern>sw_management</pattern>
+      <pattern>enhanced_base</pattern>
+      <pattern>apparmor</pattern>
+      <pattern>base</pattern>
+      <pattern>imaging</pattern>
+    </patterns>
+  </software>
+  <timezone>
+    <hwclock>UTC</hwclock>
+    <timezone>Asia/Beijing</timezone>
+  </timezone>
+  <user_defaults>
+    <expire/>
+    <group>100</group>
+    <groups/>
+    <home>/home</home>
+    <inactive>-1</inactive>
+    <no_groups config:type="boolean">true</no_groups>
+    <shell>/bin/bash</shell>
+    <skel>/etc/skel</skel>
+    <umask>022</umask>
+  </user_defaults>
+  <users config:type="list">
+    <user>
+      <encrypted config:type="boolean">true</encrypted>
+      <user_password>$6$pc/0vAulQjjO$2nZYITEzgIh2Hsu7HmjE1YDyi8jx7H2jup3EGXe.li6wOwa1Hef2NDkR6RafCiy3NJGoeX4yGYJZhSAiy3o2Z0</user_password>
+      <username>hauser</username>
+    </user>
+    <user>
+      <encrypted config:type="boolean">true</encrypted>
+      <user_password>$6$pc/0vAulQjjO$2nZYITEzgIh2Hsu7HmjE1YDyi8jx7H2jup3EGXe.li6wOwa1Hef2NDkR6RafCiy3NJGoeX4yGYJZhSAiy3o2Z0</user_password>
+      <username>root</username>
+    </user>
+  </users>
+  <scripts>
+    <init-scripts config:type="list">
+      <script>
+        <debug config:type="boolean">true</debug>
+        <filename>loginAndFormat.sh</filename>
+        <location><![CDATA[]]></location>
+		<source><![CDATA[mkdir -p /root/.ssh/
+echo "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC6LKxNNRsAhR1Ov7KsoijAaVu3VuNu08llrS7q/m+wLqAabx0XB+8iSkjo+WBblpqdanPYJ55Z2I7GpOWdMu/0+Rv2XP0w2yr8BXxnMSxYDZuxGXpG4P1YbZMCK1Z/Hxbts+Mcsr/IaUYllGEwkxG6cONMAQxA5bkyIilp1UMymPjWvPNqXcoLrMmiLXdPxynn10WSIbbO1ZTPw8ewpV155I1RdN9+SfiIGlM8B7Y2pHEOVCKnJfYWp8OQtJVI+rbEwD9JHutxn7w8yrPFbhSUMyYSsf7AarYVvJ7FXNMlmqLgImp0LBINuvEtbSne9WychbvzL21LUzcezkWKZEMZ root@bj-ha-4" >> /root/.ssh/authorized_keys]]></source>
+      </script>
+    </init-scripts>
+  </scripts>
+</profile>
