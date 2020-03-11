@@ -132,7 +132,7 @@ def removeVMByName(vmname, remove=True):
     remove_vm(vm, remove)
 
 def getVMList():
-    elelist = get_vm_name_list()
+    namelist = get_vm_name_list()
 
     expired_list=[]
     delete_list=[]
@@ -140,8 +140,7 @@ def getVMList():
     diff = 0
     if canCleanVMs() == False:
         sys.exit(-1)
-    for el in elelist:
-        vmname = el[7:][:-8].strip()
+    for vmname in namelist:
         vm = getVMByName(vmname)
         diff = now - vm.vm_mtime()
         if diff >= 7776000:
@@ -185,7 +184,8 @@ def get_vm_name_list():
     elelist=output.split('\n')
 
     for el in elelist:
-        vmname = el[7:][:-8].strip()
+        vm_info_list = [x for x in el.split(" ") if x != ""]
+        vmname = vm_info_list[1]
         vm_list.append(vmname)
 
     return vm_list
