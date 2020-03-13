@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 
 import sys
 if sys.version_info[0] < 3:
@@ -10,6 +10,7 @@ import argparse
 import pprint
 import re
 import os
+import datetime
 
 # <img src="/icons/unknown.gif" alt="[   ]"> <a href="openSUSE-Tumbleweed-DVD-x86_64-Snapshot20200309-Media.iso">openSUSE-Tumbleweed-DVD-x86_64-Snapshot20200309-Media.iso</a>         2020-03-10 23:03  4.3G
 HTML_FORMAT = '<a href=".*">({})</a>'
@@ -18,8 +19,8 @@ Default = {
     "URL": "http://mirror.suse.asia/dist/install/openSUSE-Tumbleweed/iso/",
     # The inner pattern need able to compare
     "Pattern" : "openSUSE-Tumbleweed-DVD-x86_64-Snapshot([0-9]*)-Media.iso",
-    "Location" : "/tmp/downloads",
-    "Mount" : "/mnt/ISOs",
+    "Location" : "/tmp/downloads/",
+    "Mount" : "/mnt/ISOs/",
 }
 
 
@@ -40,6 +41,9 @@ class Resource:
 
     def getValue(self):
         return self.value
+
+    def getMedia(self):
+        return self.url + self.name
 
 def retrieveResource(url, pattern):
     page = urllib.urlopen(url)
@@ -71,13 +75,28 @@ def select(resource_list, count):
 
     return result
 
-def download_all(resources, location, remove_old=True):
-    os.makedirs(loction, exist_ok=True)
+def download_all(resources, location):
+    if os.path.exists(location) == False:
+        os.makedirs(location)
 
     #Starting download new resources
-    #Check existing
-    #Remove the one not in the list
+    for res in resources:
+        if os.path.exists(os.path.abspath(location) + "/" + res.name):
+            print("A file with same name '%s' exist in '%s'" % (res.getMedia(),
+                                                               os.path.abspath(location)))
+            continue
 
+        response = urllib.urlopen(res.getMedia())
+        data = response.read()
+
+        print("Start to download: %s" % res.getMedia())
+        print("\t===Downloading %s ===" % datetime.datetime.now())
+        _file = open(os.path.abspath(location) + "/" + res.name, "wb")
+        _file.write(data)
+        _file.close()
+        print("\t===Finish download %s ===\n" % datetime.datetime.now())
+
+    #verification md5sum?
 
 def main():
     parser = argparse.ArgumentParser(description="script to download the latest (n) images/isos",
@@ -93,8 +112,8 @@ def main():
                         help="The lastest (numbers) iso if available.", default=1)
     parser.add_argument('-l', '--location', metavar='location', type=str,
                         help="The folder for download resources.", default=Default['Location'])
-    parser.add_argument('-r', '--remove', metavar='remove', type=str,
-                        help="Remove old resources if exist.", default=Default['Location'])
+    parser.add_argument('-r', '--remove', dest='remove', action='store_true',
+                        help="Remove old resources if exist.")
     parser.add_argument('-m', '--mount-point', metavar='mount', type=str,
                         help="The folder of mount point.", default=Default['Mount'])
 
@@ -111,6 +130,9 @@ def main():
 
     download_all(resources, args.location)
 
+    if args.remove:
+        remove_old(resources, args.location)
+
     #mount_all_isos(resources, args.mount)
 
 
@@ -119,13 +141,20 @@ def test():
     b = Resource(Default["URL"], Default["Pattern"], 323)
     c = Resource(Default["URL"], Default["Pattern"])
     d = Resource(Default["URL"], Default["Pattern"], 393)
+    e = Resource("http://10.67.19.7/cups/", "client.conf")
+    f = Resource("http://10.67.19.7/cups/", "command.types")
+    g = Resource("http://10.67.19.7/cups/", "cups-browsed.conf")
+    h = Resource("http://10.67.19.7/cups/", "cups-files.conf")
 
     resource_list = [a, b, c, d]
 
     resources = select(resource_list, 3)
+    resources = [e, f, g, h]
 
     for res in resources:
         pprint.pprint(res.value)
+
+    download_all(resources, "./")
 
 
 if __name__ == "__main__":
