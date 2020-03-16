@@ -93,12 +93,15 @@ def download_all(resources, location):
 
         print("Start to download: %s" % res.getMedia())
         print("\t===Downloading %s ===" % datetime.datetime.now())
-        response = urllib.urlopen(res.getMedia())
-        data = response.read()
+        # Using wget instead of urllib2 to download
+        #response = urllib.urlopen(res.getMedia())
+        #data = response.read()
 
-        _file = open(os.path.join(os.path.abspath(location), res.name), "wb")
-        _file.write(data)
-        _file.close()
+        #_file = open(os.path.join(os.path.abspath(location), res.name), "wb")
+        #_file.write(data)
+        #_file.close()
+        sh = utils.command("wget -c {url} -P {location}".format(url=res.getMedia(),
+                                                                location=location))
         print("\t===Finish download %s ===\n" % datetime.datetime.now())
 
     #TODO: verification md5sum?
