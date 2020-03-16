@@ -11,6 +11,9 @@ import pprint
 import re
 import os
 import datetime
+import glob
+
+import utils
 
 # <img src="/icons/unknown.gif" alt="[   ]"> <a href="openSUSE-Tumbleweed-DVD-x86_64-Snapshot20200309-Media.iso">openSUSE-Tumbleweed-DVD-x86_64-Snapshot20200309-Media.iso</a>         2020-03-10 23:03  4.3G
 HTML_FORMAT = '<a href=".*">({})</a>'
@@ -76,7 +79,7 @@ def select(resource_list, count):
     return result
 
 def download_all(resources, location):
-    if os.path.exists(location) == False:
+    if not os.path.exists(location):
         os.makedirs(location)
 
     #Starting download new resources
@@ -91,12 +94,46 @@ def download_all(resources, location):
 
         print("Start to download: %s" % res.getMedia())
         print("\t===Downloading %s ===" % datetime.datetime.now())
-        _file = open(os.path.abspath(location) + "/" + res.name, "wb")
+        _file = open(os.path.join(os.path.abspath(location), res.name), "wb")
         _file.write(data)
         _file.close()
         print("\t===Finish download %s ===\n" % datetime.datetime.now())
 
-    #verification md5sum?
+    #TODO: verification md5sum?
+
+def mount_all_isos(resources, location, mount_point):
+    for res in resources:
+        if res.type != "iso":
+            continue
+
+        src = os.path.join(os.path.abspath(location), res.name)
+
+        m_dir = os.path.join(os.path.abspath(mount_point), res.value)
+
+        #print("Mount iso: %s to %s" % (src, m_dir))
+        utils.mount_iso(src, m_dir, create_dir=True)
+
+def found_old(resources, location, pattern="*"):
+    os.chdir(location)
+
+    pattern = pattern.replace("(", "").replace(")", "")
+
+    flist = glob.glob(pattern)
+    print(flist)
+
+    outdate = []
+    for f in flist:
+        for res in resources:
+            if f == res.name:
+                break
+        else:
+            # The resouces need remove doesn't need url and value
+            outdate.append(Resource("", f, 0))
+
+    # TODO: umount if is iso type
+    print("Found obsolete resources:")
+    pprint.pprint(outdate)
+    return outdate
 
 def main():
     parser = argparse.ArgumentParser(description="script to download the latest (n) images/isos",
@@ -114,7 +151,7 @@ def main():
                         help="The folder for download resources.", default=Default['Location'])
     parser.add_argument('-r', '--remove', dest='remove', action='store_true',
                         help="Remove old resources if exist.")
-    parser.add_argument('-m', '--mount-point', metavar='mount', type=str,
+    parser.add_argument('-m', '--mount-point', dest='mount', metavar='mount', type=str,
                         help="The folder of mount point.", default=Default['Mount'])
 
     args = parser.parse_args()
@@ -126,15 +163,16 @@ def main():
             print("Find resources: %s" % res)
             return
 
-    resoures = select(resource_list, args.numbers)
+    resources = select(resource_list, args.numbers)
 
     download_all(resources, args.location)
 
+    mount_all_isos(resources, args.location, args.mount)
+
+    old_res = []
     if args.remove:
-        remove_old(resources, args.location)
-
-    #mount_all_isos(resources, args.mount)
-
+        old_res = found_old(resources, args.location, args.pattern)
+        #umount_and_delete_old(old, args.location, args.mount)
 
 def test():
     a = Resource(Default["URL"], Default["Pattern"], 333)
