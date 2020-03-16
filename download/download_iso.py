@@ -116,9 +116,12 @@ def mount_all_isos(resources, location, mount_point):
         utils.mount_iso(src, m_dir, create_dir=True)
 
     #Create the latest link
+    cwd = os.path.abspath((os.curdir))
     os.chdir(mount_point)
-    os.remove("latest")
+    if os.path.exists("latest"):
+        os.remove("latest")
     os.symlink(os.path.join(os.path.abspath(mount_point), resources[0].value), "latest")
+    os.chdir(cwd)
 
 def umount_and_delete_old(old_res, location, mount_point):
     for res in old_res:
@@ -129,13 +132,20 @@ def umount_and_delete_old(old_res, location, mount_point):
         print("Umount iso: %s" % src)
         if utils.umount_iso(src):
             os.remove(src)
+            # The folder "os.path.join(os.path.abspath(mount_point), res.value)"
+            # suppose to empty after umount
+            os.rmdir(os.path.join(os.path.abspath(mount_point), res.value))
+            #import shutil
+            #shutil.rmtree(os.path.join(os.path.abspath(mount_point), res.value))
 
 def found_old(resources, location, pattern="*"):
+    cwd = os.path.abspath((os.curdir))
     os.chdir(location)
 
-    pattern = pattern.replace("(", "").replace(")", "")
+    new_pa = pattern.replace("(", "").replace(")", "")
 
-    flist = glob.glob(pattern)
+    flist = glob.glob(new_pa)
+    os.chdir(cwd)
 
     outdate = []
     for f in flist:
@@ -143,8 +153,13 @@ def found_old(resources, location, pattern="*"):
             if f == res.name:
                 break
         else:
-            # The resouces need remove doesn't need url and value
-            outdate.append(Resource("", f, 0))
+            # The resouces need remove doesn't need url
+            value = 0
+            reg = re.search(pattern, f)
+            if reg is not None:
+                value = reg.groups()[0]
+
+            outdate.append(Resource("", f, value))
 
     # TODO: umount if is iso type
     print("Found obsolete resources:")
