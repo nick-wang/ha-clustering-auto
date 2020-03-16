@@ -71,9 +71,11 @@ def cmpFunction(res):
 
 def select(resource_list, count):
     result = []
+    # Sorted from latest to old
     sort_list = sorted(resource_list, key=cmpFunction, reverse=True)
+    length = len(resource_list)
 
-    for i in range(count):
+    for i in range(min(count, length)):
         result.append(sort_list[i])
 
     return result
@@ -110,8 +112,23 @@ def mount_all_isos(resources, location, mount_point):
 
         m_dir = os.path.join(os.path.abspath(mount_point), res.value)
 
-        #print("Mount iso: %s to %s" % (src, m_dir))
+        print("Mount iso: %s to %s" % (src, m_dir))
         utils.mount_iso(src, m_dir, create_dir=True)
+
+    #Create the latest link
+    os.chdir(mount_point)
+    os.remove("latest")
+    os.symlink(os.path.join(os.path.abspath(mount_point), resources[0].value), "latest")
+
+def umount_and_delete_old(old_res, location, mount_point):
+    for res in old_res:
+        if res.type != "iso":
+            continue
+
+        src = os.path.join(os.path.abspath(location), res.name)
+        print("Umount iso: %s" % src)
+        if utils.umount_iso(src):
+            os.remove(src)
 
 def found_old(resources, location, pattern="*"):
     os.chdir(location)
@@ -119,7 +136,6 @@ def found_old(resources, location, pattern="*"):
     pattern = pattern.replace("(", "").replace(")", "")
 
     flist = glob.glob(pattern)
-    print(flist)
 
     outdate = []
     for f in flist:
@@ -172,7 +188,7 @@ def main():
     old_res = []
     if args.remove:
         old_res = found_old(resources, args.location, args.pattern)
-        #umount_and_delete_old(old, args.location, args.mount)
+        umount_and_delete_old(old_res, args.location, args.mount)
 
 def test():
     a = Resource(Default["URL"], Default["Pattern"], 333)

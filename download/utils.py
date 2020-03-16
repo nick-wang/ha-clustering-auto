@@ -21,7 +21,7 @@ def mount_iso(src, mount_dir, create_dir=False):
 
     if not os.path.exists(mount_dir):
         if create_dir:
-            os.makedirs(location)
+            os.makedirs(mount_dir)
         else:
             return False
 
@@ -37,7 +37,7 @@ def mount_iso(src, mount_dir, create_dir=False):
     return True
 
 def umount_iso(src):
-    if os.path.exists(src) == False:
+    if not os.path.exists(src):
         return False
 
     fname = os.path.basename(src)
