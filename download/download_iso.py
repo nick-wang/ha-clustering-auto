@@ -141,7 +141,8 @@ def umount_and_delete_old(old_res, location, mount_point):
             #import shutil
             #shutil.rmtree(os.path.join(os.path.abspath(mount_point), res.value))
 
-def found_old(resources, location, pattern="*"):
+def found_old(resources, numbers, location, pattern="*"):
+    newNum = len(resources)
     cwd = os.path.abspath((os.curdir))
     os.chdir(location)
 
@@ -164,6 +165,15 @@ def found_old(resources, location, pattern="*"):
 
             outdate.append(Resource("", f, value))
 
+    sort_list = sorted(outdate, key=cmpFunction, reverse=True)
+    needNum = numbers - newNum
+    oldNum = len(outdate)
+    delNum = oldNum - needNum
+
+    if needNum > 0 and delNum > 0:
+        for i in range(delNum):
+            outdate.pop()
+
     # TODO: umount if is iso type
     print("Found obsolete resources:")
     pprint.pprint(outdate)
@@ -180,7 +190,7 @@ def main():
     parser.add_argument('-p', '--pattern', metavar='pattern', type=str,
                         help="pattern of image", default=Default["Pattern"])
     parser.add_argument('-n', '--numbers', metavar='numbers', type=int,
-                        help="The lastest (numbers) iso if available.", default=1)
+                        help="The lastest (numbers) resources to download/keep.", default=3)
     parser.add_argument('-l', '--location', metavar='location', type=str,
                         help="The folder for download resources.", default=Default['Location'])
     parser.add_argument('-r', '--remove', dest='remove', action='store_true',
@@ -208,7 +218,7 @@ def main():
 
     old_res = []
     if args.remove:
-        old_res = found_old(resources, args.location, args.pattern)
+        old_res = found_old(resources, args.numbers, args.location, args.pattern)
         umount_and_delete_old(old_res, args.location, args.mount)
 
 def test():
