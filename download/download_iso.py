@@ -170,9 +170,13 @@ def found_old(resources, numbers, location, pattern="*"):
     oldNum = len(outdate)
     delNum = oldNum - needNum
 
-    if needNum > 0 and delNum > 0:
+    if delNum > 0:
         for i in range(delNum):
             outdate.pop()
+    else:
+        print("No need to delete resource. {} needed, {} exist.".
+              format(numbers, newNum + oldNum))
+        return []
 
     # TODO: umount if is iso type
     print("Found obsolete resources:")
