@@ -34,7 +34,10 @@ class Resource:
         self.name = name
         self.value = value
 
-        self.type = name.split(".")[-1]
+        if "." in name:
+            self.type = name.split(".")[-1]
+        else:
+            self.type = ""
 
     def __cmp__(self, res2):
         return cmp(self.value, res2.value)

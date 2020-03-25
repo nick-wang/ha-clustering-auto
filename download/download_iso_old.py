@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+# Obsoleted by download_iso.py
+
 import re, urllib, time, os, getopt
 from sys import argv, exit
 from multiprocessing import Process, Pipe
