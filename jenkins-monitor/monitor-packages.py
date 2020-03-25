@@ -113,6 +113,7 @@ def need_update(old_packages, new_packages):
 def main(url):
     global packages_monitoring
     #response=urllib2.urlopen('http://download.suse.de/ibs/SUSE:/SLE-12-SP2:/GA/standard/x86_64/')
+    #response=urllib2.urlopen('http://10.67.160.200/SLP/openSUSE-Tumbleweed/latest/x86_64/')
     try:
         response=urllib2.urlopen(url)
         html = response.read()
@@ -130,9 +131,7 @@ def main(url):
 
     if old_packages is None:
         print '-----------------------'
-        print "Initializing the packages:"
-        for new_package in new_packages:
-            print new_package
+        print "Initializing the packages:" for new_package in new_packages: print new_package
         print '-----------------------'
         save_package_info(html)
         sys.exit(0)
@@ -160,6 +159,8 @@ def usage():
     print "./monitor.py -u <url> -m <module> -P <project_name> -D <job_name> (-p <packages>)"
     print "\tIf gives -p <packages>, then -m <module> will be ignored."
     print "\tIf gives -D <job_name>, -P <project_name> can be omitted."
+    print "\tExample:"
+    print "\t\t./monitor-packages.py  -u 'http://10.67.160.200/SLP/openSUSE-Tumbleweed/latest/x86_64/' -P dummy -p 'kernel-default vim wicked'"
     sys.exit(3)
 
 if __name__ == "__main__":
