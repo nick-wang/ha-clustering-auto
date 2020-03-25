@@ -133,6 +133,7 @@ def getSUSEVersionViaURL(repo):
         if version not in repo:
             continue
 
+        print("From url: %s" %  repo+url_pattern[version]['postfix'])
         fd = urlopen(repo+url_pattern[version]['postfix'])
         lines = fd.readlines()
         fd.close()

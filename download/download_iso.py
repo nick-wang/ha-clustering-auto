@@ -22,8 +22,8 @@ Default = {
     "URL": "http://mirror.suse.asia/dist/install/openSUSE-Tumbleweed/iso/",
     # The inner pattern need able to compare
     "Pattern" : "openSUSE-Tumbleweed-DVD-x86_64-Snapshot([0-9]*)-Media.iso",
-    "Location" : "/tmp/downloads/",
-    "Mount" : "/mnt/ISOs/",
+    "Location" : "/tmp/downloads/ISOs/openSUSE-Tumbleweed",
+    "Mount" : "/mnt/SLP/openSUSE-Tumbleweed",
 }
 
 
