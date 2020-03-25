@@ -24,6 +24,11 @@ Default = {
     "Pattern" : "openSUSE-Tumbleweed-DVD-x86_64-Snapshot([0-9]*)-Media.iso",
     "Location" : "/tmp/downloads/ISOs/openSUSE-Tumbleweed",
     "Mount" : "/mnt/SLP/openSUSE-Tumbleweed",
+    "Verify" : ""
+}
+
+verification_bin = {
+    "sha256" : "/usr/bin/sha256sum",
 }
 
 
@@ -83,13 +88,33 @@ def select(resource_list, count):
 
     return result
 
-def download_all(resources, location):
+def verification(name, location, verify):
+    if not verification_bin.get(verify):
+        print("\tNo (%s) binary to verify the resource.\n" % verify)
+        return False
+
+    get_veriNo = os.popen("{bin} {location}/{file} ".format(bin=verification_bin[verify],
+                                                         location=location,
+                                                         file=name))
+    veriNo = get_veriNo.readline().split()[0]
+
+    if os.system("grep %s %s/%s >/dev/null 2>&1" % (veriNo, location,
+                                                    name + "." + verify)
+                 ) >> 8 == 0:
+        print("\tSucceed to verify (%s) number: %s.\n" % (verify, veriNo))
+        return True
+    else:
+        print("\tERROR! Downloaded ISO is incomplete.\n")
+        return False
+
+def download_all(resources, location, verify):
     if not os.path.exists(location):
         os.makedirs(location)
 
     #Starting download new resources
     for res in resources:
-        if os.path.exists(os.path.abspath(location) + "/" + res.name):
+        place = os.path.abspath(location) + "/" + res.name
+        if os.path.exists(place):
             print("A file with same name '%s' exist in '%s'" % (res.getMedia(),
                                                                os.path.abspath(location)))
             continue
@@ -107,7 +132,15 @@ def download_all(resources, location):
                                                                 location=location))
         print("\t===Finish download %s ===\n" % datetime.datetime.now())
 
-    #TODO: verification md5sum?
+        if verify != "":
+            verfile = res.getMedia() + "." + verify
+            print("\tStart to download (%s) verify file: %s" % (verify, verfile))
+            sh = utils.command("wget -c {url} -P {location}".format(url=verfile,
+                                                                    location=location))
+            print("\tFinish download verification file(%s).\n" % verify)
+            verification(res.name, location, verify)
+            os.remove("%s/%s" % (location, res.name + "." + verify))
+
 
 def mount_all_isos(resources, location, mount_point):
     for res in resources:
@@ -204,6 +237,9 @@ def main():
                         help="Remove old resources if exist.")
     parser.add_argument('-m', '--mount-point', dest='mount', metavar='mount', type=str,
                         help="The folder of mount point.", default=Default['Mount'])
+    parser.add_argument('-c', '--verify', dest='verify', metavar='verify', type=str,
+                        help="verification of the download.", default=Default['Verify'])
+
 
     args = parser.parse_args()
 
@@ -219,7 +255,7 @@ def main():
 
     resources = select(resource_list, args.numbers)
 
-    download_all(resources, args.location)
+    download_all(resources, args.location, args.verify)
 
     mount_all_isos(resources, args.location, args.mount)
 
