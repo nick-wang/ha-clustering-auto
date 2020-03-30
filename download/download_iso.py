@@ -204,20 +204,22 @@ def found_old(resources, numbers, location, pattern="*"):
     sort_list = sorted(outdate, key=cmpFunction, reverse=True)
     needNum = numbers - newNum
     oldNum = len(outdate)
-    delNum = oldNum - needNum
 
-    if delNum > 0:
+    removeRes = []
+    if oldNum > needNum:
+        delNum = oldNum - needNum
+
         for i in range(delNum):
-            outdate.pop()
+            removeRes.append(sort_list.pop())
+
+        print("Found obsolete resources:")
+        pprint.pprint(removeRes)
+
     else:
         print("No need to delete resource. {} needed, {} exist.".
               format(numbers, newNum + oldNum))
-        return []
 
-    # TODO: umount if is iso type
-    print("Found obsolete resources:")
-    pprint.pprint(outdate)
-    return outdate
+    return removeRes
 
 def main():
     parser = argparse.ArgumentParser(description="script to download the latest (n) images/isos",
