@@ -21,6 +21,12 @@ BUILD_LOG_DIR_IN_HOST=$2
 echo scp -r root@${MASTER_NODE_IP}:/usr/local/ocfs2-test/log ${BUILD_LOG_DIR_IN_HOST}
 scp -r root@${MASTER_NODE_IP}:/usr/local/ocfs2-test/log ${BUILD_LOG_DIR_IN_HOST}
 
+echo scp -r root@${MASTER_NODE_IP}:/var/lib/ocfs2test/test_o2lock.log ${BUILD_LOG_DIR_IN_HOST}
+scp -r root@${MASTER_NODE_IP}:/var/lib/ocfs2test/test_o2lock.log ${BUILD_LOG_DIR_IN_HOST}
+
 # remove all for the next run
 echo ssh root@${MASTER_NODE_IP} rm -rf /usr/local/ocfs2-test/log/*
 ssh root@${MASTER_NODE_IP} rm -rf /usr/local/ocfs2-test/log/*
+
+echo ssh root@${MASTER_NODE_IP} rm -f /var/lib/ocfs2test/test_o2lock.log
+ssh root@${MASTER_NODE_IP} rm -f /var/lib/ocfs2test/test_o2lock.log

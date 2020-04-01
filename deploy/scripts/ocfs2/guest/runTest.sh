@@ -178,4 +178,16 @@ for tm in $(echo ${TESTMODE} | sed 's:,: :g'); do
 
 		f_info "DONE: multiple-node discontig block group testing"
 	fi
+
+	if [ X"$tm" == X"o2locktop" ];then
+		echo -e "\n\n\n"
+		f_info "Start o2locktop testing..."
+
+		f_log "/var/lib/ocfs2test/test_o2lock.sh ${NODE_LIST} ${SHARED_DISK} ${MOUNT_POINT}"
+
+		sudo /var/lib/ocfs2test/test_o2lock.sh ${NODE_LIST} ${SHARED_DISK} ${MOUNT_POINT}
+
+		f_info "DONE: o2locktop testing"
+	fi
+
 done

@@ -48,6 +48,7 @@ else
 	zypper --non-interactive install  openmpi
 fi
 
+zypper --non-interactive install  o2locktop
 zypper --non-interactive install  ocfs2-test
 
 # it's time to complete the tricky started in sshTestUsr.sh

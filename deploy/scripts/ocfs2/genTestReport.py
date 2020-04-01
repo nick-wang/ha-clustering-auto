@@ -33,6 +33,31 @@ def parseSingleLog(log, test_report_dir):
 			row = str(k) + " " + str(v[0]) + " " + str(v[1])
 			f.write(row + "\n")
 
+def parseO2locktopLog(log, test_report_dir):
+	tblLog = {}
+	priorLine = ""
+	case = ""
+	time = ""
+
+	with open(log, "r") as f:
+		for line in f:
+			if line.find("PASSED") != -1:
+				time = re.split(r"\(|\)", line)[1]
+				case = priorLine.split()[2]
+				tblLog[case] = ["PASSED", time]
+			elif line.find("FAILED") != -1:
+				time = re.split(r"\(|\)", line)[1]
+				case = priorLine.split()[2]
+				tblLog[case] = ["FAILED", time]
+			else:
+				pass
+			priorLine = line
+
+	with open(test_report_dir + "/o2locktop_report.txt", "w") as f:
+		for k, v in tblLog.iteritems():
+			row = str(k) + " " + str(v[0]) + " " + str(v[1])
+			f.write(row + "\n")
+
 def parseMultipleLog(log, test_report_dir):
 	tblLog = {}
 	priorLine = ""
@@ -124,6 +149,7 @@ def main(dir):
 	multiple_log = ""
 	discontig_bg_single_log=""
 	discontig_bg_multiple_log=""
+	o2locktop_log=""
 
 	p = subprocess.Popen(["find", dir, "-name", "single_run.log"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 	(stdoutdata, stderrdata) = p.communicate()
@@ -165,8 +191,18 @@ def main(dir):
 	else:
 		print stderrdata
 
+	p = subprocess.Popen(["find", dir, "-name", "test_o2lock.log"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+	(stdoutdata, stderrdata) = p.communicate()
 
-	if single_log or multiple_log or discontig_bg_single_log or discontig_bg_multiple_log:
+	if p.returncode == 0:
+		if (stdoutdata):
+			o2locktop_log = str(stdoutdata).splitlines()[-1]
+		print "O2locktop log file: %s" % o2locktop_log
+	else:
+		print stderrdata
+
+
+	if single_log or multiple_log or discontig_bg_single_log or discontig_bg_multiple_log or o2locktop_log:
 		test_report_dir = dir + "/test_reports/"
 		p = subprocess.Popen(["mkdir", "-p", test_report_dir], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 		(stdoutdata, stderrdata) = p.communicate()
@@ -184,6 +220,8 @@ def main(dir):
 		parseDiscontigBgSingleLog(discontig_bg_single_log, test_report_dir)
 	if discontig_bg_multiple_log:
 		parseDiscontigBgMultipleLog(discontig_bg_multiple_log, test_report_dir)
+	if o2locktop_log:
+		parseO2locktopLog(o2locktop_log, test_report_dir)
 
 if __name__ == "__main__":
 	if len(sys.argv) < 2:

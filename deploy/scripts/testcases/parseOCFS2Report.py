@@ -97,6 +97,28 @@ def parseSingleLog(testreport_dir, cluster_env):
 
     parseLog(TestSuiteName, JunitXML, cases_def, logfile, cluster_env)
 
+def parseO2locktopLog(testreport_dir, cluster_env):
+    logfile = "%s/o2locktop_report.txt" % testreport_dir
+    if not os.path.isfile(logfile):
+        print "WARN: %s not found!" % logfile
+        return -1
+
+    #Name of Test Suite
+    TestSuiteName = "ocfs2 o2locktop test"
+    #Name of junit xml file
+    JunitXML = "%s/junit-ocfs2-test-o2locktop.xml" % testreport_dir
+
+    #Define testcases
+    #testcases = [(TestcaseName, TestcaseClass, TestcaseFunction)]
+    cases_def = [("init_test_cases", "O2locktop.init_test_cases", get_result),
+                 ("no_file_access", "O2locktop.no_file_access", get_result),
+                 ("local_file_access", "O2locktop.local_file_access", get_result),
+                 ("remote_file_access", "O2locktop.remote_file_access", get_result),
+                 ("multi_file_access", "O2locktop.multi_file_access", get_result),
+                 ("uninit_test_cases", "O2locktop.uninit_test_cases", get_result)]
+
+    parseLog(TestSuiteName, JunitXML, cases_def, logfile, cluster_env)
+
 def parseMultipleLog(testreport_dir, cluster_env):
 
     logfile = "%s/multiple_report.txt" % testreport_dir
@@ -171,6 +193,7 @@ def main(cluster_conf, testreport_dir):
     parseMultipleLog(testreport_dir, cluster_env)
     parseDiscontigBgSingleLog(testreport_dir, cluster_env)
     parseDiscontigBgMultipleLog(testreport_dir, cluster_env)
+    parseO2locktopLog(testreport_dir, cluster_env)
 
 if __name__ == "__main__":
     if len(sys.argv) < 3:
