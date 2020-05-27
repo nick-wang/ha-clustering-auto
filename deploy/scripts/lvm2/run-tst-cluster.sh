@@ -75,8 +75,7 @@ echo "create start file"
 echo `date +%Y%m%d-%H%M` > start.txt
 
 # quick verify env
-#echo "start testing on `hostname`, maybe failed"
-#lvm2-testsuite --flavours udev-lvmlockd-dlm --only shell/aa-lvmlockd-dlm-prepare.sh,shell/activate-minor.sh,shell/zz-lvmlockd-dlm-remove.sh
+#lvm2-testsuite --flavours udev-lvmlockd-dlm --only shell/aa-lvmlockd-dlm-prepare.sh,shell/activate-minor.sh,shell/covercmd.sh,shell/zz-lvmlockd-dlm-remove.sh
 #sleep 2
 
 # start test.  "S=": skip test cases

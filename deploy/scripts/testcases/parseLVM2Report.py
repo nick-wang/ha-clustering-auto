@@ -7,7 +7,7 @@ from library.libJunitXml import assertCase, skipCase
 from library.libReadConf import readClusterConf
 
 diff_results = "not found not found"
-mask_items
+mask_items = []
 
 #below items result will change from failure to skipped
 #cluster: udev-lvmlockd-dlm
@@ -58,10 +58,8 @@ def get_result(args=None):
 	if status1 == status2:
 		status = status1
 	else:
-		# if one met failed but another not, think as skip.
-		if status1 != status2:
-			status = "skip"
-			message = "%s: one node failed, tread as skip" % casename
+		# note: if one met failed but another not, think as skip.
+		status = "skip"
 
 	if status == "passed":
 		status = "pass"
@@ -140,10 +138,10 @@ def parseTestResults(result_dir, cluster_env):
 	f = open(test_results, 'r')
 	line = f.readline()
 	if (line.split(':')[0]).find("lvmlockd-dlm") > 0:
-	    print("using cluster mask_items")
+		print("using cluster mask_items")
 		mask_items = mask_cluster_items
 	else:
-	    print("using local mask_items")
+		print("using local mask_items")
 		mask_items = mask_local_items
 	f.seek(0,0)
 	for line in f.readlines():
