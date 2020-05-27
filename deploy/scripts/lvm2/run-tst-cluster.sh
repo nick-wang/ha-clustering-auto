@@ -124,13 +124,17 @@ shell/lvcreate-thin.sh,\
 shell/lvcreate-raid.sh,\
 shell/lvconvert-repair-raid.sh,\
 shell/lvconvert-raid-takeover-thin.sh,\
+shell/lvconvert-mirror.sh,\
 shell/lvconvert-mirror-basic-0.sh,\
 shell/lvconvert-mirror-basic-1.sh,\ 
 shell/lvconvert-mirror-basic-2.sh,\
 shell/lvconvert-thin-raid.sh,\
+shell/lvconvert-raid10.sh,\
 shell/lvconvert-raid-takeover-thin.sh,\
+shell/lvconvert-raid-takeover-raid4_to_linear.sh,\
 shell/lvconvert-raid-reshape-stripes-load-reload.sh,\
 shell/lvconvert-cache-raid.sh,\ 
+shell/lvm-on-md.sh,\
 shell/metadata-balance.sh,\
 shell/missing-pv-unused.sh,\
 shell/nomda-missing.sh,\

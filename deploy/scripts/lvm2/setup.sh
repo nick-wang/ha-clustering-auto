@@ -6,6 +6,10 @@
 CLUSTER_CONF=$1
 LOG_DIR=$2
 run_script=$3
+
+# $4 use to control testsuite running on 1 or 2 nodes
+# if $4 non-exist, only run lvm2 on single node.
+# please note, this is not cluster/local option.
 if [ ! -n "$4" ]; then
 	# only running on one node
 	SINGLE_NODE=1
@@ -32,9 +36,6 @@ if [ ${SINGLE_NODE} -ne 1 ];then
 	nextPhase "running test suite on both nodes"
 	runOnAllNodes ${CLUSTER_CONF} "cd ${TEST_DIR}; ./${run_script} ${MASTER_NODE}"
 
-	nextPhase "wait for completion"
-	checkAllFinish ${CLUSTER_CONF} ${TEST_DIR}/complete.txt
-	
 	nextPhase "collection test suites log"
 	for ip in `cat $CLUSTER_CONF |grep IP_NODE |cut -d "=" -f 2`; do
 	{
@@ -51,15 +52,6 @@ else
 	nextPhase "running test suite on ${HOSTNAME_NODE1}"
 	ssh root@${node1_ip} "cd ${TEST_DIR}; ./${run_script} ${MASTER_NODE}"
 
-	nextPhase "wait for completion"
-	while :
-	do
-		ssh root@${node1_ip} "ls ${TEST_DIR}/complete.txt >/dev/null 2>&1"
-		if [ $? -eq 0 ]; then
-			break
-		fi
-		sleep 10
-	done
 	
 	nextPhase "collection test suites log"
 	scp -r root@${node1_ip}:${TEST_DIR} ${LOG_DIR}/${node1_ip}
