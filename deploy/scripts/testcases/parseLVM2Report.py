@@ -7,19 +7,12 @@ from library.libJunitXml import assertCase, skipCase
 from library.libReadConf import readClusterConf
 
 diff_results = "not found not found"
+mask_items = []
 
 #below items result will change from failure to skipped
 #cluster: udev-lvmlockd-dlm
+#currently, all the cluster_items had been move into run-tst-cluster.sh skip list
 mask_cluster_items=[
-"shell/lvchange-syncaction-raid.sh",
-"shell/lvchange-rebuild-raid.sh",
-"shell/lvconvert-mirror.sh",
-"shell/lvconvert-raid10.sh",
-"shell/lvconvert-raid-takeover-raid4_to_linear.sh",
-"shell/lvm-on-md.sh",
-"shell/pvremove-thin.sh",
-"shell/unknown-segment.sh",
-"shell/missing-pv-unused.sh",
 ]
 #local:ndev-vanilla
 mask_local_items=[
@@ -38,11 +31,6 @@ def get_result(args=None):
 	global diff_results
 	global mask_cluster_items
 	global mask_local_items
-
-	if cluster_env["HOSTNAME_NODE1"].find("local") > 0:
-		mask_items = mask_local_items
-	else:
-		mask_items = mask_cluster_items
 
 	result = {"status":"failed", "message":"", "output":"", "skipall": False}
 	status = "not found"
@@ -70,10 +58,8 @@ def get_result(args=None):
 	if status1 == status2:
 		status = status1
 	else:
-		# if one met failed but another not, think as skip.
-		if status1 == "failed" or status2 == "failed":
-			status = "skip"
-			message = "%s: one node failed, tread as skip" % casename
+		# note: if one met failed but another not, think as skip.
+		status = "skip"
 
 	if status == "passed":
 		status = "pass"
@@ -127,6 +113,7 @@ def parseLog(TestSuiteName, xmlfile, caseset, test_results, cluster_env):
 
 def parseTestResults(result_dir, cluster_env):
 	global diff_results
+	global mask_items
 	test_results = result_dir + '/' + cluster_env["IP_NODE1"] + '/' + "list"
 	if not os.path.isfile(test_results):
 		print("WARN: %s not found!" % test_results)
@@ -149,6 +136,14 @@ def parseTestResults(result_dir, cluster_env):
 	cases_def = []
 	name = ''
 	f = open(test_results, 'r')
+	line = f.readline()
+	if (line.split(':')[0]).find("lvmlockd-dlm") > 0:
+		print("using cluster mask_items")
+		mask_items = mask_cluster_items
+	else:
+		print("using local mask_items")
+		mask_items = mask_local_items
+	f.seek(0,0)
 	for line in f.readlines():
 		name = line.split()[0]
 		caseName = name.split(':')[1]
