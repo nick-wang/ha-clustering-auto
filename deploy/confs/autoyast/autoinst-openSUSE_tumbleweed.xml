@@ -6,7 +6,7 @@
       <listentry>
         <!--media_url><![CDATA[https://download.opensuse.org/tumbleweed/repo/oss/]]></media_url-->
         <media_url>HA_RESOURCE</media_url>
-        <product>openSUSE-tumbleweed</product>
+        <product>openSUSE</product>
         <product_dir>/</product_dir>
       </listentry>
     </add_on_products>
