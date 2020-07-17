@@ -224,14 +224,14 @@ def _replaceMediaURL(line, value):
     else:
         return line
 
-def installVM(VMName, disk, OSType, vcpus, memory, disk_size, source, nic, second_nic, graphics, autoyast, child_fd):
+def installVM(VMName, disk, OSType, vcpus, memory, disk_size, source, nic, second_nic, graphics, extra_args, autoyast, child_fd):
     if second_nic and second_nic != '':
         nic2 = ' --nic bridge=%s,model=virtio ' % (second_nic)
     else:
         nic2 = ''
 
-    options = "--debug --os-type %s --name %s --vcpus %d --memory %d --disk %s,vda,disk,w,%d,sparse=0, --source %s --nic bridge=%s,model=virtio %s --graphics %s --os-settings=%s" \
-              %(OSType, VMName, vcpus, memory, disk, disk_size, source, nic, nic2, graphics, autoyast)
+    options = "--debug --os-type %s --name %s --vcpus %d --memory %d --disk %s,vda,disk,w,%d,sparse=0, --source %s --nic bridge=%s,model=virtio %s --graphics %s --extra-args %s --os-settings=%s" \
+              %(OSType, VMName, vcpus, memory, disk, disk_size, source, nic, nic2, graphics, extra_args, autoyast)
     # TODO: Detect host OS, using virt-install in SLE12 or later
     cmd = "echo << EOF| vm-install %s%s%s" % (options, "\n\n\n\n\n\n\n", "EOF")
     print "Install command is: %s" % cmd
@@ -445,6 +445,7 @@ def run_install_cmd(os_settings, vm_name, vm, disk, res):
         f.write(line)
     f.close()
 
+    extra_args = "YAST_SKIP_XML_VALIDATION=1"
     autoyast = "%s/%s" % (dummy_folder,vm_name)
     parent_fd, child_fd = multiprocessing.Pipe()
     process = multiprocessing.Process(target=installVM,
@@ -452,10 +453,10 @@ def run_install_cmd(os_settings, vm_name, vm, disk, res):
                                   vm["vcpus"], vm["memory"],
                                   vm["disk_size"], res["sle_source"],
                                   vm["nic"], vm["second_nic"], vm["graphics"],
-                                  autoyast, child_fd),
+                                  extra_args, autoyast, child_fd),
                             name=vm_name)
     return autoyast, parent_fd, process
-    
+
 def fill_vm_xml(vmname, memory, cur_mem, vcpus, disk, network, interface, xmlfile, templatefile = "../confs/backing_file_template.xml"):
     if os.path.exists(templatefile):
         f = open(templatefile)
