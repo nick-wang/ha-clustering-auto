@@ -24,7 +24,7 @@ backing_file_disk_pattern = "qcow2:%s/SUSE-HA-%s-base.qcow2"
 default_vm_install = {'ostype': "sles11",
                      'vcpus': 1,
                      'memory': 1024,
-                     'disk_size': 15360,
+                     'disk_size': 20480,
                      'nic': 'br0',
                      'second_nic': '',
                      'graphics': 'cirrus'
