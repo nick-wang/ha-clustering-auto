@@ -20,7 +20,7 @@ if [ $# -eq 3 ]
 then
     pkgs=($3)
 else
-    pkgs=(kernel-default drbd drbd-utils drbd-kmp-default pacemaker corosync lvm2 ocfs2-kmp-default cluster-md-kmp-default)
+    pkgs=(kernel-default drbd drbd-utils drbd-kmp-default pacemaker corosync lvm2)
 fi
 
 runOnAllNodes ${CLUSTER_CONF} "rpm -qa|sort>${LOG_DIR}/rpm-before-update-pkgs"

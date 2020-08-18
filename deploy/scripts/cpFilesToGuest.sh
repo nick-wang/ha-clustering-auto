@@ -28,6 +28,8 @@ do
         tmp=$((tmp+1)) && sleep 3
 done
 
+sleep 5
+
 ssh root@${ip} "mkdir -p ${CLUSTER_DIR}/template; mkdir -p ${CLUSTER_DIR}/scripts"
 ssh root@${ip} "echo `hostname` >${CLUSTER_DIR}/on-which-host"
 
