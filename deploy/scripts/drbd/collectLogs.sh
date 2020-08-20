@@ -24,6 +24,7 @@ do
   mkdir -p ${LOG_DIR}/${ip}_drbd
   ssh root@${ip} "mkdir -p ${TEMP_DIR}"
   ssh root@${ip} "rpm -qa|grep drbd>${TEMP_DIR}/drbd-rpm"
+  ssh root@${ip} "rpm -qa>${TEMP_DIR}/all-rpms"
   sle_ver=($(ssh root@${ip} ". /tmp/cluster-configuration/scripts/functions; getSLEVersion"))
   case ${sle_ver[0]} in
     12)
@@ -35,13 +36,14 @@ do
   esac
   ssh root@${ip} "crm configure show>${TEMP_DIR}/crm-ra; crm_mon -1>${TEMP_DIR}/crm_mon"
   ssh root@${ip} "drbdadm status all>${TEMP_DIR}/drbd9-status 2>&1"
+  ssh root@${ip} "journalctl >/var/log/messages-journalctl 2>/dev/null"
 
   scp root@${ip}:/etc/drbd.conf ${LOG_DIR}/${ip}_drbd
   scp root@${ip}:/etc/drbd.d/* ${LOG_DIR}/${ip}_drbd
-  scp root@${ip}:/var/log/messages ${LOG_DIR}/${ip}_drbd
-  scp root@${ip}:~/drbdlog/* ${LOG_DIR}/${ip}_drbd
+  scp root@${ip}:/var/log/messages* ${LOG_DIR}/${ip}_drbd
+  scp root@${ip}:${TEMP_DIR}/* ${LOG_DIR}/${ip}_drbd
   scp root@${ip}:/tmp/drbd-log-* ${LOG_DIR}/${ip}_drbd
-  scp root@${ip}:/tmp/rpm-* ${LOG_DIR}
+  scp root@${ip}:/tmp/rpm-* ${LOG_DIR}/${ip}_drbd 2>/dev/null
 
 } &
 done
