@@ -67,6 +67,46 @@ def configurePacemaker(args=None):
 
     return result
 
+def checkDRBDVersion(args=None):
+    message = ""
+    output = ""
+    result = {"status":"fail", "message":"", "output":"", "skipall": False}
+
+    cluster_env = args[0]
+
+    #Own test steps
+    ver = ""
+    gen = 0
+    release = 0
+
+    lines = os.popen("ssh root@%s cat /proc/drbd" % cluster_env["IP_NODE1"]).readlines()
+    output = "".join(lines)
+
+    pa = re.compile("^version: ([\d\.]*)-(\d*) .*")
+    for line in lines:
+        tmp = re.match(pa, line)
+        if tmp is not None:
+            ver = tmp.groups()[0]
+            gen = int(ver.split(".")[0])
+            release = int(tmp.groups()[1])
+
+    if len(ver) == 0 or gen < 8:
+        message = "No support DRBD version found."
+    else:
+        if gen == 8:
+            message = "DRBD8(%s) loaded! Check the DRBD module package." % ver
+        else:
+            result["status"] = "pass"
+
+    #Skipall following test cases when this failed
+    if result["status"] == "fail" and len(message) == 0:
+        result["skipall"] = True
+
+    result["message"] = message
+    result["output"] = output
+
+    return result
+
 def checkDRBDState(args=None):
     message = ""
     output = ""
@@ -234,6 +274,7 @@ def Run(conf, xmldir):
     # ('PacemakerService', 'SetupCluster.service', runPackmakerService)
     #Define function runPackmakerService before using
     cases_def = [('drbdPacemakerRes', 'SetupCluster.drbd', configurePacemaker),
+                 ('drbdCheckVersion', 'SetupCluster.drbd', checkDRBDVersion),
                  ('drbdUpToDateBefore', 'DRBD.disks', checkDRBDState),
                  ('drbdPrimaryBefore', 'DRBD.state', checkDRBDRole),
                  ('drbdShowInPacemaker', 'DRBD.pacemaker', checkPacemakerStatus),
