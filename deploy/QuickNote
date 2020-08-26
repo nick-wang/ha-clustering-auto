@@ -27,6 +27,7 @@ Q. How to deploy a host server?
       configure:
       ./email-templates/template.jelly
       (./plugins/emailext-template/templates/template.jelly)
+  14. change permission 0600 to ssh_keys/id_rsa
 
 Q. How to deploy a virtual host (jenkins guest)?
   1. Configure ntp-client:
