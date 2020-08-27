@@ -25,10 +25,14 @@ tmp=0
 while [ ${tmp} -lt 10 ]
 do
     nmap ${ip} 2>&1|grep -q "22/tcp" && echo "${ip} ssh enabled. (${tmp})" && break ||
-        tmp=$((tmp+1)) && sleep 3
+        tmp=$((tmp+1)) && sleep 5
 done
 
-sleep 5
+# error with "Too many authentication failures" due to startup taking too long than expected
+# kmessage:
+# systemd[1]: Startup finished in 5.653s (kernel) + 5.730s (initrd) + 2min 11.453s (userspace) = 2min 22.838s.
+#
+sleep 150
 
 ssh root@${ip} "mkdir -p ${CLUSTER_DIR}/template; mkdir -p ${CLUSTER_DIR}/scripts"
 ssh root@${ip} "echo `hostname` >${CLUSTER_DIR}/on-which-host"
