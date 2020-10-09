@@ -22,7 +22,6 @@
       <accept_verification_failed config:type="boolean">false</accept_verification_failed>
       <import_gpg_key config:type="boolean">true</import_gpg_key>
     </signature-handling>
-    <storage/>
   </general>
   <groups config:type="list"/>
   <login_settings/>
