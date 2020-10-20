@@ -88,7 +88,8 @@ def checkDRBDVersion(args=None):
         if tmp is not None:
             ver = tmp.groups()[0]
             gen = int(ver.split(".")[0])
-            release = int(tmp.groups()[1])
+            #remove the int(), in case release like 0rc1
+            release = tmp.groups()[1]
 
     if len(ver) == 0 or gen < 8:
         message = "No support DRBD version found."
@@ -166,6 +167,55 @@ def checkDRBDRole(args=None):
     else:
         message = "Only %d in Primary and %d in Secondary." % (primary_num, secondary_num)
         output = "".join(lines)
+
+    result["message"] = message
+    result["output"] = output
+
+    return result
+
+def checkMakeFS(args=None):
+    message = ""
+    output = ""
+    result = {"status":"fail", "message":"", "output":"", "skipall": False}
+
+    cluster_env = args[0]
+
+    #Own test steps
+    #"xfs" require 4096 blocks at least. by default /dev/drbd3 only 10M(2550 blocks)
+    support_fs = ["ext4", "xfs", "ext3"]
+    ok_list = []
+    index = 0
+
+    #Only check minor number from 0 to 5
+    for i in range(6):
+        lines = os.popen("ssh root@%s drbdsetup dstate %d 2>/dev/null" % (cluster_env["IP_NODE1"], i)).readlines()
+
+        if len(lines) != 0 and "UpToDate/UpToDate" in lines[0].strip():
+            # Device /dev/drbd(i) found
+            _ = os.popen("ssh root@%s mkfs.%s %s /dev/drbd%d >/dev/null 2>&1" %
+                         (cluster_env["IP_NODE1"], support_fs[index],
+                          ("-f" if support_fs[index] == "xfs" else ""), i)).readlines()
+
+            a = os.popen("ssh root@%s lsblk -f |grep drbd%d" %
+                         (cluster_env["IP_NODE1"], i)).readlines()
+
+            flag = False
+            for l in a:
+                if support_fs[index] in l:
+                    flag = True
+                    ok_list.append(support_fs[index])
+
+            if flag == False:
+                message = "Fail to make filesystem %s on /dev/drbd%d" % (support_fs[index], i)
+                output = lines[0]
+                break
+
+            index = (index + 1) % len(support_fs)
+
+    ok_output = " ".join(ok_list)
+
+    if message == "" and output == "":
+        result["status"] = "pass"
 
     result["message"] = message
     result["output"] = output
@@ -278,6 +328,7 @@ def Run(conf, xmldir):
                  ('drbdUpToDateBefore', 'DRBD.disks', checkDRBDState),
                  ('drbdPrimaryBefore', 'DRBD.state', checkDRBDRole),
                  ('drbdShowInPacemaker', 'DRBD.pacemaker', checkPacemakerStatus),
+                 ('drbdMakeFS', 'DRBD.fs', checkMakeFS),
                  ('drbdSwitchMaster', 'DRBD.pacemaker', switchDRBD),
                  ('drbdUpToDateAfter', 'DRBD.disks', checkDRBDState),
                  ('drbdPrimaryAfter', 'DRBD.state', checkDRBDRole),
