@@ -82,7 +82,7 @@ def checkDRBDVersion(args=None):
     lines = os.popen("ssh root@%s cat /proc/drbd" % cluster_env["IP_NODE1"]).readlines()
     output = "".join(lines)
 
-    pa = re.compile("^version: ([\d\.]*)-(\d*) .*")
+    pa = re.compile("^version: ([\d\.]*)-([\d\w]*) .*")
     for line in lines:
         tmp = re.match(pa, line)
         if tmp is not None:
