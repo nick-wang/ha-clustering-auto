@@ -25,6 +25,7 @@ then
           primitive res-${resname} ocf:linbit:drbd \
                     params drbd_resource=${resname} \
                     op monitor interval=10s timeout=20s\
+                    op notify timeout=120 \
                     op start timeout=240 \
                     op stop timeout=100" > $tempfile
 
