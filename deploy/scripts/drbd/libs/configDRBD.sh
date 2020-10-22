@@ -235,6 +235,12 @@ cp *.res /etc/drbd.d/
 cp drbd_global_common.conf_template /etc/drbd.d/global_common.conf
 cp drbd_drbd.conf_template /etc/drbd.conf
 
+# Add quorum off; when two nodes DRBD cluster
+if [ "$NODES" -eq 2 ]
+then
+    sed -i "/common/a\  options { \n     quorum off;\n  }" /etc/drbd.d/global_common.conf
+fi
+
 #Create meta-data on all nodes
 drbdadm create-md all
 sleep 5
