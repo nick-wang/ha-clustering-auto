@@ -8,13 +8,44 @@ from junit_xml import TestSuite, TestCase
 from library.libJunitXml import assertCase, skipCase
 from library.libReadConf import readClusterConf
 
-def _getPrimaries(cluster_env):
-    primaries = []
-    lines = os.popen("ssh root@%s drbdadm status all" % cluster_env["IP_NODE1"]).readlines()
-    for line in lines:
-        if " role:Primary" in line:
-            primaries.append(line.split()[0])
-    return primaries
+def _getDRBDInfo(cluster_env):
+    lines = os.popen("ssh root@%s drbdadm dump all" % cluster_env["IP_NODE1"]).readlines()
+    resources = [ line.strip().split()[1] for line in lines if line.startswith("resource ") ]
+
+    info = []
+
+    for r in resources:
+        res = {}
+        res["name"] = r
+        res["device"] = os.popen("ssh root@%s drbdadm sh-dev %s" % (cluster_env["IP_NODE1"], r)).readline().strip()
+        res["primaries"] = []
+
+        lines = os.popen("ssh root@%s drbdadm status %s" % (cluster_env["IP_NODE1"], r)).readlines()
+        # example:
+        # 1-single-0 role:Primary
+        #   disk:UpToDate
+        #   nick-SLE15-SP3-drbd-milestone-node2 role:Secondary
+        #     peer-disk:UpToDate
+        #   nick-SLE15-SP3-drbd-milestone-node3 role:Secondary
+        #     peer-disk:UpToDate
+        # 
+        # 1-single-1 role:Secondary
+        #   disk:UpToDate
+        #   nick-SLE15-SP3-drbd-milestone-node2 role:Primary
+        #     peer-disk:UpToDate
+        #   nick-SLE15-SP3-drbd-milestone-node3 role:Secondary
+        #     peer-disk:UpToDate
+
+        for line in lines:
+            if " role:Primary" in line:
+                if line.startswith(" "):
+                    res["primaries"].append(line.strip().split()[0])
+                else:
+                    res["primaries"].append(cluster_env["HOSTNAME_NODE1"])
+
+        info.append(res)
+
+    return info
 
 def getNodesNumber(cluster_env):
     lines = os.popen("ssh root@%s crm_node -l" % cluster_env["IP_NODE1"]).readlines()
@@ -194,26 +225,32 @@ def checkMakeFS(args=None):
     ok_list = []
     index = 0
 
-    pnodes = _getPrimaries(cluster_env)
-    pindex = 0
-    if len(pnodes) > 0:
-        pindex = pnodes[0][-1]
-    else:
+    info = _getDRBDInfo(cluster_env)
+
+    if len(info) <= 0:
         result["status"] = "skip"
         return result
 
-    #Only check minor number from 0 to 5
-    for i in range(6):
-        lines = os.popen("ssh root@%s drbdsetup dstate %d 2>/dev/null" % (cluster_env["IP_NODE1"], i)).readlines()
+    for i in info:
+        name = i["name"]
+        pindex = i["primaries"][0][-1]
+        device = i["device"]
 
-        if len(lines) != 0 and "UpToDate/UpToDate" in lines[0].strip():
+        line = os.popen("ssh root@%s drbdadm dstate %s 2>/dev/null" %
+                (cluster_env["IP_NODE%s" % pindex], name)).readline().strip()
+
+        if line is not None and "UpToDate/UpToDate" in line:
             # Device /dev/drbd(i) found
-            _ = os.popen("ssh root@%s mkfs.%s %s /dev/drbd%d >/dev/null 2>&1" %
+            _ = os.popen("ssh root@%s mkfs.%s %s %s >/dev/null 2>&1" %
                          (cluster_env["IP_NODE%s" % pindex], support_fs[index],
-                          ("-f" if support_fs[index] == "xfs" else ""), i)).readlines()
+                          ("-f" if support_fs[index] == "xfs" else ""), device)).readlines()
+            print("Make file system on primary node of resource(%s)" % name)
+            print("\tssh root@%s mkfs.%s %s %s >/dev/null 2>&1" %
+                         (cluster_env["IP_NODE%s" % pindex], support_fs[index],
+                          ("-f" if support_fs[index] == "xfs" else ""), device))
 
-            a = os.popen("ssh root@%s lsblk -f |grep drbd%d" %
-                         (cluster_env["IP_NODE%s" % pindex], i)).readlines()
+            a = os.popen("ssh root@%s lsblk -f |grep %s" %
+                         (cluster_env["IP_NODE%s" % pindex], os.path.basename(device))).readlines()
 
             flag = False
             for l in a:
