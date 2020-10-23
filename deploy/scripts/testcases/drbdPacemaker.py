@@ -8,6 +8,14 @@ from junit_xml import TestSuite, TestCase
 from library.libJunitXml import assertCase, skipCase
 from library.libReadConf import readClusterConf
 
+def _getPrimaries(cluster_env):
+    primaries = []
+    lines = os.popen("ssh root@%s drbdadm status all" % cluster_env["IP_NODE1"]).readlines()
+    for line in lines:
+        if " role:Primary" in line:
+            primaries.append(line.split()[0])
+    return primaries
+
 def getNodesNumber(cluster_env):
     lines = os.popen("ssh root@%s crm_node -l" % cluster_env["IP_NODE1"]).readlines()
     return len(lines)
@@ -186,6 +194,14 @@ def checkMakeFS(args=None):
     ok_list = []
     index = 0
 
+    pnodes = _getPrimaries(cluster_env)
+    pindex = 0
+    if len(pnodes) > 0:
+        pindex = pnodes[0][-1]
+    else:
+        result["status"] = "skip"
+        return result
+
     #Only check minor number from 0 to 5
     for i in range(6):
         lines = os.popen("ssh root@%s drbdsetup dstate %d 2>/dev/null" % (cluster_env["IP_NODE1"], i)).readlines()
@@ -193,11 +209,11 @@ def checkMakeFS(args=None):
         if len(lines) != 0 and "UpToDate/UpToDate" in lines[0].strip():
             # Device /dev/drbd(i) found
             _ = os.popen("ssh root@%s mkfs.%s %s /dev/drbd%d >/dev/null 2>&1" %
-                         (cluster_env["IP_NODE1"], support_fs[index],
+                         (cluster_env["IP_NODE%s" % pindex], support_fs[index],
                           ("-f" if support_fs[index] == "xfs" else ""), i)).readlines()
 
             a = os.popen("ssh root@%s lsblk -f |grep drbd%d" %
-                         (cluster_env["IP_NODE1"], i)).readlines()
+                         (cluster_env["IP_NODE%s" % pindex], i)).readlines()
 
             flag = False
             for l in a:
