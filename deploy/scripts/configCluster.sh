@@ -42,6 +42,9 @@ then
   done
 fi
 
+# save log messages after reboot
+sed -i '/#Storage/a Storage=persistent' /etc/systemd/journald.conf
+
 #Modify template according to cluster configuration
 temp=$NODES
 while [ "$temp" -ge 1 ]
