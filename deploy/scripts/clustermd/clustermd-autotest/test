@@ -83,7 +83,8 @@ do_test() {
 	then
 		rm -f $targetdir/stderr
 		# this might have been reset: restore the default.
-		echo 50 > /proc/sys/dev/raid/speed_limit_max
+		echo 300 > /proc/sys/dev/raid/speed_limit_max
+		echo 50 > /proc/sys/dev/raid/speed_limit_min
 		do_clean
 		# source script in a subshell, so it has access to our
 		# namespace, but cannot change it.
