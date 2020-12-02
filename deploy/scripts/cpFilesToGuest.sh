@@ -53,3 +53,15 @@ fi
 done
 
 wait
+
+if [ ${SKIP_CLUSTER} -ne 1 ]
+then
+    for ip in `cat ${CLUSTER_CONF} |grep IP_NODE |cut -d "=" -f 2`
+    do
+    {
+        ssh root@${ip} "cd ${CLUSTER_DIR}; ${CLUSTER_DIR}/scripts/configStonith.sh "
+    } &
+    done
+
+    wait
+fi

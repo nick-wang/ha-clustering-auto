@@ -255,19 +255,3 @@ passwd hacluster > /dev/null 2>&1 <<EOF
 linux
 linux
 EOF
-
-#config stonith resource and restart pacemaker
-isMaster "$HOSTNAME_NODE1"
-if [ $? -eq 0 ]
-then
-    if [ $STONITH == "sbd" ];
-    then
-        crm configure primitive stonith_sbd stonith:external/sbd
-    else
-        crm configure primitive libvirt_stonith stonith:external/libvirt \
-                  params hostlist="$NODE_LIST" \
-                  hypervisor_uri="qemu+tcp://$HOST_IPADDR/system" \
-                  op monitor interval="60"
-    fi
-    infoRun crm configure show
-fi
