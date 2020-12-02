@@ -43,7 +43,7 @@ scp ../template/*_template root@${ip}:${CLUSTER_DIR}/template/
 scp ../template/*_template_1.4.7 root@${ip}:${CLUSTER_DIR}/template/
 scp ../template/authkey root@${ip}:${CLUSTER_DIR}/template/
 scp -p ../ssh_keys/id_rsa root@${ip}:/root/.ssh/
-scp ./configCluster.sh ./functions root@${ip}:${CLUSTER_DIR}/scripts/
+scp ./configStonith.sh ./configCluster.sh ./functions root@${ip}:${CLUSTER_DIR}/scripts/
 
 if [ ${SKIP_CLUSTER} -ne 1 ]
 then
