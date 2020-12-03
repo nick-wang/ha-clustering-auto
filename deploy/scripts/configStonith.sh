@@ -20,3 +20,7 @@ then
     infoRun crm configure show
 
 fi
+
+#Wait for stonith device start
+#Usually less than 2 secs
+sleep 15
