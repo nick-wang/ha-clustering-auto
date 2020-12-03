@@ -10,7 +10,7 @@ if [ $? -eq 0 ]
 then
     if [ $STONITH == "sbd" ];
     then
-        crm configure primitive stonith_sbd stonith:external/sbd
+        crm configure primitive sbd_stonith stonith:external/sbd
     else
         crm configure primitive libvirt_stonith stonith:external/libvirt \
                   params hostlist="$NODE_LIST" \

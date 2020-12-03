@@ -52,6 +52,17 @@ def runNodesNumber(args=None):
                 output = "Only %s of %s nodes configured." % (tmp.groups()[0], cluster_env["NODES"])
             break
 
+        #In sle15, format is changed, eg
+        #  * 2 nodes configured
+        tmp = re.match(" * \* (\d+) nodes? configured", line)
+        if tmp is not None:
+            if int(tmp.groups()[0]) == int(cluster_env["NODES"]):
+                result["status"] = "pass"
+            else:
+                message = "Not only one resources configured."
+                output = "%s custom resources configured." % tmp.groups()[0]
+            break
+
     result["message"] = message
     result["output"] = output
 
@@ -67,7 +78,7 @@ def runNodesStatus(args=None):
     #Own test steps
     lines = os.popen("ssh root@%s crm_mon -1r" % cluster_env["IP_NODE1"]).readlines()
     for line in lines:
-        if re.match("OFFLINE:", line) is not None:
+        if re.search("OFFLINE:", line) is not None:
             message = "Not all nodes started."
             output = line
             break
@@ -97,6 +108,40 @@ def runConfigureRes(args=None):
                 output = "%s custom resources configured." % tmp.groups()[1]
             break
 
+        #In sle15, format is changed, eg
+        # * 1 resource instance configured
+        tmp = re.match(" * \* (\d+) resources? instance configured", line)
+        if tmp is not None:
+            #Only one resource - sbd
+            if int(tmp.groups()[0]) == 1:
+                result["status"] = "pass"
+            else:
+                message = "Not only one resources configured."
+                output = "%s custom resources configured." % tmp.groups()[0]
+            break
+
+    result["message"] = message
+    result["output"] = output
+    return result
+
+def activeStonith(args=None):
+    message = ""
+    output = ""
+    result = {"status":"fail", "message":"", "output":"", "skipall": False}
+
+    cluster_env = args[0]
+
+    lines = os.popen("ssh root@%s crm_mon -1r" % cluster_env["IP_NODE1"]).readlines()
+    for line in lines:
+        tmp = re.match(".*_stonith\s*\(stonith:external/(.*)\):\s*.*", line)
+        if tmp is not None:
+            #Stonith resource configured, type tmp.groups()[0]
+            result["status"] = "pass"
+            break
+    else:
+        message = "No active stonithd resources configured."
+        output = "No active stonithd resources configured."
+
     result["message"] = message
     result["output"] = output
     return result
@@ -117,8 +162,9 @@ def Run(conf, xmldir):
     #Define function runPackmakerService before using
     cases_def = [('PacemakerService', 'SetupCluster.service', runPackmakerService),
                  ('NodesNumber', 'SetupCluster.nodes', runNodesNumber),
-                 ('NodesStatus', 'SetupCluster.nodes', runNodesStatus)]
-                 #('ConfigureRes', 'SetupCluster.resources', runConfigureRes)]
+                 ('NodesStatus', 'SetupCluster.nodes', runNodesStatus),
+                 ('ConfigureRes', 'SetupCluster.resources', runConfigureRes),
+                 ('ConfigureRes', 'SetupCluster.resources', activeStonith)]
 
     #Not necessary to modify the lines below!
     skip_flag = False
