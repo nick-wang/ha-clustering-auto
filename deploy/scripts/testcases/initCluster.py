@@ -186,8 +186,16 @@ def Run(conf, xmldir):
     with open(xmldir+"/"+"crm_mon", "w") as p:
         p.writelines(lines)
 
+    lines = os.popen("ssh root@%s crm configure show" % cluster_env["IP_NODE1"]).readlines()
+    with open(xmldir+"/"+"crm-configure", "w") as p:
+        p.writelines(lines)
+
     lines = os.popen("ssh root@%s cat /etc/YaST2/*build*" % cluster_env["IP_NODE1"]).readlines()
     with open(xmldir+"/"+"host-build", "w") as p:
+        p.writelines(lines)
+
+    lines = os.popen("ssh root@%s journalctl" % cluster_env["IP_NODE1"]).readlines()
+    with open(xmldir+"/"+"journalctl-log", "w") as p:
         p.writelines(lines)
 
 if __name__ == "__main__":
