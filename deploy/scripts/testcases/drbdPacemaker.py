@@ -249,8 +249,15 @@ def checkMakeFS(args=None):
                          (cluster_env["IP_NODE%s" % pindex], support_fs[index],
                           ("-f" if support_fs[index] == "xfs" else ""), device))
 
-            a = os.popen("ssh root@%s lsblk -f |grep %s" %
-                         (cluster_env["IP_NODE%s" % pindex], os.path.basename(device))).readlines()
+            #Since SLE-15-SP3-Full-x86_64-Build124.5, `lsblk -f` can't show FSTYPE correctly. (Likely BUG)
+            #Use blkid instead, example:
+            #  /dev/drbd0: UUID="dc3df020-d90e-486e-aacf-4034012e45a6" TYPE="ext4"
+            #  /dev/drbd2: UUID="632aca5b-b5a8-4493-9226-72cce79aba83" TYPE="xfs"
+            #  /dev/drbd3: UUID="4cd23219-bfd8-4d2b-8976-7f45b1ed2780" SEC_TYPE="ext2" TYPE="ext3"
+            #command = "lsblk -f"
+            command = "blkid"
+            a = os.popen("ssh root@%s %s |grep %s" %
+                         (cluster_env["IP_NODE%s" % pindex], command, os.path.basename(device))).readlines()
 
             flag = False
             for l in a:
