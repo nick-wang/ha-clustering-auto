@@ -259,7 +259,7 @@ def checkMakeFS(args=None):
                     ok_list.append(support_fs[index])
 
             if flag == False:
-                message = "Fail to make filesystem %s on /dev/drbd%d" % (support_fs[index], i)
+                message = "Fail to make filesystem %s on %s" % (support_fs[index], device)
                 output = lines[0]
                 break
 
