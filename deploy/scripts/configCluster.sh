@@ -142,7 +142,6 @@ done
 sle_ver=($(getSLEVersion))
 case ${sle_ver[0]} in
   15|tumbleweed*)
-    systemctl enable --now serial-getty@ttyS0.service
     systemctl enable chronyd.service
 
     # Add NTP server to /etc/chrony.conf
