@@ -40,10 +40,11 @@ do
 
   scp root@${ip}:/etc/drbd.conf ${LOG_DIR}/${ip}_drbd
   scp root@${ip}:/etc/drbd.d/* ${LOG_DIR}/${ip}_drbd
-  scp root@${ip}:/var/log/messages* ${LOG_DIR}/${ip}_drbd
+  scp root@${ip}:/var/log/messages* ${LOG_DIR}/${ip}_drbd 2>/dev/null
   scp root@${ip}:${TEMP_DIR}/* ${LOG_DIR}/${ip}_drbd
   scp root@${ip}:/tmp/drbd-log-* ${LOG_DIR}/${ip}_drbd
   scp root@${ip}:/tmp/rpm-* ${LOG_DIR}/${ip}_drbd 2>/dev/null
+  scp -r root@${ip}:/var/log/pacemaker ${LOG_DIR}/${ip}_drbd 2>/dev/null
 
 } &
 done
