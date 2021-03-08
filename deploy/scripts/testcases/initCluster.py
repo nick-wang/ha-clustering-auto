@@ -198,5 +198,9 @@ def Run(conf, xmldir):
     with open(xmldir+"/"+"journalctl-log", "w") as p:
         p.writelines(lines)
 
+    lines = os.popen("ssh root@%s cat /var/log/pacemaker/pacemaker.log" % cluster_env["IP_NODE1"]).readlines()
+    with open(xmldir+"/"+"pacemaker.log", "w") as p:
+        p.writelines(lines)
+
 if __name__ == "__main__":
     Run(sys.argv[1], sys.argv[2])
