@@ -56,6 +56,9 @@ wait
 
 if [ ${SKIP_CLUSTER} -ne 1 ]
 then
+    # Wait a while for all nodes online
+    sleep 30
+
     for ip in `cat ${CLUSTER_CONF} |grep IP_NODE |cut -d "=" -f 2`
     do
     {

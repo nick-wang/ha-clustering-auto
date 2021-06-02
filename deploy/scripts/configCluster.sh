@@ -16,14 +16,17 @@ do
 	if [ $? -eq 0 ]; then
 		echo "Change hostname on IP:${ip}."
 		host_name=`cat cluster_conf | grep "HOSTNAME_NODE$i"|cut -d "=" -f 2`
-        # For systemd, may use "hostnamectl set-hostname $host_name"
+		# For systemd, may use "hostnamectl set-hostname $host_name"
 		hostname $host_name
 		echo "$host_name" > /etc/HOSTNAME
 		echo "$host_name" > /etc/hostname
 
-        echo "Replace the initiatorname in /etc/iscsi/initiatorname.iscsi:"
-        sed -i "/^InitiatorName/s/.*/&-${host_name}/" /etc/iscsi/initiatorname.iscsi
-        cat /etc/iscsi/initiatorname.iscsi |grep "^InitiatorName"
+		# In Tumbleweed 20210524, no /etc/iscsi/initiatorname.iscsi in open-iscsi by default
+		if [ -e /etc/iscsi/initiatorname.iscsi ]; then
+			echo "Replace the initiatorname in /etc/iscsi/initiatorname.iscsi:"
+			sed -i "/^InitiatorName/s/.*/&-${host_name}/" /etc/iscsi/initiatorname.iscsi
+			cat /etc/iscsi/initiatorname.iscsi |grep "^InitiatorName"
+		fi
 	fi
 done
 
@@ -114,6 +117,7 @@ then
 fi
 
 #update ha packages
+zypper in -y -l open-iscsi ntp chrony
 zypper up -y -l -t pattern ha_sles
 
 #Login and enable automatic login of iscsi target
@@ -131,6 +135,11 @@ for i in `seq $START_NUM $NUM_SHARED_TARGETS`; do
     name=`echo "SHARED_TARGET_LUN$i"`
     tgt_lun=`getEnv $name ../cluster_conf`
 
+    # In Tumbleweed 20210524, link /bin/systemctl is removed...
+    if [ ! -e /bin/systemctl ]; then
+        sed -i "$ a iscsid.startup = /usr/bin/systemctl start iscsid.socket iscsiuio.socket" /etc/iscsi/iscsid.conf
+    fi
+
     iscsiadm -m discovery -t st -p $tgt_ip > /dev/null
     iscsiadm -m node -T $tgt_lun -p $tgt_ip -l
 
@@ -141,7 +150,8 @@ done
 #sync the time
 sle_ver=($(getSLEVersion))
 case ${sle_ver[0]} in
-  15|tumbleweed*)
+  # ${sle_ver[0]} maybe openSUSETumbleweed/tumbleweed*
+  15|*umbleweed*)
     systemctl enable chronyd.service
 
     # Add NTP server to /etc/chrony.conf
@@ -173,7 +183,7 @@ else
 
     # Using systemd way to handle startup commands
     case ${sle_ver[0]} in
-      15|12|42.1|42.2|tumbleweed*)
+      15|12|42.1|42.2|*umbleweed*)
         echo "[Unit]
 After=network.service
 

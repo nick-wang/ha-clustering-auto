@@ -32,8 +32,13 @@ function getSLEVersion()
     if [ -f /etc/SuSE-release ]
     then
         vals=`cat /etc/SuSE-release |grep -P "PATCHLEVEL|VERSION" | sed "s/ //g"`
-    else
+    elif [ -f /etc/SuSE-brand ]
+    then
         vals=`cat /etc/SUSE-brand | grep "=" | tr -d " "`
+        #TODO: So far in SLE15, no file show the PATCHLEVEL, fix in future
+        PATCHLEVEL=0
+    else
+        vals=`cat /etc/os-release | grep "^NAME=" | tr -d " "| sed "s/NAME/VERSION/"`
         #TODO: So far in SLE15, no file show the PATCHLEVEL, fix in future
         PATCHLEVEL=0
     fi
