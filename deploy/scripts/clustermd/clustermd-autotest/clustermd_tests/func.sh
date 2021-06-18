@@ -39,6 +39,9 @@ fetch_devlist()
 		devlist=($(ls /dev/disk/by-path/*$ISCSI_ID*))
 	fi
 	# sbd disk cannot use in testing
+	# Init devlist as an array
+	i=''
+	devlist=(${devlist[@]#$i})
 	for i in ${devlist[@]}
 	do
 		sbd -d $i dump &> /dev/null
@@ -64,9 +67,8 @@ check_dlm()
 		crm configure group base-group dlm
 		crm configure clone base-clone base-group \
 			meta interleave=true
-
-		sleep 60
 	fi
+	sleep 1
 	for ip in $NODE1 $NODE2
 	do
 		ssh $ip "pgrep dlm_controld > /dev/null" || {
@@ -107,6 +109,11 @@ check_env()
 				exit 1
 			}
 		done
+		ssh $ip "lsblk -a | grep -iq raid"
+		[ $? -eq 0 ] && {
+			echo "$ip: Please run testing without running RAIDs environment."
+			exit 1
+		}
 		ssh $ip "modprobe md_mod"
 	done
 	fetch_devlist
@@ -310,7 +317,7 @@ check()
 		dmesg )
 			for ip in ${NODES[@]}
 			do
-				ssh $ip "dmesg | grep -iq 'error\|call trace\|segfault'" &&
+				ssh $ip "dmesg | egrep -iq '(dlm|md|raid).*:.*(error|call trace|segfault)'" &&
 					die "$ip: check '$2' prints errors!"
 			done
 		;;

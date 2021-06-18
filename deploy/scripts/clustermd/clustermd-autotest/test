@@ -91,7 +91,7 @@ do_test() {
 		echo -ne "$_script... " | tee -a $logdir/result
 		if ( set -ex ; . $_script ) &> $targetdir/log
 		then
-			dmesg | grep -iq "error\|call trace\|segfault" &&
+			dmesg | egrep -iq "(dlm|md|raid).*:.*(error|call trace|segfault)" &&
 				die "dmesg prints errors when testing $_basename!"
 			echo "succeeded" | tee -a $logdir/result
 			_fail=0
