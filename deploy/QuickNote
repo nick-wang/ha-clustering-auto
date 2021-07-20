@@ -28,6 +28,9 @@ Q. How to deploy a host server?
       ./email-templates/template.jelly
       (./plugins/emailext-template/templates/template.jelly)
   14. change permission 0600 to ssh_keys/id_rsa
+  15. use "root" user to run instead of "jenkins"
+      vim /etc/sysconfig/jenkins
+      JENKINS_USER="root"
 
 Q. How to deploy a virtual host (jenkins guest)?
   1. Configure ntp-client:
@@ -58,8 +61,12 @@ A.To make the cmd on the guest
   listen_addr = "0.0.0.0"
   auth_tcp = "none"
 
-  # if fail to connect with libvirtd, need to start with "--listen"
+  A.1 # if fail to connect with libvirtd, need to start with "--listen"
   # https://wiki.libvirt.org/page/Libvirt_daemon_is_not_listening_on_tcp_ports_although_configured_to
-  On host /etc/libvirt/libvirtd.conf
+  On host /etc/sysconfig/libvirtd
   LIBVIRTD_ARGS="--listen"
+
+  A.2 # on the latest version. eg. Leap15.3 in `man libvirtd` find `--listen`
+      It is conflict to the socket activation... so should not enable `--listen` of LIBVIRTD_ARGS in `/etc/sysconfig/libvirtd`
+      instead, should `systemctl enable --now libvirtd-tcp.socket`
 
