@@ -89,15 +89,11 @@
     </products>
     <packages config:type="list">
       <package>autoyast2-installation</package>
-      <package>conntrack-tools</package>
       <package>corosync</package>
       <package>crmsh</package>
       <package>csync2</package>
-      <package>ctdb</package>
       <package>drbd</package>
       <package>drbd-utils</package>
-      <package>ha-cluster-bootstrap</package>
-      <package>hawk2</package>
       <package>ldirectord</package>
       <package>lvm2-lockd</package>
       <package>ocfs2-tools</package>
@@ -106,7 +102,13 @@
       <package>sbd</package>
       <package>yast2-cluster</package>
       <package>yast2-drbd</package>
-      <package>yast2-iplb</package>
+      <package>grub2</package>
+      <package>glibc</package>
+      <package>e2fsprogs</package>
+      <package>chrony</package>
+      <package>os-prober</package>
+      <package>openssh</package>
+      <package>openSUSE-release</package>
       <!--package>systemd-rpm-macros</package-->
       <!--package>bsc#1096375 haveged can drain the entropy</package-->
       <package>haveged</package>
@@ -117,7 +119,9 @@
       <pattern>enhanced_base</pattern>
       <pattern>apparmor</pattern>
       <pattern>base</pattern>
+	  <pattern>basesystem</pattern>
       <pattern>imaging</pattern>
+	  <pattern>documentation</pattern>
     </patterns>
   </software>
   <timezone>
