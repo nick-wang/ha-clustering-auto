@@ -45,7 +45,7 @@ NUM=$1
 
 sle_ver=($(getSLEVersion))
 case ${sle_ver[0]} in
-  42.1|42.2)
+  42.1|42.2|*umbleweed*)
     # Need to install patch and rsyslog in leap42.2
     ins_packages=(exxe fio logscan drbd-test patch rsyslog python3)
     ins_src_packages=(drbd-test)

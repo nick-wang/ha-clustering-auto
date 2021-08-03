@@ -216,7 +216,7 @@ fi
 #Enable service
 infoLog "Enable services and start pacemaker."
 case ${sle_ver[0]} in
-  15|12|42.1|42.2|tumbleweed*)
+  15|12|42.1|42.2|*umbleweed*)
     zypper in -y systemd-rpm-macros 
     systemctl enable iscsid.socket
     systemctl enable iscsiuio.socket
