@@ -109,15 +109,20 @@ cp -rf key_hagroup_template /etc/csync2/key_hagroup
 cp -rf corosync.conf_template /etc/corosync/corosync.conf
 
 #Disable hostkey checking of ssh
-grep "^ *StrictHostKeyChecking" /etc/ssh/ssh_config >/dev/null
-if [ $? -ne 0 ]
+if [ -e /etc/ssh/ssh_config ]
 then
-    sed -i "/^# *StrictHostKeyChecking ask/a\StrictHostKeyChecking no" \
-        /etc/ssh/ssh_config
+    grep "^ *StrictHostKeyChecking" /etc/ssh/ssh_config >/dev/null
+    if [ $? -ne 0 ]
+    then
+        sed -i "/^# *StrictHostKeyChecking ask/a\StrictHostKeyChecking no" \
+            /etc/ssh/ssh_config
+    fi
+else
+	echo "StrictHostKeyChecking no" >> /etc/ssh/ssh_config
 fi
 
 #update ha packages
-zypper in -y -l open-iscsi ntp chrony
+zypper in -y -l open-iscsi iscsiuio ntp chrony
 zypper up -y -l -t pattern ha_sles
 
 #Login and enable automatic login of iscsi target
@@ -135,11 +140,14 @@ for i in `seq $START_NUM $NUM_SHARED_TARGETS`; do
     name=`echo "SHARED_TARGET_LUN$i"`
     tgt_lun=`getEnv $name ../cluster_conf`
 
-    # In Tumbleweed 20210524, link /bin/systemctl is removed...
-    if [ ! -e /bin/systemctl ]; then
+    #In Tumbleweed 20210524, link /bin/systemctl is removed. Then added back in 20210730...
+    if [ -e /usr/bin/systemctl ]; then
         sed -i "$ a iscsid.startup = /usr/bin/systemctl start iscsid.socket iscsiuio.socket" /etc/iscsi/iscsid.conf
+    elif [ -e /bin/systemctl ]; then
+        sed -i "$ a iscsid.startup = /bin/systemctl start iscsid.socket iscsiuio.socket" /etc/iscsi/iscsid.conf
     fi
 
+	#For SBD, the login may fail. But it won't effect the result
     iscsiadm -m discovery -t st -p $tgt_ip > /dev/null
     iscsiadm -m node -T $tgt_lun -p $tgt_ip -l
 
@@ -217,7 +225,7 @@ fi
 infoLog "Enable services and start pacemaker."
 case ${sle_ver[0]} in
   15|12|42.1|42.2|*umbleweed*)
-    zypper in -y systemd-rpm-macros 
+    zypper in -y systemd-rpm-macros
     systemctl enable iscsid.socket
     systemctl enable iscsiuio.socket
     systemctl enable iscsi.service
