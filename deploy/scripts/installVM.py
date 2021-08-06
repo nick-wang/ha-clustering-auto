@@ -42,6 +42,7 @@ default_base_dir = "/mnt/vm/sle_base"
 dummy_folder = "../dummy_temp/"
 
 clean_up = True
+DEBUG = False
 
 # Check mirror.suse.asia/dist/slp to see whether modules/products are saved seperately
 seperate = False
@@ -230,8 +231,13 @@ def installVM(VMName, disk, OSType, vcpus, memory, disk_size, source, nic, secon
     else:
         nic2 = ''
 
-    options = "--debug --os-type %s --name %s --vcpus %d --memory %d --disk %s,vda,disk,w,%d,sparse=0, --source %s --nic bridge=%s,model=virtio %s --graphics %s --extra-args %s --os-settings=%s" \
-              %(OSType, VMName, vcpus, memory, disk, disk_size, source, nic, nic2, graphics, extra_args, autoyast)
+    if DEBUG:
+        verbose = "--debug"
+    else:
+        verbose = ""
+
+    options = "%s --os-type %s --name %s --vcpus %d --memory %d --disk %s,vda,disk,w,%d,sparse=0, --source %s --nic bridge=%s,model=virtio %s --graphics %s --extra-args %s --os-settings=%s" \
+              %(verbose, OSType, VMName, vcpus, memory, disk, disk_size, source, nic, nic2, graphics, extra_args, autoyast)
     # TODO: Detect host OS, using virt-install in SLE12 or later
     cmd = "echo << EOF| vm-install %s%s%s" % (options, "\n\n\n\n\n\n\n", "EOF")
     print "Install command is: %s" % cmd

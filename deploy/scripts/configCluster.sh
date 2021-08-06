@@ -181,10 +181,10 @@ esac
 if [ $STONITH == "libvirt" ];
 then
     zypper in -y libvirt
-	# Temporily fix for bsc#1186576, need extra pacemaker>=2.1.0 repo
-	# https://download.opensuse.org/repositories/home:/yan_gao:/branches:/network:/ha-clustering:/Factory:/Test/openSUSE_Tumbleweed/
-	# Only available for libvirt, since the pacemaker conflict to sbd
-	zypper up --allow-vendor-change --force-resolution -y pacemaker
+    # Temporily fix for bsc#1186576, need extra pacemaker>=2.1.0 repo
+    # https://download.opensuse.org/repositories/home:/yan_gao:/branches:/network:/ha-clustering:/Factory:/Test/openSUSE_Tumbleweed/
+    # Only available for libvirt, since the pacemaker conflict to sbd
+    zypper up --allow-vendor-change --force-resolution -y pacemaker
 else
     sleep 15
     # To use sbd, should configure at least one iscsi target - $SHARED_TARGET_LUN0
