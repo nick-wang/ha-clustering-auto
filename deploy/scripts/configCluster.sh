@@ -268,7 +268,7 @@ case ${sle_ver[0]} in
     rchawk start
     ;;
   *)
-    echo "Not support. SLE${sle_ver[0]} SP${sle_ver[1]}"
+    echo "!!!ERROR!!! Not support. SLE${sle_ver[0]} SP${sle_ver[1]}"
 esac
 
 #update password for hacluster

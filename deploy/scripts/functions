@@ -32,14 +32,25 @@ function getSLEVersion()
     if [ -f /etc/SuSE-release ]
     then
         vals=`cat /etc/SuSE-release |grep -P "PATCHLEVEL|VERSION" | sed "s/ //g"`
-    elif [ -f /etc/SuSE-brand ]
+    elif [ -f /etc/SUSE-brand ]
     then
         vals=`cat /etc/SUSE-brand | grep "=" | tr -d " "`
-        #TODO: So far in SLE15, no file show the PATCHLEVEL, fix in future
-        PATCHLEVEL=0
+	egrep -i "opensuse|tumbleweed" /etc/SUSE-brand >/dev/null
+	if [ $? == 0 ]; then
+            PATCHLEVEL=0
+	else
+	   if [ -f /etc/os-release ]; then
+	       # In VERSION or VERSION_ID, should be string like 15.4
+               PATCHLEVEL=`cat /etc/os-release |grep "^VERSION" |grep "\."|cut -d "." -f "2"|tr -d "\""`
+	       if [ -z $PATCHLEVEL ]; then
+                   PATCHLEVEL=0
+	       fi
+           fi
+        fi
     else
+	# In latest tumbleweed, there is not /etc/S*SE-brand file
+	# No patchlevel for tumbleweed
         vals=`cat /etc/os-release | grep "^NAME=" | tr -d " "| sed "s/NAME/VERSION/"`
-        #TODO: So far in SLE15, no file show the PATCHLEVEL, fix in future
         PATCHLEVEL=0
     fi
 

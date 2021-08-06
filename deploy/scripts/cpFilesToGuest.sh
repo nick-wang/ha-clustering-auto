@@ -32,6 +32,7 @@ done
 # kmessage:
 # systemd[1]: Startup finished in 5.653s (kernel) + 5.730s (initrd) + 2min 11.453s (userspace) = 2min 22.838s.
 #
+echo "SSH enabled, but still need to wait (around 150s) for the startup process..."
 sleep 150
 
 ssh root@${ip} "mkdir -p ${CLUSTER_DIR}/template; mkdir -p ${CLUSTER_DIR}/scripts"
