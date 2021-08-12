@@ -16,18 +16,41 @@ except:
     # python2
     from urllib import urlopen
 
+# Remove autoyast file after installation
+clean_up = True
+
+# Enable/disable debug log
+DEBUG = False
+
+# Legacy vm-install will be removed, replace to virt-install
+# virt-install require nfs/http/formatted disk to attach for autoyast file
+# virt-install only support graphics vnc. vm-install can use cirrus
+# TODO: Detect host OS, using virt-install in SLE12 or later
+VIRT_INSTALL = False
+
+# Maximum VM installation time
 MAX_VM_INSTALL_TIMEOUT = 3600
 
-disk_pattern = "qcow2:%s/SUSE-HA-%s.qcow2"
+# Internal:
+# Check mirror.suse.asia/dist/slp to see whether modules/products are saved seperately
+seperate = False
+
+if VIRT_INSTALL:
+    disk_pattern = "%s/SUSE-HA-%s.qcow2"
+else:
+    disk_pattern = "qcow2:%s/SUSE-HA-%s.qcow2"
 backing_file_disk_pattern = "qcow2:%s/SUSE-HA-%s-base.qcow2"
 
-default_vm_install = {'ostype': "sles11",
+default_base_dir = "/mnt/vm/sle_base"
+dummy_folder = "../dummy_temp/"
+
+default_vm_install = {'ostype': "sles12",
                      'vcpus': 1,
                      'memory': 1024,
                      'disk_size': 20480,
                      'nic': 'br0',
                      'second_nic': '',
-                     'graphics': 'cirrus'
+                     'graphics': 'vnc'
                     }
 
 default_res = {'sle_source': 'http://mirror.bej.suse.com/dist/install/SLP/SLE-12-SP3-Server-LATEST/x86_64/DVD1/',
@@ -36,16 +59,6 @@ default_res = {'sle_source': 'http://mirror.bej.suse.com/dist/install/SLP/SLE-12
 
 default_dev = {'disk_dir':"/mnt/vm/sles_ha_auto/"
               }
-
-default_base_dir = "/mnt/vm/sle_base"
-
-dummy_folder = "../dummy_temp/"
-
-clean_up = True
-DEBUG = False
-
-# Check mirror.suse.asia/dist/slp to see whether modules/products are saved seperately
-seperate = False
 
 autoyast_dic = { "openSUSE": {"Full_tw_outdate": "autoinst-openSUSE_tumbleweed-full.xml",
                               "Leap": "autoinst-openSUSE_leap.xml",
@@ -60,7 +73,6 @@ autoyast_dic = { "openSUSE": {"Full_tw_outdate": "autoinst-openSUSE_tumbleweed-f
                }
 latest_openSUSE_autoyast = autoyast_dic['openSUSE']["Tumbleweed"]
 latest_SLE_autoyast = autoyast_dic['SLE']['SLE15SP1_SP2_sep']
-
 
 
 def getSUSEVersionViaURL(repo):
@@ -227,7 +239,10 @@ def _replaceMediaURL(line, value):
 
 def installVM(VMName, disk, OSType, vcpus, memory, disk_size, source, nic, second_nic, graphics, extra_args, autoyast, child_fd):
     if second_nic and second_nic != '':
-        nic2 = ' --nic bridge=%s,model=virtio ' % (second_nic)
+        if VIRT_INSTALL:
+            nic2 = ' --network bridge=%s ' % (second_nic)
+        else:
+            nic2 = ' --nic bridge=%s,model=virtio ' % (second_nic)
     else:
         nic2 = ''
 
@@ -236,18 +251,46 @@ def installVM(VMName, disk, OSType, vcpus, memory, disk_size, source, nic, secon
     else:
         verbose = ""
 
-    options = "%s --os-type %s --name %s --vcpus %d --memory %d --disk %s,vda,disk,w,%d,sparse=0, --source %s --nic bridge=%s,model=virtio %s --graphics %s --extra-args %s --os-settings=%s" \
-              %(verbose, OSType, VMName, vcpus, memory, disk, disk_size, source, nic, nic2, graphics, extra_args, autoyast)
-    # TODO: Detect host OS, using virt-install in SLE12 or later
-    cmd = "echo << EOF| vm-install %s%s%s" % (options, "\n\n\n\n\n\n\n", "EOF")
+    if VIRT_INSTALL:
+        # Update/valid parameters like disk, disk_size, graphics
+        size = int(disk_size)/1024
+
+        if graphics not in ("vnc", "none"):
+            graphics = "vnc"
+
+        options = "%s --wait -1 \
+                --name %s --os-type %s \
+                --connect qemu:///system \
+                --vcpus=%d --ram=%d \
+                --graphics %s \
+                --noautoconsole \
+                --disk path=%s,size=%d \
+                --network bridge=%s %s \
+                --watchdog i6300esb,action=reset \
+                --location=%s \
+                -x YAST_SKIP_XML_VALIDATION=1 \
+                " % (verbose, VMName, OSType, vcpus, memory, graphics,
+                          disk, size, nic, nic2, source)
+        if DEBUG:
+            cmd = "virt-install %s" % options
+        else:
+            cmd = "virt-install %s 2>/dev/null" % options
+    else:
+        options = "%s --os-type %s --name %s \
+                --vcpus %d --memory %d \
+                --disk %s,vda,disk,w,%d,sparse=0, \
+                --source %s \
+                --nic bridge=%s,model=virtio %s \
+                --graphics %s \
+                --extra-args %s \
+                --os-settings=%s" \
+                  %(verbose, OSType, VMName, vcpus, memory, disk, disk_size,
+                          source, nic, nic2, graphics, extra_args, autoyast)
+        cmd = "echo << EOF| vm-install %s%s%s" % (options, "\n\n\n\n\n\n\n", "EOF")
+
     print "Install command is: %s" % cmd
     ret = os.system(cmd)
     exit(ret>>8)
-    #status, output = commands.getstatusoutput(cmd)
-    #p = subprocess.Popen(args=["vm-install", options], \
-    #    stdin=subprocess.PIPE, stderr=subprocess.PIPE)
-    #p.communicate("\n\n\n\n\n\n\n")
-    #print p.wait()
 
 def get_shared_backing_file_name(vm, devices, repo_url):
     suse = getSUSEVersionViaURL(repo_url)
@@ -365,7 +408,7 @@ def prepareVMs(vm_list=[], res={}, devices={}, autoyast=""):
     else:
         os_settings = autoyast
 
-    print("Autoyast template from: %s" % os_settings)
+    print("Autoyast template from: %s\n" % os_settings)
 
     for key in default_res.keys():
         if res[key] is None:
@@ -488,6 +531,7 @@ def installVMs(vm_list, res, devices, autoyast, os_settings, base_image = ""):
 
     exitcode = 0
     processes = {}
+    print("Note: Using virt-install: %s." % VIRT_INSTALL)
     for i in range(len(vm_list)):
         vm = vm_list[i]
         vm_name = vm['name']
@@ -495,7 +539,8 @@ def installVMs(vm_list, res, devices, autoyast, os_settings, base_image = ""):
         vm, disk = parse_vm_args(vm, devices)
         if base_image != "" :
             disk = "qcow2:" + base_image
-        print "DEBUG: prepare to install virt-machine %s in disk(base:%s) %s." % ( vm['name'], base_image, disk )
+
+        print "Note: Prepare to install virt-machine %s in disk(base:%s) %s." % ( vm['name'], base_image, disk )
 
         vm_list[i] = vm
         process = {}
