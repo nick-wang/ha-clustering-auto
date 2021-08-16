@@ -47,6 +47,7 @@ Q. How to deploy a virtual host (jenkins guest)?
      (Could use python-setuptools for pip or easy_install)
   7. Copy ha-share/deploy/ssh_keys/* to ~/.ssh/
   8. Create lvm pool for image, saved in /mnt/vm
+  9. To use virt-install, may need nfs/http/ftp
 
 A.To make the cmd on the guest
   https://hawk-guide.readthedocs.io/en/latest/stonith.html
@@ -70,3 +71,22 @@ A.To make the cmd on the guest
       It is conflict to the socket activation... so should not enable `--listen` of LIBVIRTD_ARGS in `/etc/sysconfig/libvirtd`
       instead, should `systemctl enable --now libvirtd-tcp.socket`
 
+
+A.To setup nfs server/client on the virtual hosts:
+  A.1 Install NFS packages:
+    zypper in nfs-kernel-server nfs-client
+  A.2 Create the Export Directory
+    mkdir -p /tmp/jenkins-work/ha-share/deploy/dummy_temp/nfs_share
+  A.3 To allow all clients to access
+    chown nobody:nogroup /tmp/jenkins-work/ha-share/deploy/dummy_temp/nfs_share
+    chmod 777 /tmp/jenkins-work/ha-share/deploy/dummy_temp/nfs_share
+  A.4 Assign server access to client(s) through NFS export file
+    vi /etc/exports:
+       # /tmp/jenkins-work/ha-share/deploy/dummy_temp/nfs_share `clientIP`(rw,sync,no_subtree_check)
+       /tmp/jenkins-work/ha-share/deploy/dummy_temp/nfs_share *(rw,sync,no_subtree_check)
+  A.5 Export the shared directory:
+       exportfs -a
+  A.6 Restart the service
+       systemctl status nfsserver
+       systemctl enable --now nfsserver
+  A.7 Don't forget open nfs ports in firewall
