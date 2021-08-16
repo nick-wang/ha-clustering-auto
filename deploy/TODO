@@ -55,3 +55,7 @@ By default, we use sbd
 [Done]23. add timeout and exception handler for vm installation
 For the timeout expiration and exception during vm installation, this program will clean all vms,
 and exit with -1
+
+24. Support http/nfs/ftp as autoyast disk for virt-install
+
+25. Use autoyast disk with virtio(vdx), use addVirtDisk with scsi(sdx)
