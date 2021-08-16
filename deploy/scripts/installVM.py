@@ -276,11 +276,11 @@ def installVM(VMName, disk, OSType, vcpus, memory, disk_size, source, nic, secon
                 --graphics %s \
                 --noautoconsole \
                 --disk path=%s,size=%d \
-                --disk path=%s \
+                --disk path=%s,bus=scsi \
                 --network bridge=%s %s \
                 --watchdog i6300esb,action=reset \
                 --location=%s \
-                -x \"YAST_SKIP_XML_VALIDATION=1 autoyast=device://vdb/%s\"\
+                -x \"YAST_SKIP_XML_VALIDATION=1 autoyast=device://sda/%s\"\
                 " % (verbose, VMName, OSType, vcpus, memory, graphics, disk,
                         size, autoyast_disk.get_img(), nic, nic2,
                         source, createAutoyastDisk.AUTOYAST_FILENAME)
