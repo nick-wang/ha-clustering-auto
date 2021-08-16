@@ -26,7 +26,7 @@ DEBUG = False
 # virt-install require nfs/http/formatted disk to attach for autoyast file
 # virt-install only support graphics vnc. vm-install can use cirrus
 # TODO: Detect host OS, using virt-install in SLE12 or later
-VIRT_INSTALL = False
+VIRT_INSTALL = True
 
 # Maximum VM installation time
 MAX_VM_INSTALL_TIMEOUT = 3600
@@ -36,10 +36,12 @@ MAX_VM_INSTALL_TIMEOUT = 3600
 seperate = False
 
 if VIRT_INSTALL:
+    import createAutoyastDisk
     disk_pattern = "%s/SUSE-HA-%s.qcow2"
+    backing_file_disk_pattern = "%s/SUSE-HA-%s-base.qcow2"
 else:
     disk_pattern = "qcow2:%s/SUSE-HA-%s.qcow2"
-backing_file_disk_pattern = "qcow2:%s/SUSE-HA-%s-base.qcow2"
+    backing_file_disk_pattern = "qcow2:%s/SUSE-HA-%s-base.qcow2"
 
 default_base_dir = "/mnt/vm/sle_base"
 dummy_folder = "../dummy_temp/"
@@ -252,6 +254,15 @@ def installVM(VMName, disk, OSType, vcpus, memory, disk_size, source, nic, secon
         verbose = ""
 
     if VIRT_INSTALL:
+        # Create qemu image with autoyast file
+        autoyast_path = os.path.dirname(disk) + "/" + "/autoyast-img"
+        autoyast_disk = createAutoyastDisk.AutoyastDisk(VMName, autoyast_path)
+        autoyast_disk.save_autoyast_to_image(autoyast)
+
+        if autoyast_disk.get_img() == "":
+            print("ERROR! Failed to create qemu image with autoyast file in!")
+            exit(-1)
+
         # Update/valid parameters like disk, disk_size, graphics
         size = int(disk_size)/1024
 
@@ -265,12 +276,14 @@ def installVM(VMName, disk, OSType, vcpus, memory, disk_size, source, nic, secon
                 --graphics %s \
                 --noautoconsole \
                 --disk path=%s,size=%d \
+                --disk path=%s \
                 --network bridge=%s %s \
                 --watchdog i6300esb,action=reset \
                 --location=%s \
-                -x YAST_SKIP_XML_VALIDATION=1 \
-                " % (verbose, VMName, OSType, vcpus, memory, graphics,
-                          disk, size, nic, nic2, source)
+                -x \"YAST_SKIP_XML_VALIDATION=1 autoyast=device://vdb/%s\"\
+                " % (verbose, VMName, OSType, vcpus, memory, graphics, disk,
+                        size, autoyast_disk.get_img(), nic, nic2,
+                        source, createAutoyastDisk.AUTOYAST_FILENAME)
         if DEBUG:
             cmd = "virt-install %s" % options
         else:
