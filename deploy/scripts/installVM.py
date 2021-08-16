@@ -5,6 +5,7 @@ import os, sys
 import re
 import multiprocessing
 import time
+import shutil
 
 from parseYAML import GET_VM_CONF
 from getClusterConf import get_vm_info_list, get_interface_info 
@@ -17,7 +18,7 @@ except:
     from urllib import urlopen
 
 # Remove autoyast file after installation
-clean_up = True
+CLEAN_UP = False
 
 # Enable/disable debug log
 DEBUG = False
@@ -28,6 +29,10 @@ DEBUG = False
 # TODO: Detect host OS, using virt-install in SLE12 or later
 VIRT_INSTALL = True
 
+# Local NFS server for autoyast
+NFS_ENABLED = True
+NFS_LOCATION = "/tmp/jenkins-work/ha-share/deploy/dummy_temp/nfs"
+
 # Maximum VM installation time
 MAX_VM_INSTALL_TIMEOUT = 3600
 
@@ -36,7 +41,18 @@ MAX_VM_INSTALL_TIMEOUT = 3600
 seperate = False
 
 if VIRT_INSTALL:
-    import createAutoyastDisk
+    def _nfs_enabled(path):
+        if os.path.isdir(path):
+            cmd = 'showmount -e 127.0.0.1|grep %s' % path
+            if os.system(cmd) == 0:
+                return True
+        return False
+
+    if not NFS_ENABLED or not _nfs_enabled(NFS_LOCATION):
+        NFS_ENABLED = False
+        import createAutoyastDisk
+        print("Local NFS not enabled. Use autoyast disk instead.")
+
     disk_pattern = "%s/SUSE-HA-%s.qcow2"
     backing_file_disk_pattern = "%s/SUSE-HA-%s-base.qcow2"
 else:
@@ -239,6 +255,19 @@ def _replaceMediaURL(line, value):
     else:
         return line
 
+def _get_ip_list_via_interface(iface):
+    ip_list = []
+
+    lines = os.popen("ip address show dev %s" % iface).readlines()
+    for line in lines:
+        tmp = re.search("\s*inet ([0-9./]*) .*", line)
+        if tmp is not None:
+            ip = tmp.groups()[0].split("/")[0]
+
+            ip_list.append(ip)
+
+    return ip_list
+
 def installVM(VMName, disk, OSType, vcpus, memory, disk_size, source, nic, second_nic, graphics, extra_args, autoyast, child_fd):
     if second_nic and second_nic != '':
         if VIRT_INSTALL:
@@ -254,14 +283,29 @@ def installVM(VMName, disk, OSType, vcpus, memory, disk_size, source, nic, secon
         verbose = ""
 
     if VIRT_INSTALL:
-        # Create qemu image with autoyast file
-        autoyast_path = os.path.dirname(disk) + "/" + "/autoyast-img"
-        autoyast_disk = createAutoyastDisk.AutoyastDisk(VMName, autoyast_path)
-        autoyast_disk.save_autoyast_to_image(autoyast)
+        if NFS_ENABLED:
+            extra_disk = ""
 
-        if autoyast_disk.get_img() == "":
-            print("ERROR! Failed to create qemu image with autoyast file in!")
-            exit(-1)
+            ip_list = _get_ip_list_via_interface(nic)
+            if len(ip_list) == 0:
+                print("ERROR! Failed to get IP address via interface %s!\n \
+                        Please check 'ip address show dev %s' on virtual host" %
+                        (nic, nic))
+                exit(-1)
+
+            autoinst = "autoyast=nfs://%s/%s" % (ip_list[0], autoyast)
+        else:
+            # Create qemu image with autoyast file
+            autoyast_path = os.path.dirname(disk) + "/" + "/autoyast-img"
+            autoyast_disk = createAutoyastDisk.AutoyastDisk(VMName, autoyast_path)
+            autoyast_disk.save_autoyast_to_image(autoyast)
+
+            if autoyast_disk.get_img() == "":
+                print("ERROR! Failed to create qemu image with autoyast file in!")
+                exit(-2)
+
+            extra_disk = "--disk path=%s,bus=scsi" % autoyast_disk.get_img()
+            autoinst = "autoyast=device://sda/%s" % createAutoyastDisk.AUTOYAST_FILENAME
 
         # Update/valid parameters like disk, disk_size, graphics
         size = int(disk_size)/1024
@@ -275,15 +319,13 @@ def installVM(VMName, disk, OSType, vcpus, memory, disk_size, source, nic, secon
                 --vcpus=%d --ram=%d \
                 --graphics %s \
                 --noautoconsole \
-                --disk path=%s,size=%d \
-                --disk path=%s,bus=scsi \
+                --disk path=%s,size=%d %s\
                 --network bridge=%s %s \
                 --watchdog i6300esb,action=reset \
                 --location=%s \
-                -x \"YAST_SKIP_XML_VALIDATION=1 autoyast=device://sda/%s\"\
+                -x \"YAST_SKIP_XML_VALIDATION=1 %s\"\
                 " % (verbose, VMName, OSType, vcpus, memory, graphics, disk,
-                        size, autoyast_disk.get_img(), nic, nic2,
-                        source, createAutoyastDisk.AUTOYAST_FILENAME)
+                        size, extra_disk, nic, nic2, source, autoinst)
         if DEBUG:
             cmd = "virt-install %s" % options
         else:
@@ -509,6 +551,12 @@ def run_install_cmd(os_settings, vm_name, vm, disk, res):
 
     extra_args = "YAST_SKIP_XML_VALIDATION=1"
     autoyast = "%s/%s" % (dummy_folder,vm_name)
+
+    # Change to NFS share if using virt-install with local NFS server
+    if VIRT_INSTALL and NFS_ENABLED:
+        shutil.move(autoyast, NFS_LOCATION + "/" + vm_name)
+        autoyast = NFS_LOCATION + "/" + vm_name
+
     parent_fd, child_fd = multiprocessing.Pipe()
     process = multiprocessing.Process(target=installVM,
                             args=(vm_name, disk, vm["ostype"],
@@ -544,7 +592,7 @@ def installVMs(vm_list, res, devices, autoyast, os_settings, base_image = ""):
 
     exitcode = 0
     processes = {}
-    print("Note: Using virt-install: %s." % VIRT_INSTALL)
+    print("Note: Using virt-install: %s. NFS enabled %s." % (VIRT_INSTALL, NFS_ENABLED))
     for i in range(len(vm_list)):
         vm = vm_list[i]
         vm_name = vm['name']
@@ -565,7 +613,7 @@ def installVMs(vm_list, res, devices, autoyast, os_settings, base_image = ""):
     for vm in vm_list:
         vm_name = vm['name']
         processes[vm_name]["process"].join(MAX_VM_INSTALL_TIMEOUT)
-        if clean_up:
+        if CLEAN_UP:
             os.remove(processes[vm_name]["autoyast"])
 
     for vm in vm_list:
