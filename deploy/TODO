@@ -17,7 +17,7 @@
 [Done]8. Result output tools.
    junit xml or cucumber result?
 
-9. Commit the code of jekins job to ha-share
+[Done]9. Commit the code of jekins job to ha-share
 
 [Done]10.Move "cluster_conf" into working dir.
 
@@ -29,7 +29,7 @@ and if you specify use sbd stonith or by default, we set up the 1st device to sb
 
 13. Parameterized the jenkins task. Support input yaml file via command line.
 
-14. New options for iscsi in Yaml file.
+[Done]14. New options for iscsi in Yaml file.
     Enable/disable iscsi (sbd).
     Auto deploy or manually input.
     Manually field.(No need to change.)
@@ -45,7 +45,7 @@ Maybe We can use what pacemaker-cts did, added it to functions
 
 19. Considering CLOUD environment.
 
-20. Detect the host OS. Using virt-install instead of vm-install for SLE12 or later.
+[Done]20. Detect the host OS. Using virt-install instead of vm-install for SLE12 or later.
 
 21. Reconstruct the directory structure, as the deploy directory is in disorder so far
 
@@ -56,6 +56,8 @@ By default, we use sbd
 For the timeout expiration and exception during vm installation, this program will clean all vms,
 and exit with -1
 
-24. Support http/nfs/ftp as autoyast disk for virt-install
+[Done]24. Support http/nfs/ftp as autoyast disk for virt-install
+https://documentation.suse.com/sles/12-SP4/html/SLES-all/cha-kvm-inst.html#sec-libvirt-inst-virt-install
+https://www.techotopia.com/index.php/Installing_a_KVM_Guest_OS_from_the_Command-line_(virt-install)
 
-25. Use autoyast disk with virtio(vdx), use addVirtDisk with scsi(sdx)
+[Unnecessary]25. Use autoyast disk with virtio(vdx), use addVirtDisk with scsi(sdx)
