@@ -47,7 +47,7 @@ class managerVM:
         self.dom.start()
         return 0
 
-    def shutdown(self)
+    def shutdown(self):
         if self.dom is None:
             return -1
         self.dom.shutdown()
@@ -76,7 +76,7 @@ class managerVM:
 #************the life cycle***********************
 
 #************the configuration********************
-    def setMaxMemory(self, memory)
+    def setMaxMemory(self, memory):
         if self.dom is None:
             return -1
         self.dom.setMaxMemory(memory)

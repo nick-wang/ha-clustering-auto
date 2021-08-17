@@ -131,7 +131,9 @@ def main(url):
 
     if old_packages is None:
         print '-----------------------'
-        print "Initializing the packages:" for new_package in new_packages: print new_package
+        print "Initializing the packages:"
+        for new_package in new_packages:
+            print new_package
         print '-----------------------'
         save_package_info(html)
         sys.exit(0)
