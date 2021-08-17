@@ -65,7 +65,7 @@ def parseLog(TestSuiteName, xmlfile, caseset, logfile, cluster_env):
 def parseSingleLog(testreport_dir, cluster_env):
     logfile = "%s/single_report.txt" % testreport_dir
     if not os.path.isfile(logfile):
-        print "WARN: %s not found!" % logfile
+        print("WARN: %s not found!" % logfile)
         return -1
 
     #Name of Test Suite
@@ -100,7 +100,7 @@ def parseSingleLog(testreport_dir, cluster_env):
 def parseO2locktopLog(testreport_dir, cluster_env):
     logfile = "%s/o2locktop_report.txt" % testreport_dir
     if not os.path.isfile(logfile):
-        print "WARN: %s not found!" % logfile
+        print("WARN: %s not found!" % logfile)
         return -1
 
     #Name of Test Suite
@@ -123,7 +123,7 @@ def parseMultipleLog(testreport_dir, cluster_env):
 
     logfile = "%s/multiple_report.txt" % testreport_dir
     if not os.path.isfile(logfile):
-        print "WARN: %s not found!" % logfile
+        print("WARN: %s not found!" % logfile)
         return -1
 
     #Name of Test Suite
@@ -148,7 +148,7 @@ def parseMultipleLog(testreport_dir, cluster_env):
 def parseDiscontigBgSingleLog(testreport_dir, cluster_env):
     logfile = "%s/discontig_bg_single_report.txt" % testreport_dir
     if not os.path.isfile(logfile):
-        print "WARN: %s not found!" % logfile
+        print("WARN: %s not found!" % logfile)
         return -1
 
     #Name of Test Suite
@@ -170,7 +170,7 @@ def parseDiscontigBgMultipleLog(testreport_dir, cluster_env):
 
     logfile = "%s/discontig_bg_multiple_report.txt" % testreport_dir
     if not os.path.isfile(logfile):
-        print "WARN: %s not found!" % logfile
+        print("WARN: %s not found!" % logfile)
         return -1
 
     #Name of Test Suite
@@ -197,6 +197,6 @@ def main(cluster_conf, testreport_dir):
 
 if __name__ == "__main__":
     if len(sys.argv) < 3:
-        print "Usage: %s <CLUSTER_CONF> <TEST_REPORT_DIR>" % sys.argv[0]
+        print("Usage: %s <CLUSTER_CONF> <TEST_REPORT_DIR>" % sys.argv[0])
 	sys.exit(1)
     main(sys.argv[1], sys.argv[2])

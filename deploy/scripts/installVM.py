@@ -207,7 +207,7 @@ def getSUSEVersionViaURL(repo):
         for line in lines:
             reg = re.search(url_pattern[version]['pattern'], line)
             if reg is not None:
-                print "Pattern matched: %s" % line
+                print("Pattern matched: %s" % line)
                 print(reg.groups())
 
                 #SLES-11-SP4-DVD-x86_64-Build1221
@@ -235,14 +235,14 @@ def getSUSEVersionViaURL(repo):
                 suse_release['build'] = reg.groups()[url_pattern[version]['build']]
 
                 if "-OnlineOnly" in line:
-                    print "Using OnlineOnly installer, may not work!"
+                    print("Using OnlineOnly installer, may not work!")
 
                 break
         else:
-            print "Not found any pattern in url."
+            print("Not found any pattern in url.")
 
     if len(suse_release) == 0:
-        print "Do not have any patch info. Wrong url?"
+        print("Do not have any patch info. Wrong url?")
         return suse_release
 
     if suse_release['flavor'] == 'S':
@@ -379,7 +379,7 @@ def installVM(VMName, disk, OSType, vcpus, memory, disk_size, source, nic, secon
                           source, nic, nic2, graphics, extra_args, autoyast)
         cmd = "echo << EOF| vm-install %s%s%s" % (options, "\n\n\n\n\n\n\n", "EOF")
 
-    print "Install command is: %s" % cmd
+    print("Install command is: %s" % cmd)
     ret = os.system(cmd)
     exit(ret>>8)
 
@@ -468,7 +468,7 @@ def create_vms_on_backing_file(vm_list, devices, base_image):
         disk_name = disk.split(':')[1]
 
         #create the new image
-        print "qemu-img create -f qcow2 %s -b %s" % (disk_name, base_image)
+        print("qemu-img create -f qcow2 %s -b %s" % (disk_name, base_image))
         if os.path.exists(os.path.dirname(disk_name)) == False:
             os.makedirs(os.path.dirname(disk_name))
         os.system("qemu-img create -f qcow2 %s -b %s" % (disk_name, base_image))
@@ -478,7 +478,7 @@ def create_vms_on_backing_file(vm_list, devices, base_image):
         fill_vm_xml(vm['name'], vm['memory'], vm['memory'], vm['vcpus'], disk_name,
             'bridge', vm['nic'], xmlfile, "../confs/backing_file_template.xml")
 
-        print "virsh define %s with name %s" % (xmlfile, vm['name'])
+        print("virsh define %s with name %s" % (xmlfile, vm['name']))
         os.system("virsh define %s" % xmlfile)
         os.system("virsh start %s" % vm['name'])
 
@@ -513,7 +513,7 @@ def prepareVMs(vm_list=[], res={}, devices={}, autoyast=""):
         else: #"backing_file" won't share with others, also won't be tracked by cleanVM.py
             base_image = get_backing_file_name(vm_list[0], devices)
 
-        print "Using base image: %s" % base_image
+        print("Using base image: %s" % base_image)
 
         if not find_an_exist_backing_file(base_image):
             # Only installed one(1st) vm as backing file
@@ -637,7 +637,7 @@ def installVMs(vm_list, res, devices, autoyast, os_settings, base_image = ""):
         if base_image != "" :
             disk = "qcow2:" + base_image
 
-        print "Note: Prepare to install virt-machine %s in disk(base:%s) %s." % ( vm['name'], base_image, disk )
+        print("Note: Prepare to install virt-machine %s in disk(base:%s) %s." % ( vm['name'], base_image, disk ))
 
         vm_list[i] = vm
         process = {}
@@ -657,18 +657,18 @@ def installVMs(vm_list, res, devices, autoyast, os_settings, base_image = ""):
         process = processes[vm_name]["process"]
 
         if process.exitcode is None:
-            print "process %d for installing %s timeout\n" %(process.pid, vm_name)
+            print("process %d for installing %s timeout\n" %(process.pid, vm_name))
             exitcode = -1
         elif process.exitcode != 0:
-            print "process %d for installing %s returned error %d\n" %(process.pid, vm_name, process.exitcode)
+            print("process %d for installing %s returned error %d\n" %(process.pid, vm_name, process.exitcode))
             exitcode = -2
 
         if exitcode != 0:
-            print "the installing processes exited with %d" % (exitcode)
+            print("the installing processes exited with %d" % (exitcode))
             for vm1 in processes.keys():
                 process1 = processes[vm1]["process"]
                 if process1.is_alive():
-                    print "terminate process %d with vm %s" %(process1.pid, vm1)
+                    print("terminate process %d with vm %s" %(process1.pid, vm1))
                     process1.terminate()
             sys.exit(exitcode)
 
@@ -682,11 +682,11 @@ def get_config_and_install(deployfile='../confs/vm_list.yaml', autoyast=''):
     prepareVMs(vm_list, resource, devices, autoyast)
 
 def usage():
-    print "usage:"
-    print "\t./installVM.py <yaml-conf> <autoyast>"
-    print "\tDefault yaml file in '../confs/vm_list.yaml'"
-    print "\t        autoyast files in '../confs/autoyast/',"
-    print "\t        will select automatically based on source."
+    print("usage:")
+    print("\t./installVM.py <yaml-conf> <autoyast>")
+    print("\tDefault yaml file in '../confs/vm_list.yaml'")
+    print("\t        autoyast files in '../confs/autoyast/',")
+    print("\t        will select automatically based on source.")
     sys.exit(1)
 
 if __name__ == "__main__":

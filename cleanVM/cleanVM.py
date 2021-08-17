@@ -75,11 +75,11 @@ def formatVMs(vmlist, listname):
     return content
 
 def printVMs(vmlist, listname):
-    print '\tVMs are %s:' % listname
+    print('\tVMs are %s:' % listname)
     for vm in vmlist:
-        print '\t\t%s:' % vm.name
+        print('\t\t%s:' % vm.name)
         for disk in vm.disks:
-            print '\t\t\t%s\t%s\t\t\t%s' % (disk.label, disk.path, time.asctime(time.localtime(disk.stat.st_mtime)))
+            print('\t\t\t%s\t%s\t\t\t%s' % (disk.label, disk.path, time.asctime(time.localtime(disk.stat.st_mtime))))
 
 def getVMByName(vmname):
     cmd = 'virsh domblklist %s|grep \/' % (vmname)
@@ -104,7 +104,7 @@ def remove_vm(vm, remove=True):
     disk_list = vm.get_disks()
     cmd = 'virsh destroy %s' % vmname
     status, output = commands.getstatusoutput(cmd)
-    print "destroying vm %s" % vmname
+    print("destroying vm %s" % vmname)
     #just shutdown vm
     if remove == False:
         return
@@ -115,10 +115,10 @@ def remove_vm(vm, remove=True):
             continue
         stat_struct = os.stat(path)
         os.remove(path)
-        print "os.remove(%s)" % path
+        print("os.remove(%s)" % path)
     cmd = "virsh undefine %s" % vmname
     status, output = commands.getstatusoutput(cmd)
-    print "status, output = commands.getstatusoutput(%s)" % cmd
+    print("status, output = commands.getstatusoutput(%s)" % cmd)
 
 def checkVMExists(vmname):
     status,_=commands.getstatusoutput("virsh domid %s" % vmname)
@@ -168,7 +168,7 @@ def removeVMViaYaml(yamlfile, remove=True):
 def getHostInfo():
     hostname = socket.gethostname()
     #ip = socket.gethostbyname(hostname)
-    #print '\tThe host is (%s/%s) ' %(hostname, ip)
+    #print('\tThe host is (%s/%s) ' %(hostname, ip))
     return 'On Host %s' %(hostname)
 
 def get_ip_first_ip():
@@ -198,7 +198,7 @@ def get_content():
     if os.path.exists('notice.txt'):
         f = open('notice.txt')
         content = content + f.read()
-        print content
+        print(content)
     return title, content
 
 def send_mail(to_list,sub,content):
@@ -216,11 +216,11 @@ def send_mail(to_list,sub,content):
         s.close()
         return True
     except Exception, e:
-        print str(e)
+        print(str(e))
         return False
 
 def usage():
-    print '''Usage:
+    print('''Usage:
         To clean old vms and sendmail: ./cleanVM.py -m
         To find out all disk file usage: ./cleanVM.py -d
         To list all backing files: ./cleanVM.py -b
@@ -232,7 +232,7 @@ def usage():
               - name: node-1
               - name: node-2
               - name: node-3
-    '''
+    ''')
     sys.exit(-2)
 
 def get_all_disks(get_backing_files=False):
@@ -242,7 +242,7 @@ def get_all_disks(get_backing_files=False):
 
     for vmname in vm_list:
         disks = []
-        #print vmname
+        #print(vmname)
         vm = getVMByName(vmname)
         disk_list = vm.get_disks()
 
@@ -252,7 +252,7 @@ def get_all_disks(get_backing_files=False):
             tmp["useBackingFile"] = False
             tmp["BackingFileName"] = ""
 
-            #print disk
+            #print(disk)
             dpath = disk.get_path()
             tmp["name"] = dpath
 
@@ -300,12 +300,12 @@ if __name__ == '__main__':
     for opt, value in opts:
        if opt == '-m':
            title, content = get_content()
-           print content
+           print(content)
            if send_mail(mailto_list,title,content):
-               print "success"
+               print("success")
                sys.exit(0)
            else:
-               print "failed"
+               print("failed")
                sys.exit(-3)
        elif opt == '-d':
            disks = get_all_disks()
@@ -322,12 +322,12 @@ if __name__ == '__main__':
            if os.path.exists(value) and os.path.isfile(value):
                yaml_file = value
            else:
-              print "%s is not exist or not a file." % value
+              print("%s is not exist or not a file." % value)
               sys.exit(-3)
        elif opt == "-s":
            remove = False
        else:
-           print "Wrong input. opt %s, value %s" % (opt, value)
+           print("Wrong input. opt %s, value %s" % (opt, value))
     if vm_list is not None:
         for vmname in vm_list:
             if checkVMExists(vmname):

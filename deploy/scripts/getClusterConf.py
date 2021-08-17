@@ -85,7 +85,7 @@ def isAllIpAssigned(vm_info_list):
     return True
 
 def restartGuest(name):
-    print "Restart guest %s" % name
+    print("Restart guest %s" % name)
     os.system("virsh shutdown %s" % name)
     time.sleep(20)
     os.system("virsh start %s" % name)
@@ -121,7 +121,7 @@ def get_cluster_conf(sleep_time="0", configuration="../cluster_conf",
     f.write(contents)
     f.close()
 
-    print contents
+    print(contents)
 
 def get_vm_info_list(vm_list, ip_range, recursive):
     vm_names = []
@@ -132,19 +132,19 @@ def get_vm_info_list(vm_list, ip_range, recursive):
             node_list = vm['name']
         else:
             node_list += ',' + vm['name']
-    print "DEBUG: Checking ip range: %s" % ip_range
+    print("DEBUG: Checking ip range: %s" % ip_range)
     vm_info_list = get_ip_list_by_mac(vm_names, ip_range)
 
     recur_times = 0
     already_restart = False
     while recursive:
         if isAllIpAssigned(vm_info_list):
-            print "All nodes have been assigned IP address."
+            print("All nodes have been assigned IP address.")
             break
 
         if recur_times == 20:
             if already_restart:
-                print "Failed to get IP address!"
+                print("Failed to get IP address!")
                 sys.exit(3)
             else:
                 restartNoIpNodes(vm_info_list)
@@ -153,7 +153,7 @@ def get_vm_info_list(vm_list, ip_range, recursive):
 
         time.sleep(10)
         recur_times += 1
-        print "Checking again..."
+        print("Checking again...")
         vm_info_list = get_ip_list_by_mac(vm_names, ip_range)
     return node_list, vm_info_list
 
@@ -189,7 +189,7 @@ def write_conf_file(vm_list, dp, interface, recursive, stonith):
 
     i = 1
     if (stonith == 'sbd') and ((target_list is None) or (len(target_list) == 0)):
-        print "Warning: sbd needs target."
+        print("Warning: sbd needs target.")
 #        sys.exit(-1)
     elif stonith == 'sbd':
         i = 0
@@ -219,10 +219,10 @@ def get_interface_info(interface):
     return (ipaddr, netaddr, netmask_int)
 
 def usage():
-    print "usage:"
-    print "\t./getClusterConf.py -s <sleep-time> -f <configuration> -y <yaml> -S <stonith-type>"
-    print "example:\n\t./getClusterConf.py -s 120 -f ../cluster_conf -y ../confs/vm_list.yaml -S sbd"
-    print "\tsubnet will use nic in yaml file(devices)."
+    print("usage:")
+    print("\t./getClusterConf.py -s <sleep-time> -f <configuration> -y <yaml> -S <stonith-type>")
+    print("example:\n\t./getClusterConf.py -s 120 -f ../cluster_conf -y ../confs/vm_list.yaml -S sbd")
+    print("\tsubnet will use nic in yaml file(devices).")
     sys.exit(1)
 
 def getOption():
@@ -234,7 +234,7 @@ def getOption():
         opts, args = getopt.getopt(sys.argv[1:], "s:f:y:S:R",
                     ["sleep=", "configuration=", "yaml=", "recursive", "stonith-type="])
     except getopt.GetoptError:
-        print "Get options Error!"
+        print("Get options Error!")
         sys.exit(2)
     for opt, value in opts:
         if opt in ("-s", "--sleep"):
@@ -248,7 +248,7 @@ def getOption():
         elif opt in ("-S", "--stonith-type"):
             value = value.lower()
             if (value != "sbd") and (value != "libvirt"):
-                print "stonith type can only be sbd or libvirt.\n"
+                print("stonith type can only be sbd or libvirt.\n")
                 usage()
             options['stonith-type'] = value
         else:

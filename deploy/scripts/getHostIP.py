@@ -67,9 +67,9 @@ def get_netaddr(interface):
 if __name__ == "__main__":
     if len(sys.argv) == 2:
         if is_interface_existed(sys.argv[1]):
-            print "The interface %s has ipaddr %s/%s" % (sys.argv[1], get_ipaddr_by_interface(sys.argv[1]), get_net_mask(sys.argv[1]))
-            print "The netaddr is %s " % get_netaddr(sys.argv[1])
+            print("The interface %s has ipaddr %s/%s" % (sys.argv[1], get_ipaddr_by_interface(sys.argv[1]), get_net_mask(sys.argv[1])))
+            print("The netaddr is %s " % get_netaddr(sys.argv[1]))
         else:
-            print "no such a interface %s" % sys.argv[1]
+            print("no such a interface %s" % sys.argv[1])
     else:
-        print "the ip list is", get_ip_list()
+        print("the ip list is", get_ip_list())

@@ -56,7 +56,7 @@ def save_package_info(html):
 
 def get_package_info():
     filename = "%s_package_info" % proj_name
-    print "Packages info saved in %s" % (dummy_dir + filename)
+    print("Packages info saved in %s" % (dummy_dir + filename))
 
     if os.path.isdir(dummy_dir):
         if os.path.exists(dummy_dir + filename):
@@ -78,7 +78,7 @@ def getName(rpm):
         name=tmp.groups()[0]
         return name
 
-    print "Fail to parse: %s" % rpm
+    print("Fail to parse: %s" % rpm)
     return None
 
 def need_update(old_packages, new_packages):
@@ -93,7 +93,7 @@ def need_update(old_packages, new_packages):
             else:
                 continue
         else:
-            print old_package + " is not in the new repo."
+            print(old_package + " is not in the new repo.")
 
     for new_package in new_packages:
         p_name = getName(new_package)
@@ -102,7 +102,7 @@ def need_update(old_packages, new_packages):
             if p_name == getName(old_package):
                 break
         else:
-            #print "New record: " + new_package
+            #print("New record: " + new_package)
             if need_updated.has_key("NEW"):
                 need_updated["NEW"].append(new_package)
             else:
@@ -118,8 +118,8 @@ def main(url):
         response=urllib2.urlopen(url)
         html = response.read()
     except Exception, e:
-        print "wrong url %s" % url
-        print e
+        print("wrong url %s" % url)
+        print(e)
         usage()
         sys.exit(-1)
     if packages_monitoring == '':
@@ -130,39 +130,39 @@ def main(url):
     need_updated = {}
 
     if old_packages is None:
-        print '-----------------------'
-        print "Initializing the packages:"
+        print('-----------------------')
+        print("Initializing the packages:")
         for new_package in new_packages:
-            print new_package
-        print '-----------------------'
+            print(new_package)
+        print('-----------------------')
         save_package_info(html)
         sys.exit(0)
 
     elif len(new_packages) > 0:
         need_updated = need_update(old_packages, new_packages)
         if len(need_updated) > 0:
-            print "-----------------------"
-            print "please update packages:"
+            print("-----------------------")
+            print("please update packages:")
             for old_package in need_updated.keys():
                 if old_package != "NEW":
-                    print "update %s to %s" %(old_package, need_updated[old_package])
+                    print("update %s to %s" %(old_package, need_updated[old_package]))
                 else:
                     for new_record in need_updated[old_package]:
-                        print "new record %s" % new_record
-            print "-----------------------"
+                        print("new record %s" % new_record)
+            print("-----------------------")
             save_package_info(html)
             sys.exit(0)
 
-    print "do not update"
+    print("do not update")
     sys.exit(1)
 
 def usage():
-    print "Usage:"
-    print "./monitor.py -u <url> -m <module> -P <project_name> -D <job_name> (-p <packages>)"
-    print "\tIf gives -p <packages>, then -m <module> will be ignored."
-    print "\tIf gives -D <job_name>, -P <project_name> can be omitted."
-    print "\tExample:"
-    print "\t\t./monitor-packages.py  -u 'http://10.67.160.200/SLP/openSUSE-Tumbleweed/latest/x86_64/' -P dummy -p 'kernel-default vim wicked'"
+    print("Usage:")
+    print("./monitor.py -u <url> -m <module> -P <project_name> -D <job_name> (-p <packages>)")
+    print("\tIf gives -p <packages>, then -m <module> will be ignored.")
+    print("\tIf gives -D <job_name>, -P <project_name> can be omitted.")
+    print("\tExample:")
+    print("\t\t./monitor-packages.py  -u 'http://10.67.160.200/SLP/openSUSE-Tumbleweed/latest/x86_64/' -P dummy -p 'kernel-default vim wicked'")
     sys.exit(3)
 
 if __name__ == "__main__":
@@ -170,7 +170,7 @@ if __name__ == "__main__":
     try:
         opts, args = getopt.getopt(sys.argv[1:], "u:p:m:P:D:")
     except getopt.GetoptError:
-        print "Get options Error!"
+        print("Get options Error!")
         sys.exit(2)
     for opt, value in opts:
         if opt in ("-u", "--url"):

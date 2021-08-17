@@ -32,14 +32,14 @@ PRODUCTS = { "sle": {"pattern": sle_pattern, "database": sle_db, "verify": postf
 run_as_daemon = False
 
 def usage():
-	print '''Download and mount daily build ISO tool.\n
+	print('''Download and mount daily build ISO tool.\n
 Syntax:
 %s <options>
 
 Options:
 -d(--daemon) Constantly check and download new build.
 -h(--help) Show usage.
-''' % argv[0]
+''' % argv[0])
 
 def DEBUG(string):
 	if Enable_debug:
@@ -66,10 +66,10 @@ def updateRecord(pname, build):
 def downloadFiles(pname, nbuild, conn):
 	name = PRODUCTS[pname]["pattern"] % nbuild
 
-	print "Process %d - Start to download: %s." % (PRODUCTS[pname]["process"].pid, URL+name+postfix_sha)
+	print("Process %d - Start to download: %s." % (PRODUCTS[pname]["process"].pid, URL+name+postfix_sha))
 	urllib.urlretrieve(URL+name+postfix_sha, "./ISO/"+name+postfix_sha)
 
-	print "Process %d - Start to download: %s." % (PRODUCTS[pname]["process"].pid, URL+name)
+	print("Process %d - Start to download: %s." % (PRODUCTS[pname]["process"].pid, URL+name))
 	urllib.urlretrieve(URL+name, "./ISO/"+name)
 
 	if not verifySha256(name):
@@ -91,7 +91,7 @@ def hasNew(pname, old):
 		try:
 			urlfd = urllib.urlopen(URL)
 		except IOError, e:
-			print "urlopen: %s.\nURL is %s." % (e.__str__(), URL)
+			print("urlopen: %s.\nURL is %s." % (e.__str__(), URL))
 			time.sleep(20)
 		else:
 			break
@@ -161,7 +161,7 @@ def getOption():
 	try:
 		opts, args = getopt.getopt(argv[1:], "dh", ["help", "daemon"])
 	except getopt.GetoptError:
-		print "Get options Error!"
+		print("Get options Error!")
 		exit(1)
 
 	for opt, value in opts:
@@ -198,7 +198,7 @@ def main():
 			time.sleep(pause_time)
 			DEBUG("Checking new build...")
 
-	print "Monitor process End."
+	print("Monitor process End.")
 
 if __name__=='__main__':
 	main()

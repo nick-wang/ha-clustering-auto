@@ -100,14 +100,14 @@ class GET_VM_CONF:
             Only for single section, can not use for list.
         '''
         if not self.structs.has_key(section):
-            print "Need to config a new section (%s)." % section
+            print("Need to config a new section (%s)." % section)
             sys.exit(4)
 
         conf = {}
         struct = self.ya.get(section)
 
         if struct is None:
-            print "Lack of '%s' section in yaml file." % section
+            print("Lack of '%s' section in yaml file." % section)
             return
 
         # So far, only for 'iscsi', 'devices' and 'resources'
@@ -122,13 +122,13 @@ class GET_VM_CONF:
             list section in yaml file starts with "-"
         '''
         if not self.lists.has_key(section):
-            print "Need to config a new list section (%s)." % section
+            print("Need to config a new list section (%s)." % section)
             sys.exit(4)
 
         structs = self.ya.get(section)
 
         if structs is None:
-            print "Lack of '%s' section in yaml file." % section
+            print("Lack of '%s' section in yaml file." % section)
             return []
 
         conf = []
@@ -149,12 +149,12 @@ class GET_VM_CONF:
                        'disk_size', 'nic', 'second_nic', 'graphics', 'os_settings' )
 
         if nodes is None:
-            print "Lack of 'nodes' section in yaml file."
+            print("Lack of 'nodes' section in yaml file.")
             return
 
         for node in nodes:
             if node.get('name') is None:
-                print "Error! Node name can not empty."
+                print("Error! Node name can not empty.")
                 sys.exit(3)
 
             vm = {}
@@ -164,7 +164,7 @@ class GET_VM_CONF:
             if vm not in vms:
                 vms.append(vm)
             else:
-                print "Error! Duplicate node name(%s) detected." % vm['name']
+                print("Error! Duplicate node name(%s) detected." % vm['name'])
                 sys.exit(2)
         return vms
 
@@ -206,12 +206,12 @@ def test(deployfile=""):
     target_list = dp.get_shared_target()
 
     for i in dp.structs.keys():
-        print dp.get_single_section_conf(i)
+        print(dp.get_single_section_conf(i))
     repos=dp.get_list_section_conf("repos")
     if len(repos) > 0:
-        print " ".join(repos)
-    print vm_list
-    print target_list
+        print(" ".join(repos))
+    print(vm_list)
+    print(target_list)
 
 if __name__ == "__main__":
     '''

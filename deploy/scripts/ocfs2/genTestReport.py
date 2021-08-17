@@ -157,9 +157,9 @@ def main(dir):
 	if p.returncode == 0:
 		if (stdoutdata):
 			single_log = str(stdoutdata).splitlines()[-1]
-		print "Single log file: %s" % single_log
+		print("Single log file: %s" % single_log)
 	else:
-		print stderrdata
+		print(stderrdata)
 
 	p = subprocess.Popen(["find", dir, "-name", "multiple-run-*.log"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 	(stdoutdata, stderrdata) = p.communicate()
@@ -167,9 +167,9 @@ def main(dir):
 	if p.returncode == 0:
 		if (stdoutdata):
 			multiple_log = str(stdoutdata).splitlines()[-1]
-		print "Multiple log file: %s" % multiple_log
+		print("Multiple log file: %s" % multiple_log)
 	else:
-		print stderrdata
+		print(stderrdata)
 
 	p = subprocess.Popen(["find", dir, "-name", "*discontig-bg-single-run.log"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 	(stdoutdata, stderrdata) = p.communicate()
@@ -177,9 +177,9 @@ def main(dir):
 	if p.returncode == 0:
 		if (stdoutdata):
 			discontig_bg_single_log = str(stdoutdata).splitlines()[-1]
-		print "Discontig bg single log file: %s" % discontig_bg_single_log
+		print("Discontig bg single log file: %s" % discontig_bg_single_log)
 	else:
-		print stderrdata
+		print(stderrdata)
 
 	p = subprocess.Popen(["find", dir, "-name", "*discontig-bg-multiple-run.log"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 	(stdoutdata, stderrdata) = p.communicate()
@@ -187,9 +187,9 @@ def main(dir):
 	if p.returncode == 0:
 		if (stdoutdata):
 			discontig_bg_multiple_log = str(stdoutdata).splitlines()[-1]
-		print "Discontig bg multiple log file: %s" % discontig_bg_multiple_log
+		print("Discontig bg multiple log file: %s" % discontig_bg_multiple_log)
 	else:
-		print stderrdata
+		print(stderrdata)
 
 	p = subprocess.Popen(["find", dir, "-name", "test_o2lock.log"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 	(stdoutdata, stderrdata) = p.communicate()
@@ -197,9 +197,9 @@ def main(dir):
 	if p.returncode == 0:
 		if (stdoutdata):
 			o2locktop_log = str(stdoutdata).splitlines()[-1]
-		print "O2locktop log file: %s" % o2locktop_log
+		print("O2locktop log file: %s" % o2locktop_log)
 	else:
-		print stderrdata
+		print(stderrdata)
 
 
 	if single_log or multiple_log or discontig_bg_single_log or discontig_bg_multiple_log or o2locktop_log:
@@ -208,9 +208,9 @@ def main(dir):
 		(stdoutdata, stderrdata) = p.communicate()
 
 		if p.returncode == 0:
-			print "Mkdir -p %s" % test_report_dir
+			print("Mkdir -p %s" % test_report_dir)
 		else:
-			print stderrdata
+			print(stderrdata)
 
 	if single_log:
 		parseSingleLog(single_log, test_report_dir)
@@ -225,7 +225,7 @@ def main(dir):
 
 if __name__ == "__main__":
 	if len(sys.argv) < 2:
-		print "Usage: %s <BUILD_LOG_DIR>" % sys.argv[0]
+		print("Usage: %s <BUILD_LOG_DIR>" % sys.argv[0])
 		sys.exit(1)
 
 	main(sys.argv[1])

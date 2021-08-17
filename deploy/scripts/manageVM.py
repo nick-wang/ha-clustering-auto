@@ -113,7 +113,7 @@ class managerVM:
         conn = libvirt.open("qemu:///system")
         dom = conn.lookupByName(vmname)
         if dom is None:
-            print '%s does not exist' %vmname
+            print('%s does not exist' %vmname)
             return None
         return dom
 #************the utils library********************
