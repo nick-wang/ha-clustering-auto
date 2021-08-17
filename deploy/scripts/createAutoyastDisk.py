@@ -143,3 +143,10 @@ class AutoyastDisk(object):
             return True
 
         return False
+
+
+if __name__ == "__main__":
+    a = AutoyastDisk("NickWang")
+    a.save_autoyast_to_image("/tmp/test-autoyast.xml")
+    a.remove_img()
+

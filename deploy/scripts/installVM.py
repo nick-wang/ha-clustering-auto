@@ -6,6 +6,7 @@ import re
 import multiprocessing
 import time
 import shutil
+import ConfigParser
 
 from parseYAML import GET_VM_CONF
 from getClusterConf import get_vm_info_list, get_interface_info 
@@ -17,24 +18,28 @@ except:
     # python2
     from urllib import urlopen
 
+config = ConfigParser.ConfigParser()
+config.read('config.ini')
+section = 'INSTALL'
+
 # Remove autoyast file after installation
-CLEAN_UP = False
+CLEAN_UP = config.getboolean(section, 'CLEAN_UP')
 
 # Enable/disable debug log
-DEBUG = False
+DEBUG = config.getboolean(section, 'DEBUG')
 
 # Legacy vm-install will be removed, replace to virt-install
 # virt-install require nfs/http/formatted disk to attach for autoyast file
 # virt-install only support graphics vnc. vm-install can use cirrus
 # TODO: Detect host OS, using virt-install in SLE12 or later
-VIRT_INSTALL = True
+VIRT_INSTALL = config.getboolean(section, 'VIRT_INSTALL')
 
 # Local NFS server for autoyast
-NFS_ENABLED = True
-NFS_LOCATION = "/tmp/jenkins-work/ha-share/deploy/dummy_temp/nfs"
+NFS_ENABLED = config.getboolean(section, 'NFS_ENABLED')
+NFS_LOCATION = config.get(section, 'NFS_LOCATION')
 
 # Maximum VM installation time
-MAX_VM_INSTALL_TIMEOUT = 3600
+MAX_VM_INSTALL_TIMEOUT = config.getint(section, 'MAX_VM_INSTALL_TIMEOUT')
 
 # Internal:
 # Check mirror.suse.asia/dist/slp to see whether modules/products are saved seperately
@@ -59,8 +64,8 @@ else:
     disk_pattern = "qcow2:%s/SUSE-HA-%s.qcow2"
     backing_file_disk_pattern = "qcow2:%s/SUSE-HA-%s-base.qcow2"
 
-default_base_dir = "/mnt/vm/sle_base"
-dummy_folder = "../dummy_temp/"
+DEFAULT_BASE_DIR = config.get(section, 'DEFAULT_BASE_DIR')
+DUMMY_FOLDER = config.get(section, 'DUMMY_FOLDER')
 
 default_vm_install = {'ostype': "sles12",
                      'vcpus': 1,
@@ -351,7 +356,7 @@ def get_shared_backing_file_name(vm, devices, repo_url):
     suse = getSUSEVersionViaURL(repo_url)
     base_name = "%s-%s-%s-%s-Build%s-size%d" % (suse['flavor'], suse['version'],
                     suse['patch'], suse['arch'], suse['build'], vm['disk_size'])
-    disk = backing_file_disk_pattern % (default_base_dir, base_name)
+    disk = backing_file_disk_pattern % (DEFAULT_BASE_DIR, base_name)
     return disk.split(':')[1]
 
 def get_backing_file_name(vm, devices):
@@ -453,7 +458,7 @@ def create_base_image_git_entry(base_image):
     lines = os.popen("git rev-parse HEAD").readlines()
     commit = lines[0].strip()
 
-    fd = open("%s/baseimage-git-db" % dummy_folder, "a")
+    fd = open("%s/baseimage-git-db" % DUMMY_FOLDER, "a")
     fd.write(base_image+":\t"+commit+"\n")
     fd.close()
 
@@ -536,10 +541,10 @@ def run_install_cmd(os_settings, vm_name, vm, disk, res):
     conf_str = f.readlines()
     f.close()
 
-    if not os.path.isdir(dummy_folder):
-        os.mkdir(dummy_folder)
+    if not os.path.isdir(DUMMY_FOLDER):
+        os.mkdir(DUMMY_FOLDER)
 
-    f = open("%s/%s" % (dummy_folder, vm_name), 'w')
+    f = open("%s/%s" % (DUMMY_FOLDER, vm_name), 'w')
     for line in conf_str:
         if not seperate:
             line = _replaceXML(line, "media_url", res['ha_source'])
@@ -550,7 +555,7 @@ def run_install_cmd(os_settings, vm_name, vm, disk, res):
     f.close()
 
     extra_args = "YAST_SKIP_XML_VALIDATION=1"
-    autoyast = "%s/%s" % (dummy_folder,vm_name)
+    autoyast = "%s/%s" % (DUMMY_FOLDER,vm_name)
 
     # Change to NFS share if using virt-install with local NFS server
     if VIRT_INSTALL and NFS_ENABLED:

@@ -3,6 +3,23 @@
 info_level=1
 debug_level=2
 
+function loadConfigToENV()
+{
+    # Note:
+    #     [DEFAULT] section in config.ini will overlap others
+    # Usage:
+    #     loadConfigToENV
+    #     echo $DEFAULT_BASE_DIR
+    tempfile=$(mktemp)
+    cat config.ini |grep "=" |sed 's/^/export /g' > $tempfile
+
+    set -a
+    source $tempfile
+    set +a
+
+    rm -rf $tempfile
+}
+
 function isMaster()
 {
     # Usage:
