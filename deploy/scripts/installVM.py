@@ -31,8 +31,10 @@ DEBUG = config.getboolean(section, 'DEBUG')
 # Legacy vm-install will be removed, replace to virt-install
 # virt-install require nfs/http/formatted disk to attach for autoyast file
 # virt-install only support graphics vnc. vm-install can use cirrus
-# TODO: Detect host OS, using virt-install in SLE12 or later
 VIRT_INSTALL = config.getboolean(section, 'VIRT_INSTALL')
+
+# Force to use vm-install in SLE12SP0, since virt-install have bugs
+VM_INSTALL_DETECT = config.getboolean(section, 'VM_INSTALL_DETECT')
 
 # Local NFS server for autoyast
 NFS_ENABLED = config.getboolean(section, 'NFS_ENABLED')
@@ -44,6 +46,20 @@ MAX_VM_INSTALL_TIMEOUT = config.getint(section, 'MAX_VM_INSTALL_TIMEOUT')
 # Internal:
 # Check mirror.suse.asia/dist/slp to see whether modules/products are saved seperately
 seperate = False
+
+if VIRT_INSTALL and VM_INSTALL_DETECT:
+    with open("/etc/os-release", "r") as fd:
+        lines = [ x.strip() for x in fd.readlines() ]
+
+        for line in lines:
+            if "VERSION=" in line:
+                SLEver = line.split("=")[1].strip('"')
+                # virt-install in SLE12SP2 has bug, use vm-install
+                # VERSION could be "12"/"12-SP2"/"12-SP3"/"15.3"/"15-SP1"
+                # In Tumbleweed is: # VERSION="20210803"
+                if SLEver == "12":
+                    print("Force to use vm-install in SLE12SP0!")
+                    VIRT_INSTALL = False
 
 if VIRT_INSTALL:
     def _nfs_enabled(path):
