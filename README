@@ -19,6 +19,9 @@ deploy/  : the main part of this project, we deploy cluster and run testcases ba
   -ssh_keys: the ssh keys to make host login vm without password, and interaction
              between vms without password.
   -template: stores template of configuration for the cluster.
+  -jenkins-job-examples: templates of jenkins job configured in server.
+  -dummy_temp: Temporary folder for generated autoyast files.
+               dummy_temp/nfs_share required if NFS for virt-install enabled.
 
   This is just for the project configuration and description, we run it in jenkins so
   far, you need some configurations in jenkins, for configure example of jenkins,
