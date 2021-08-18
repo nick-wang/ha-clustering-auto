@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 import sys, os, re
 import yaml
@@ -97,7 +97,7 @@ def Run(conf, xmldir):
     # ('PacemakerService', 'SetupCluster.service', runPackmakerService)
     #Define function runPackmakerService before using
     cases_def = []
-    for c_name in results.keys():
+    for c_name in list(results.keys()):
         cases_def.append( (c_name, TESTCASES.get(c_name, CLASSIFY[0]),
                            parseResult) )
 

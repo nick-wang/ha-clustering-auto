@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 import os, getopt, sys
 sys.path.append(os.path.dirname(os.getcwd())+"/scripts")

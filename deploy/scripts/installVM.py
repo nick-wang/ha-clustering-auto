@@ -1,7 +1,7 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
-import commands, subprocess
 import os, sys
+import subprocess
 import re
 import multiprocessing
 import time
@@ -13,12 +13,18 @@ from getClusterConf import get_vm_info_list, get_interface_info
 
 try:
     # python3
+    import configparser
     from urllib.request import urlopen
+
+    config = configparser.ConfigParser()
 except:
     # python2
+    import commands
+    import ConfigParser
     from urllib import urlopen
 
-config = ConfigParser.ConfigParser()
+    config = ConfigParser.ConfigParser()
+
 config.read('config.ini')
 section = 'INSTALL'
 
@@ -192,7 +198,7 @@ def getSUSEVersionViaURL(repo):
     suse_release = {}
     lines = []
 
-    for version in url_pattern.keys():
+    for version in list(url_pattern.keys()):
         if version not in repo:
             continue
 
@@ -393,7 +399,7 @@ def get_shared_backing_file_name(vm, devices, repo_url):
 def get_backing_file_name(vm, devices):
      vm_name = vm['name']
 
-     if devices.has_key("disk_dir") and devices["disk_dir"] is not None:
+     if "disk_dir" in devices and devices["disk_dir"] is not None:
          disk = backing_file_disk_pattern % (devices["disk_dir"], vm_name)
      else:
          disk = backing_file_disk_pattern % (default_dev["disk_dir"], vm_name)
@@ -501,7 +507,7 @@ def prepareVMs(vm_list=[], res={}, devices={}, autoyast=""):
 
     print("Autoyast template from: %s\n" % os_settings)
 
-    for key in default_res.keys():
+    for key in list(default_res.keys()):
         if res[key] is None:
             res[key] = default_res[key]
 
@@ -543,7 +549,7 @@ def parse_vm_args(vm, devices):
     # get value from vm config
     if vm['disk'] is not None:
         disk = vm['disk']
-    elif devices.has_key("disk_dir") and devices["disk_dir"] is not None:
+    elif "disk_dir" in devices and devices["disk_dir"] is not None:
         disk = disk_pattern % (devices["disk_dir"], vm_name)
     else:
         disk = disk_pattern % (default_dev["disk_dir"], vm_name)
@@ -552,11 +558,11 @@ def parse_vm_args(vm, devices):
     # Not necessary to add 'disk_dir' and 'backing_file' here
     devices_keys=('ostype', 'nic', 'second_nic', 'vcpus', 'memory', 'disk_size')
 
-    for key in default_vm_install.keys():
+    for key in list(default_vm_install.keys()):
         if key in devices_keys:
             if vm[key] is not None:
                 vm[key] = vm[key]
-            elif devices.has_key(key) and devices[key] is not None:
+            elif key in devices and devices[key] is not None:
                 vm[key] = devices[key]
             else:
                 vm[key] = default_vm_install[key]
@@ -665,7 +671,7 @@ def installVMs(vm_list, res, devices, autoyast, os_settings, base_image = ""):
 
         if exitcode != 0:
             print("the installing processes exited with %d" % (exitcode))
-            for vm1 in processes.keys():
+            for vm1 in list(processes.keys()):
                 process1 = processes[vm1]["process"]
                 if process1.is_alive():
                     print("terminate process %d with vm %s" %(process1.pid, vm1))
@@ -701,7 +707,7 @@ if __name__ == "__main__":
 
     if os.path.exists("/var/run/vm-install/") == False:
         os.makedirs("/var/run/vm-install/")
-    os.chmod("/var/run/vm-install/", 0755)
+    os.chmod("/var/run/vm-install/", 0o755)
     if len(sys.argv) > 3:
        usage()
     elif len(sys.argv) == 3:

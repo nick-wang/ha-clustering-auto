@@ -1,8 +1,8 @@
-#! /usr/bin/python
+#!/usr/bin/python3
 
 import os
 import sys
-import commands
+import subprocess
 import time
 import socket
 import smtplib
@@ -15,7 +15,7 @@ from glob import glob
 
 import smtplib
 from email.mime.text import MIMEText
-mailto_list=["bliu@suse.com"]#, "zzhou@suse.com"]
+mailto_list=["nwang@suse.com"]#, "zzhou@suse.com"]
 mail_host="smtp.gmail.com"
 mail_port='587'
 mail_user="slehapek"
@@ -83,7 +83,7 @@ def printVMs(vmlist, listname):
 
 def getVMByName(vmname):
     cmd = 'virsh domblklist %s|grep \/' % (vmname)
-    status, output = commands.getstatusoutput(cmd)
+    status, output = subprocess.getstatusoutput(cmd)
     if status:
         sys.exit(-1)
     disk_list = output.split('\n')
@@ -103,7 +103,7 @@ def remove_vm(vm, remove=True):
     vmname = vm.get_vmname()
     disk_list = vm.get_disks()
     cmd = 'virsh destroy %s' % vmname
-    status, output = commands.getstatusoutput(cmd)
+    status, output = subprocess.getstatusoutput(cmd)
     print("destroying vm %s" % vmname)
     #just shutdown vm
     if remove == False:
@@ -117,11 +117,11 @@ def remove_vm(vm, remove=True):
         os.remove(path)
         print("os.remove(%s)" % path)
     cmd = "virsh undefine %s" % vmname
-    status, output = commands.getstatusoutput(cmd)
+    status, output = subprocess.getstatusoutput(cmd)
     print("status, output = commands.getstatusoutput(%s)" % cmd)
 
 def checkVMExists(vmname):
-    status,_=commands.getstatusoutput("virsh domid %s" % vmname)
+    status,_=subprocess.getstatusoutput("virsh domid %s" % vmname)
     if status==0:
         return True
     else:
@@ -173,14 +173,14 @@ def getHostInfo():
 
 def get_ip_first_ip():
     cmd = 'ip addr|grep -w inet|egrep -v "vir|127.0.0.1"'
-    status,output = commands.getstatusoutput(cmd)
+    status,output = subprocess.getstatusoutput(cmd)
     ipList=output.split('\n')
     return ipList[0].strip().split()[1]
 
 def get_vm_name_list():
     vm_list = []
     cmd='virsh list --all|egrep "shut off|running"'
-    status, output=commands.getstatusoutput(cmd)
+    status, output=subprocess.getstatusoutput(cmd)
     elelist=output.split('\n')
 
     for el in elelist:
@@ -215,7 +215,7 @@ def send_mail(to_list,sub,content):
         s.sendmail(me, to_list, msg.as_string())
         s.close()
         return True
-    except Exception, e:
+    except Exception as e:
         print(str(e))
         return False
 
@@ -261,7 +261,7 @@ def get_all_disks(get_backing_files=False):
             tmp["isExist"] = True
 
             cmd = 'qemu-img info %s |grep "backing file:"' % dpath
-            status, output = commands.getstatusoutput(cmd)
+            status, output = subprocess.getstatusoutput(cmd)
             if status == 0:
                 tmp["useBackingFile"] = True
                 tmp["BackingFileName"] = output.split(":")[1].strip()

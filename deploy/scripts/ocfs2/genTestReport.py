@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 #
 # genTestReport.py <BUILD_LOG_DIR>
 
@@ -29,7 +29,7 @@ def parseSingleLog(log, test_report_dir):
 			priorLine = line
 
 	with open(test_report_dir + "/single_report.txt", "w") as f:
-		for k, v in tblLog.iteritems():
+		for k, v in tblLog.items():
 			row = str(k) + " " + str(v[0]) + " " + str(v[1])
 			f.write(row + "\n")
 
@@ -54,7 +54,7 @@ def parseO2locktopLog(log, test_report_dir):
 			priorLine = line
 
 	with open(test_report_dir + "/o2locktop_report.txt", "w") as f:
-		for k, v in tblLog.iteritems():
+		for k, v in tblLog.items():
 			row = str(k) + " " + str(v[0]) + " " + str(v[1])
 			f.write(row + "\n")
 
@@ -89,7 +89,7 @@ def parseMultipleLog(log, test_report_dir):
 				pass
 
 	with open(test_report_dir + "/multiple_report.txt", "w") as f:
-		for k, v in tblLog.iteritems():
+		for k, v in tblLog.items():
 			row = str(k) + " " + str(v[0]) + " " + str(v[1])
 			f.write(row + "\n")
 
@@ -114,7 +114,7 @@ def parseDiscontigBgSingleLog(log, test_report_dir):
 			tblLog[case] = [result]
 
 	with open(test_report_dir + "/discontig_bg_single_report.txt", "w") as f:
-		for k, v in tblLog.iteritems():
+		for k, v in tblLog.items():
 			row = str(k) + " " + str(v[0])
 			f.write(row + "\n")
 
@@ -139,7 +139,7 @@ def parseDiscontigBgMultipleLog(log, test_report_dir):
 			tblLog[case] = [result]
 
 	with open(test_report_dir + "/discontig_bg_multiple_report.txt", "w") as f:
-		for k, v in tblLog.iteritems():
+		for k, v in tblLog.items():
 			row = str(k) + " " + str(v[0])
 			f.write(row + "\n")
 

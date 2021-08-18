@@ -1,4 +1,4 @@
-#! /usr/bin/python
+#!/usr/bin/python3
 
 import subprocess, getopt
 import xml.etree.ElementTree as ET
@@ -79,7 +79,7 @@ def get_ip_list_by_mac(vm_name_list, ip_range="10.67.16.0/21"):
     return result
 
 def isAllIpAssigned(vm_info_list):
-    for vm in vm_info_list.keys():
+    for vm in list(vm_info_list.keys()):
         if vm_info_list[vm][0] == "":
             return False
     return True
@@ -92,7 +92,7 @@ def restartGuest(name):
 
 def restartNoIpNodes(vm_info_list):
     processes = []
-    for vm in vm_info_list.keys():
+    for vm in list(vm_info_list.keys()):
         if vm_info_list[vm][0] == "":
             p = Process(target=restartGuest, args=(vm, ), name=vm)
             p.start()
@@ -111,7 +111,7 @@ def get_cluster_conf(sleep_time="0", configuration="../cluster_conf",
 
     vm_list = dp.get_vms_conf()
     devices = dp.get_single_section_conf("devices")
-    if devices is not None and devices.has_key("nic"):
+    if devices is not None and "nic" in devices:
         interface = devices["nic"]
     else:
         interface = "br0"
@@ -165,7 +165,7 @@ def write_conf_file(vm_list, dp, interface, recursive, stonith):
     num_vms = len(vm_list)
     contents = "NODES=%d\n" % num_vms
     i = 1
-    vms = vm_info_list.keys()
+    vms = list(vm_info_list.keys())
     vms.sort()
     for vm in vms:
         contents += "HOSTNAME_NODE%d=%s\n" % (i, vm)

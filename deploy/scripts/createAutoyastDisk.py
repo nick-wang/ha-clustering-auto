@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 import os
 import sys
 import tempfile
@@ -110,14 +110,12 @@ class AutoyastDisk(object):
             return False
 
         # tempfile.TemporaryDirectory() only available after python3.2
-        #with tempfile.TemporaryDirectory() as tmpdname:
-        tmpdname = tempfile.mkdtemp()
-        print("Create temp dir %s to mount qemu img." % tmpdname)
-        self._mount_img(tmpdname)
-        self._cp_autoyast_file(tmpdname, autoyast)
-        self._umount_img(tmpdname)
+        with tempfile.TemporaryDirectory() as tmpdname:
+            print("Create temp dir %s to mount qemu img." % tmpdname)
+            self._mount_img(tmpdname)
+            self._cp_autoyast_file(tmpdname, autoyast)
+            self._umount_img(tmpdname)
 
-        os.system('rm -rf %s' % tmpdname)
 
     def get_img(self):
         '''

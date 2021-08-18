@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 import sys
 import os
 import socket
@@ -18,7 +18,7 @@ def get_ipaddr_by_interface(interface):
                                   0x8915, \
                                   struct.pack('256s', ifname[:15]))[20:24])
         return ipaddr
-    except Exception, e:
+    except Exception as e:
         return ''
 
 def is_interface_existed(interface):
@@ -48,7 +48,7 @@ def get_net_mask(interface):
                                   0x891b, \
                                   struct.pack('256s',ifname[:15]))[20:24])
         return netmask
-    except Exception, e:
+    except Exception as e:
         return ''
 
 def get_netaddr(interface):

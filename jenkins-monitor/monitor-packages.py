@@ -1,7 +1,7 @@
-#! /usr/bin/python
+#!/usr/bin/python
 #http://download.suse.de/ibs/SUSE:/SLE-12-SP2:/GA/standard/x86_64/
 
-import re, os, urllib2, sys
+import re, os, urllib.request, sys
 import getopt
 support_schemas = {'pacemaker':
                        ('pacemaker', 'corosync'),
@@ -103,7 +103,7 @@ def need_update(old_packages, new_packages):
                 break
         else:
             #print("New record: " + new_package)
-            if need_updated.has_key("NEW"):
+            if "NEW" in need_updated:
                 need_updated["NEW"].append(new_package)
             else:
                 need_updated["NEW"] = [new_package]
@@ -112,12 +112,12 @@ def need_update(old_packages, new_packages):
 
 def main(url):
     global packages_monitoring
-    #response=urllib2.urlopen('http://download.suse.de/ibs/SUSE:/SLE-12-SP2:/GA/standard/x86_64/')
-    #response=urllib2.urlopen('http://10.67.160.200/SLP/openSUSE-Tumbleweed/latest/x86_64/')
+    #response=urllib.request.urlopen('http://download.suse.de/ibs/SUSE:/SLE-12-SP2:/GA/standard/x86_64/')
+    #response=urllib.request.urlopen('http://10.67.160.200/SLP/openSUSE-Tumbleweed/latest/x86_64/')
     try:
-        response=urllib2.urlopen(url)
+        response=urllib.request.urlopen(url)
         html = response.read()
-    except Exception, e:
+    except Exception as e:
         print("wrong url %s" % url)
         print(e)
         usage()
@@ -143,7 +143,7 @@ def main(url):
         if len(need_updated) > 0:
             print("-----------------------")
             print("please update packages:")
-            for old_package in need_updated.keys():
+            for old_package in list(need_updated.keys()):
                 if old_package != "NEW":
                     print("update %s to %s" %(old_package, need_updated[old_package]))
                 else:

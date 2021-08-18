@@ -1,4 +1,4 @@
-#! /usr/bin/python
+#!/usr/bin/python3
 
 import os, sys, re
 from junit_xml import TestSuite, TestCase
@@ -17,7 +17,7 @@ def get_result(args=None):
 
     tmp = get_result_of_testcase(testcase, logfile)
 
-    if 'calls' not in tmp.keys():
+    if 'calls' not in list(tmp.keys()):
         return {"status":"skip", "message":"Testcase %s skipped" % testcase, "output":"skipped", "skipall": False}
 
     if tmp['calls'] > 0 and tmp['failure'] == 0:

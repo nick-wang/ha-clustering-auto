@@ -1,4 +1,4 @@
-#! /usr/bin/python
+#!/usr/bin/python3
 
 import yaml
 import os, sys
@@ -99,7 +99,7 @@ class GET_VM_CONF:
         '''
             Only for single section, can not use for list.
         '''
-        if not self.structs.has_key(section):
+        if section not in self.structs:
             print("Need to config a new section (%s)." % section)
             sys.exit(4)
 
@@ -121,7 +121,7 @@ class GET_VM_CONF:
             Only for list section with only one option.
             list section in yaml file starts with "-"
         '''
-        if not self.lists.has_key(section):
+        if section not in self.lists:
             print("Need to config a new list section (%s)." % section)
             sys.exit(4)
 
@@ -205,7 +205,7 @@ def test(deployfile=""):
     vm_list = dp.get_vms_conf()
     target_list = dp.get_shared_target()
 
-    for i in dp.structs.keys():
+    for i in list(dp.structs.keys()):
         print(dp.get_single_section_conf(i))
     repos=dp.get_list_section_conf("repos")
     if len(repos) > 0:

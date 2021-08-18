@@ -1,4 +1,4 @@
-#! /usr/bin/python
+#!/usr/bin/python3
 
 # parse the original test_results file, rewrite simplified
 # result into another file.
@@ -38,7 +38,7 @@ def run(test_results, new_file):
 	f.close()
 
 	f = open(new_file, 'w')
-	for name in resDict.keys():
+	for name in list(resDict.keys()):
 		line = name + ' ' + resDict[name] + '\n'
 		f.write(line)
 	f.close()
