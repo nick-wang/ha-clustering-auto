@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 #http://download.suse.de/ibs/SUSE:/SLE-12-SP2:/GA/standard/x86_64/
 
 import re, os, urllib.request, sys
@@ -116,7 +116,8 @@ def main(url):
     #response=urllib.request.urlopen('http://10.67.160.200/SLP/openSUSE-Tumbleweed/latest/x86_64/')
     try:
         response=urllib.request.urlopen(url)
-        html = response.read()
+        # Use decode/str since python3 will read as bytes by default
+        html = response.read().decode('utf-8')
     except Exception as e:
         print("wrong url %s" % url)
         print(e)

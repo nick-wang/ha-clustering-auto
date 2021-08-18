@@ -6,7 +6,6 @@ import re
 import multiprocessing
 import time
 import shutil
-import ConfigParser
 
 from parseYAML import GET_VM_CONF
 from getClusterConf import get_vm_info_list, get_interface_info 
@@ -204,7 +203,8 @@ def getSUSEVersionViaURL(repo):
 
         print("From url: %s" %  repo+url_pattern[version]['postfix'])
         fd = urlopen(repo+url_pattern[version]['postfix'])
-        lines = fd.readlines()
+        # Use decode or str(x), since python3 will convert line to bytes
+        lines = [x.decode('utf-8') for x in fd.readlines()]
         fd.close()
 
         if len(lines) == 0:
@@ -490,7 +490,7 @@ def create_vms_on_backing_file(vm_list, devices, base_image):
 
 def create_base_image_git_entry(base_image):
     if not os.path.isfile(base_image):
-		return False
+        return False
 
     lines = os.popen("git rev-parse HEAD").readlines()
     commit = lines[0].strip()
