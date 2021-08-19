@@ -59,7 +59,7 @@ class Resource:
 def retrieveResource(url, pattern):
     page = urllib.urlopen(url)
     # use str() because python3 will make line in bytes
-    filelines = [str(line.strip()) for line in page.readlines()]
+    filelines = [line.decode('utf-8').strip() for line in page.readlines()]
     page.close()
 
     res_list = []
@@ -119,7 +119,7 @@ def download_all(resources, location, verify):
                                                                os.path.abspath(location)))
             continue
 
-        print("Start to download: %s" % res.getMedia())
+        print("Start to download: \n\t(%s) to folder (%s)" % (res.getMedia(), location))
         print("\t===Downloading %s ===" % datetime.datetime.now())
         # Using wget instead of urllib2 to download
         #response = urllib.urlopen(res.getMedia())
@@ -284,7 +284,7 @@ def test():
     for res in resources:
         pprint.pprint(res.value)
 
-    download_all(resources, "./")
+    download_all(resources, "./", "")
 
 
 if __name__ == "__main__":

@@ -24,7 +24,7 @@ def getMacAddrs(domname):
         bufsize=1024, stdin=subprocess.PIPE, stdout=subprocess.PIPE, \
         stderr=subprocess.PIPE)
     (output, erroutput) = p.communicate()
-    macs = output.split("\n")
+    macs = output.decode('utf-8').split("\n")
     macaddrs = []
     for mac in macs:
         if ("Interface" in mac) or \
@@ -41,7 +41,7 @@ def scan_for_hosts(ip_range):
     nmap_args = ['nmap', '-n', '-sP', '-oX', '-', ip_range]
     p=subprocess.Popen(nmap_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdoutput, stderroutput=p.communicate()
-    return stdoutput
+    return stdoutput.decode('utf-8')
 
 def find_ip_address_for_mac_address(xml, mac_address):
     """Parse Nmap's XML output, find the host element with the given

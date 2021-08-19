@@ -19,6 +19,7 @@ Q. How to deploy a host server?
   10. Add a virbr0 for NAT.
   11. Install python library junit-xml.
       For sles, need python-setuptools.
+      or https://download.opensuse.org/distribution/leap/15.2/repo/oss/
   12. Install python library python-psutil.
       For cleanVM, get cpu/mem usage.
   13. Configure mail:

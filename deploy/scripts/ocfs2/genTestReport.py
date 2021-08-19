@@ -156,7 +156,7 @@ def main(dir):
 
 	if p.returncode == 0:
 		if (stdoutdata):
-			single_log = str(stdoutdata).splitlines()[-1]
+			single_log = stdoutdata.decode('utf-8').splitlines()[-1]
 		print("Single log file: %s" % single_log)
 	else:
 		print(stderrdata)
@@ -166,7 +166,7 @@ def main(dir):
 
 	if p.returncode == 0:
 		if (stdoutdata):
-			multiple_log = str(stdoutdata).splitlines()[-1]
+			multiple_log = stdoutdata.decode('utf-8').splitlines()[-1]
 		print("Multiple log file: %s" % multiple_log)
 	else:
 		print(stderrdata)
@@ -176,7 +176,7 @@ def main(dir):
 
 	if p.returncode == 0:
 		if (stdoutdata):
-			discontig_bg_single_log = str(stdoutdata).splitlines()[-1]
+			discontig_bg_single_log = stdoutdata.decode('utf-8').splitlines()[-1]
 		print("Discontig bg single log file: %s" % discontig_bg_single_log)
 	else:
 		print(stderrdata)
@@ -186,7 +186,7 @@ def main(dir):
 
 	if p.returncode == 0:
 		if (stdoutdata):
-			discontig_bg_multiple_log = str(stdoutdata).splitlines()[-1]
+			discontig_bg_multiple_log = stdoutdata.decode('utf-8').splitlines()[-1]
 		print("Discontig bg multiple log file: %s" % discontig_bg_multiple_log)
 	else:
 		print(stderrdata)
@@ -196,7 +196,7 @@ def main(dir):
 
 	if p.returncode == 0:
 		if (stdoutdata):
-			o2locktop_log = str(stdoutdata).splitlines()[-1]
+			o2locktop_log = stdoutdata.decode('utf-8').splitlines()[-1]
 		print("O2locktop log file: %s" % o2locktop_log)
 	else:
 		print(stderrdata)
