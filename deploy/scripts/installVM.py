@@ -54,7 +54,18 @@ if VIRT_INSTALL and VM_INSTALL_DETECT:
         for line in lines:
             if "VERSION=" in line:
                 SLEver = line.split("=")[1].strip('"')
-                # virt-install in SLE12SP2 has bug, use vm-install
+                # virt-install known issue1:
+                #     in SLE12SP0 has bug in loading autoyast kernel/initrd
+                # virt-install known issue2:
+                #     in SLE12SP2/SP3, failed to install openSUSETumbleweed
+                #   due to no general/version available in openSUSE-Tumbleweed/latest/.treeinfo
+                #   Should use:
+                #       if SLEver.startswith("12"):
+                #           print("Force to use vm-install in SLE12SPx!")
+                #   Alternative way:
+                #     package virt-manager-common: file /usr/share/virt-manager/virtinst/urlfetcher.py
+                #     In `isValidStore()`, always return True
+                #     Modify in virtual host manually
                 # VERSION could be "12"/"12-SP2"/"12-SP3"/"15.3"/"15-SP1"
                 # In Tumbleweed is: # VERSION="20210803"
                 if SLEver == "12":
@@ -334,8 +345,10 @@ def installVM(VMName, disk, OSType, vcpus, memory, disk_size, source, nic, secon
         if graphics not in ("vnc", "none"):
             graphics = "vnc"
 
+        # `osinfo-query os` for full list of valid --os-type/--os-variant
+        # --os-type is replaced by --os-variant
         options = "%s --wait -1 \
-                --name %s --os-type %s \
+                --name %s --os-variant %s \
                 --connect qemu:///system \
                 --vcpus=%d --ram=%d \
                 --graphics %s \
@@ -352,6 +365,8 @@ def installVM(VMName, disk, OSType, vcpus, memory, disk_size, source, nic, secon
         else:
             cmd = "virt-install %s 2>/dev/null" % options
     else:
+        # `osinfo-query os` for full list of valid --os-type/--os-variant
+        # --os-type is replaced by --os-variant
         options = "%s --os-type %s --name %s \
                 --vcpus %d --memory %d \
                 --disk %s,vda,disk,w,%d,sparse=0, \
