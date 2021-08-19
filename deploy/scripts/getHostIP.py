@@ -16,7 +16,7 @@ def get_ipaddr_by_interface(interface):
         #usr/include/linux/sockios.h
         ipaddr = socket.inet_ntoa(fcntl.ioctl(s.fileno(), \
                                   0x8915, \
-                                  struct.pack('256s', ifname[:15]))[20:24])
+                                  struct.pack('256s', ifname[:15].encode('utf-8')))[20:24])
         return ipaddr
     except Exception as e:
         return ''
@@ -46,7 +46,7 @@ def get_net_mask(interface):
     try:
         netmask = socket.inet_ntoa(fcntl.ioctl(s.fileno(), \
                                   0x891b, \
-                                  struct.pack('256s',ifname[:15]))[20:24])
+                                  struct.pack('256s',ifname[:15].encode('utf-8')))[20:24])
         return netmask
     except Exception as e:
         return ''
