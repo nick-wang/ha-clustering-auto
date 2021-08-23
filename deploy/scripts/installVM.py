@@ -476,7 +476,10 @@ def create_vms_on_backing_file(vm_list, devices, base_image):
     for i in range(len(vm_list)):
         vm = vm_list[i]
         vm, disk = parse_vm_args(vm, devices)
-        disk_name = disk.split(':')[1]
+        if VIRT_INSTALL:
+            disk_name = disk
+        else:
+            disk_name = disk.split(':')[1]
 
         #create the new image
         print("qemu-img create -f qcow2 %s -b %s" % (disk_name, base_image))
@@ -645,8 +648,11 @@ def installVMs(vm_list, res, devices, autoyast, os_settings, base_image = ""):
         vm_name = vm['name']
 
         vm, disk = parse_vm_args(vm, devices)
-        if not VIRT_INSTALL and base_image != "" :
-            disk = "qcow2:" + base_image
+        if base_image != "" :
+            if VIRT_INSTALL:
+                disk = base_image
+            else:
+                disk = "qcow2:" + base_image
 
         print("Note: Prepare to install virt-machine %s in disk(base:%s) %s." % ( vm['name'], base_image, disk ))
 
