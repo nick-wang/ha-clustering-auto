@@ -394,17 +394,22 @@ def get_shared_backing_file_name(vm, devices, repo_url):
     base_name = "%s-%s-%s-%s-Build%s-size%d" % (suse['flavor'], suse['version'],
                     suse['patch'], suse['arch'], suse['build'], vm['disk_size'])
     disk = backing_file_disk_pattern % (DEFAULT_BASE_DIR, base_name)
-    return disk.split(':')[1]
+    if VIRT_INSTALL:
+        return disk
+    else:
+        return disk.split(':')[1]
 
 def get_backing_file_name(vm, devices):
-     vm_name = vm['name']
+    vm_name = vm['name']
 
-     if "disk_dir" in devices and devices["disk_dir"] is not None:
-         disk = backing_file_disk_pattern % (devices["disk_dir"], vm_name)
-     else:
-         disk = backing_file_disk_pattern % (default_dev["disk_dir"], vm_name)
-
-     return disk.split(':')[1]
+    if "disk_dir" in devices and devices["disk_dir"] is not None:
+        disk = backing_file_disk_pattern % (devices["disk_dir"], vm_name)
+    else:
+        disk = backing_file_disk_pattern % (default_dev["disk_dir"], vm_name)
+    if VIRT_INSTALL:
+        return disk
+    else:
+        return disk.split(':')[1]
 
 def find_an_exist_backing_file(base_image):
     return os.path.isfile(base_image)

@@ -26,6 +26,12 @@ NUM=$1
 temp=$(nconvert ${NUM})
 disk=/dev/vd${temp}
 
+if [ ! -e ${disk} ]
+then
+	echo "ERROR! No device $disk exist on host."
+	exit -1
+fi
+
 #Partition
 # Plan to create 3 resources.
 # multi-res:
