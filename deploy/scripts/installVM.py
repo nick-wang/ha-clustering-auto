@@ -645,7 +645,7 @@ def installVMs(vm_list, res, devices, autoyast, os_settings, base_image = ""):
         vm_name = vm['name']
 
         vm, disk = parse_vm_args(vm, devices)
-        if base_image != "" :
+        if not VIRT_INSTALL and base_image != "" :
             disk = "qcow2:" + base_image
 
         print("Note: Prepare to install virt-machine %s in disk(base:%s) %s." % ( vm['name'], base_image, disk ))
