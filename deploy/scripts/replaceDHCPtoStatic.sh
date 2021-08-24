@@ -38,7 +38,7 @@ echo "Force convert IP retrieve from dhcp to static: $IPMASK"
 
 cp /etc/sysconfig/network/ifcfg-${NIC} /etc/sysconfig/network/ifcfg-${NIC}.bak
 
-cat <<EOF >> /etc/sysconfig/network/ifcfg-${NIC}
+cat <<EOF > /etc/sysconfig/network/ifcfg-${NIC}
 IPADDR='${IPMASK}'
 BOOTPROTO='static'
 STARTMODE='auto'
