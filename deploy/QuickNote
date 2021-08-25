@@ -32,6 +32,7 @@ Q. How to deploy a host server?
   15. use "root" user to run instead of "jenkins"
       vim /etc/sysconfig/jenkins
       JENKINS_USER="root"
+  16. Install package `bc` for DRBD advanced testing.
 
 Q. How to deploy a virtual host (jenkins guest)?
   1. Configure ntp-client:

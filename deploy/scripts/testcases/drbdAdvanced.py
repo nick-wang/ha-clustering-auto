@@ -47,6 +47,99 @@ def preRequirements(args=None):
 
     #Skipall following test cases when this failed
     result["skipall"] = skipall
+
+    if not skipall:
+        result["status"] = "pass"
+
+    result["message"] = message
+    result["output"] = output
+
+    return result
+
+
+def removeTestRes(args=None):
+    message = ""
+    output = ""
+    result = {"status":"fail", "message":"", "output":"", "skipall": False}
+
+    cluster_env = args[0]
+
+    #Own test steps
+    #Demote the TEST resource
+    os.system("ssh root@%s crm resource stop ms_%s" % (cluster_env["IP_NODE1"], RESNAME))
+
+    lines = os.popen("ssh root@%s crm resource status ms_%s" % (cluster_env["IP_NODE1"],
+                                                                RESNAME)).readlines()
+
+    for l in lines:
+        if "NOT running" not in l:
+            message = "Failed to stop DRBD resource %s." % RESNAME
+            output = l
+            break
+
+    if message == "":
+        os.system("ssh root@%s crm config delete ms_%s" % (cluster_env["IP_NODE1"], RESNAME))
+        os.system("ssh root@%s crm config delete res-%s" % (cluster_env["IP_NODE1"], RESNAME))
+
+        lines = os.popen("ssh root@%s crm configure show |grep %s" % (cluster_env["IP_NODE1"],
+                                                                    RESNAME)).readlines()
+
+        if len(lines):
+            message = "Failed to delete DRBD resource %s." % RESNAME
+            output = lines[0]
+
+    #Start the TEST resource
+    sleep(3)
+    for key in cluster_env.keys():
+        if key.startswith("IP_NODE"):
+            os.system("ssh root@%s drbdadm up %s" % (cluster_env[key], RESNAME))
+
+    #Skipall following test cases when this failed
+    if message != "" or output != "":
+        result["skipall"] = True
+
+    if not result["skipall"]:
+        result["status"] = "pass"
+
+    result["message"] = message
+    result["output"] = output
+
+    return result
+
+
+def verifyMD5(args=None):
+    message = ""
+    output = ""
+    result = {"status":"fail", "message":"", "output":"", "skipall": False}
+
+    cluster_env = args[0]
+
+    #Own test steps
+    cluster_conf = args[1]
+    xmldir = args[2]
+    loop = 2
+
+    cmd = "./testcases/scripts/drbdMD5sum.sh %s %s %s %s" % (RESNAME, loop,
+            xmldir, cluster_conf)
+
+    #Write/verify the md5sum
+    os.system(cmd)
+
+    fd = open(xmldir + "/drbdMD5sum-result", "r")
+    lines = [x.strip() for x in fd.readlines()]
+    fd.close()
+
+    for line in lines:
+        if not line.startswith("myrandom.file"):
+            continue
+
+        if "OK" not in line:
+            message = "Verify MD5sum failed!"
+            output = line
+
+    if message == "":
+        result["status"] = "pass"
+
     result["message"] = message
     result["output"] = output
 
@@ -67,7 +160,9 @@ def Run(conf, xmldir):
     #eg.
     # ('PacemakerService', 'SetupCluster.service', runPackmakerService)
     #Define function runPackmakerService before using
-    cases_def = [('drbdAdvancedRequirements', 'TEST.requirements', preRequirements)]
+    cases_def = [('drbdAdvancedRequirements', 'TEST.requirements', preRequirements),
+                 ('drbdAdvancedRemoveRes', 'TEST.RemoveRes', removeTestRes),
+                 ('drbdWriteMD5sum', 'DRBD.writeMD5', verifyMD5)]
                  #('ConfigureRes', 'SetupCluster.resources', runConfigureRes)]
 
     #Not necessary to modify the lines below!
@@ -79,7 +174,7 @@ def Run(conf, xmldir):
             skipCase(case, "Can not test!",
                      "Requirement of DRBD advanceding test not ready.")
             continue
-        skip_flag = assertCase(case, a_case[2], cluster_env)
+        skip_flag = assertCase(case, a_case[2], cluster_env, conf, xmldir)
         sleep(3)
 
     ts = TestSuite(TestSuiteName, testcases)
