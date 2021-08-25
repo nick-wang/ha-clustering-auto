@@ -12,6 +12,10 @@ then
     exit -1
 fi
 
+# Load config.ini for STATIC_IP
+source functions
+loadConfigToENV
+
 CLUSTER_CONF=$1
 CLUSTER_DIR=$2
 SKIP_CLUSTER=${3:-0}
@@ -46,8 +50,11 @@ scp ../template/authkey root@${ip}:${CLUSTER_DIR}/template/
 scp -p ../ssh_keys/id_rsa root@${ip}:/root/.ssh/
 scp ./configStonith.sh ./configCluster.sh ./functions ./replaceDHCPtoStatic.sh root@${ip}:${CLUSTER_DIR}/scripts/
 
-# Replace DHCP to static
-#ssh root@${ip} "cd ${CLUSTER_DIR}; ${CLUSTER_DIR}/scripts/replaceDHCPtoStatic.sh "
+if [ x"${STATIC_IP}" == x"True" ]
+then
+    # Replace DHCP to static IP
+    ssh root@${ip} "cd ${CLUSTER_DIR}; ${CLUSTER_DIR}/scripts/replaceDHCPtoStatic.sh "
+fi
 
 if [ ${SKIP_CLUSTER} -ne 1 ]
 then
