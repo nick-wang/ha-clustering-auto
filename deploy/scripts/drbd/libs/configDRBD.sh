@@ -12,9 +12,10 @@ NUM_MULTI=1
 MINORS[0]="1 6"
 MINORS[1]="2 7"
 
-NUM_SINGLE=2
+NUM_SINGLE=3
 MINORS[2]="3 8"
 MINORS[3]="5"
+MINORS[4]="9"
 # ================================================================
 
 function usage()

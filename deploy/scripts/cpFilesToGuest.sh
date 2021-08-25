@@ -14,7 +14,7 @@ fi
 
 # Load config.ini for STATIC_IP
 source functions
-loadConfigToENV
+loadConfigToENV >/dev/null
 
 CLUSTER_CONF=$1
 CLUSTER_DIR=$2

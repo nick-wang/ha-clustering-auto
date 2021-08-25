@@ -8,7 +8,9 @@ function loadConfigToENV()
     # Note:
     #     [DEFAULT] section in config.ini will overlap others
     # Usage:
-    #     loadConfigToENV
+    #     loadConfigToENV    # will show declared parameter in stdout
+    #   or:
+    #     loadConfigToENV > /dev/null
     #     echo $DEFAULT_BASE_DIR
     tempfile=$(mktemp)
     cat config.ini |grep "=" |sed 's/^/export /g' > $tempfile
