@@ -1,71 +1,13 @@
 #!/usr/bin/python3
 
 import sys, os, re
+import library.libDRBD as libDRBD
 
 from time import sleep
 from junit_xml import TestSuite, TestCase
 
 from library.libJunitXml import assertCase, skipCase
 from library.libReadConf import readClusterConf
-
-def _getDRBDInfo(cluster_env):
-    lines = os.popen("ssh root@%s drbdadm dump all" % cluster_env["IP_NODE1"]).readlines()
-    resources = [ line.strip().split()[1] for line in lines if line.startswith("resource ") ]
-
-    info = []
-
-    for r in resources:
-        res = {}
-        res["name"] = r
-        res["device"] = os.popen("ssh root@%s drbdadm sh-dev %s" % (cluster_env["IP_NODE1"], r)).readline().strip()
-        res["primaries"] = []
-
-        lines = os.popen("ssh root@%s drbdadm status %s" % (cluster_env["IP_NODE1"], r)).readlines()
-        # example:
-        # 1-single-0 role:Primary
-        #   disk:UpToDate
-        #   nick-SLE15-SP3-drbd-milestone-node2 role:Secondary
-        #     peer-disk:UpToDate
-        #   nick-SLE15-SP3-drbd-milestone-node3 role:Secondary
-        #     peer-disk:UpToDate
-        # 
-        # 1-single-1 role:Secondary
-        #   disk:UpToDate
-        #   nick-SLE15-SP3-drbd-milestone-node2 role:Primary
-        #     peer-disk:UpToDate
-        #   nick-SLE15-SP3-drbd-milestone-node3 role:Secondary
-        #     peer-disk:UpToDate
-
-        for line in lines:
-            if " role:Primary" in line:
-                if line.startswith(" "):
-                    res["primaries"].append(line.strip().split()[0])
-                else:
-                    res["primaries"].append(cluster_env["HOSTNAME_NODE1"])
-
-        info.append(res)
-
-    return info
-
-def getNodesNumber(cluster_env):
-    lines = os.popen("ssh root@%s crm_node -l" % cluster_env["IP_NODE1"]).readlines()
-    return len(lines)
-
-def getResNumber(cluster_env):
-    ''' Get the resource numbers per node. '''
-    resource_lists = []
-
-    lines = os.popen("ssh root@%s crm configure show" % cluster_env["IP_NODE1"]).readlines()
-    for line in lines:
-        tmp = re.match("\s*params drbd_resource=([\w-]*)\s+.*", line)
-        if tmp is not None:
-            resource_lists.append(tmp.groups()[0])
-    return len(resource_lists)
-
-def getVolumeNumber(cluster_env):
-    ''' Get the volume numbers per node. '''
-    lines = os.popen("ssh root@%s drbdadm dstate all" % cluster_env["IP_NODE1"]).readlines()
-    return len(lines)
 
 def configurePacemaker(args=None):
     message = ""
@@ -156,8 +98,8 @@ def checkDRBDState(args=None):
 
     #Own test steps
     uptodate_disk = 0
-    node_num = getNodesNumber(cluster_env)
-    disk_num = getVolumeNumber(cluster_env)
+    node_num = libDRBD.getNodesNumber(cluster_env)
+    disk_num = libDRBD.getVolumeNumber(cluster_env)
 
     lines = os.popen("ssh root@%s drbdadm status all" % cluster_env["IP_NODE1"]).readlines()
     pa = re.compile("[ -]disk:UpToDate$")
@@ -186,8 +128,8 @@ def checkDRBDRole(args=None):
     #Own test steps
     primary_num = 0
     secondary_num = 0
-    node_num = getNodesNumber(cluster_env)
-    res_num = getResNumber(cluster_env)
+    node_num = libDRBD.getNodesNumber(cluster_env)
+    res_num = libDRBD.getResNumber(cluster_env)
 
     lines = os.popen("ssh root@%s drbdadm status all" % cluster_env["IP_NODE1"]).readlines()
 
@@ -225,7 +167,7 @@ def checkMakeFS(args=None):
     ok_list = []
     index = 0
 
-    info = _getDRBDInfo(cluster_env)
+    info = libDRBD.getDRBDInfo(cluster_env)
 
     if len(info) <= 0:
         result["status"] = "skip"
