@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 
 import sys, os, re
-import subprocess
 import configparser
 import library.libDRBD as libDRBD
 
@@ -10,6 +9,7 @@ from junit_xml import TestSuite, TestCase
 
 from library.libJunitXml import assertCase, skipCase
 from library.libReadConf import readClusterConf
+from library.shell import shell
 
 config = configparser.ConfigParser({'TEST_RESOURCE':'dummy'})
 config.read('testcases/config.ini')
@@ -36,12 +36,13 @@ def preRequirements(args=None):
     for i in info:
         if RESNAME == i["name"]:
             cmd = "lsblk -b %s |grep -v NAME| xargs |cut -d ' ' -f 4" % i["device"]
-            line = os.popen("ssh root@%s %s" %
-                (cluster_env["IP_NODE1"], cmd)).readline().strip()
+
+            run = shell("ssh root@%s %s" % (cluster_env["IP_NODE1"], cmd))
 
             # TEST resource should >= 2G
-            if line is not None and int(line) >= 2147483648:
+            if run.output() and int(run.output()[0]) >= 2147483648:
                 break
+
     else:
         skipall = True
         message = "Size of DRBD %s backing device smaller than 2G." % RESNAME
@@ -71,56 +72,46 @@ def removeTestRes(args=None):
 
     #Own test steps
     #Demote the TEST resource
-    os.system("ssh root@%s crm resource stop ms_%s" % (cluster_env["IP_NODE1"], RESNAME))
+    shell("ssh root@%s crm resource stop ms_%s" % (cluster_env["IP_NODE1"], RESNAME))
 
-    lines = os.popen("ssh root@%s crm resource status ms_%s" % (cluster_env["IP_NODE1"],
-                                                                RESNAME)).readlines()
-    process = subprocess.Popen("ssh root@%s crm resource status ms_%s" %
-                               (cluster_env["IP_NODE1"], RESNAME),
-                               shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-
-    _, err = process.communicate()
-
-    lines = err.decode("utf-8").split("\n")
-
-    for l in lines:
-        if "NOT running" in l:
-            break
-
+    sleep(3)
+    run = shell("ssh root@%s crm resource status ms_%s" % (cluster_env["IP_NODE1"],
+                                                                RESNAME))
+    if run.errors():
+        for l in run.errors():
+            #Resource stopped or not configured at all
+            if "NOT running" or "No such device or address" in l:
+                break
+        else:
+            message = "Failed to stop DRBD resource %s." % RESNAME
+            output = l
     else:
-        message = "Failed to stop DRBD resource %s." % RESNAME
+        message = "Still have running DRBD resource %s in crm." % RESNAME
         output = l
 
     if message == "":
         #DRBD resource will stop after deleted
-        os.system("ssh root@%s crm config delete ms_%s" % (cluster_env["IP_NODE1"], RESNAME))
-        os.system("ssh root@%s crm config delete res-%s" % (cluster_env["IP_NODE1"], RESNAME))
+        shell("ssh root@%s crm config delete ms_%s" % (cluster_env["IP_NODE1"], RESNAME))
+        shell("ssh root@%s crm config delete res-%s" % (cluster_env["IP_NODE1"], RESNAME))
 
-        lines = os.popen("ssh root@%s crm configure show |grep %s" % (cluster_env["IP_NODE1"],
-                                                                    RESNAME)).readlines()
+        run = shell("ssh root@%s crm configure show |grep %s" % (cluster_env["IP_NODE1"], RESNAME))
 
-        if len(lines):
+        if run.output():
             message = "Failed to delete DRBD resource %s." % RESNAME
-            output = lines[0]
+            output = "\n".join(run.output())
 
     #Start the TEST resource with drbdadm
     sleep(3)
     for key in cluster_env.keys():
         if key.startswith("IP_NODE"):
-            os.system("ssh root@%s drbdadm up %s" % (cluster_env[key], RESNAME))
+            shell("ssh root@%s drbdadm up %s" % (cluster_env[key], RESNAME))
 
-        sleep(3)
-        process = subprocess.Popen("ssh root@%s drbdadm status _%s" %
-                                   (cluster_env[key], RESNAME), shell=True,
-                                   stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            sleep(2)
+            run = shell("ssh root@%s drbdadm status %s" % (cluster_env[key], RESNAME))
 
-        _, err = process.communicate()
-
-        if err:
-            lines = err.decode("utf-8")
-
-            message = "Failed to start DRBD resource %s." % RESNAME
-            output = lines
+            if run.errors():
+                message = "Failed to start DRBD resource %s." % RESNAME
+                output = "\n".join(run.errors())
 
     #Skipall following test cases when this failed
     if message != "" or output != "":
@@ -151,7 +142,7 @@ def verifyMD5(args=None):
             xmldir, cluster_conf)
 
     #Write/verify the md5sum
-    os.system(cmd)
+    shell(cmd)
 
     fd = open(xmldir + "/drbdMD5sum-result", "r")
     lines = [x.strip() for x in fd.readlines()]
@@ -184,7 +175,7 @@ def fioRequirements(args=None):
     #Own test steps
     for key in cluster_env.keys():
         if key.startswith("IP_NODE"):
-            os.system("ssh root@%s rpm -qi fio" % cluster_env[key])
+            shell("ssh root@%s rpm -qi fio" % cluster_env[key])
 
     result["message"] = message
     result["output"] = output
@@ -221,6 +212,7 @@ def Run(conf, xmldir):
             skipCase(case, "Can not test!",
                      "Requirement of DRBD advanceding test not ready.")
             continue
+        print("Running test case %s:%s()..." % (__file__, a_case[0]))
         skip_flag = assertCase(case, a_case[2], cluster_env, conf, xmldir)
         sleep(3)
 
