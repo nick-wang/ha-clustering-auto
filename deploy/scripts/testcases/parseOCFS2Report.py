@@ -198,5 +198,5 @@ def main(cluster_conf, testreport_dir):
 if __name__ == "__main__":
     if len(sys.argv) < 3:
         print("Usage: %s <CLUSTER_CONF> <TEST_REPORT_DIR>" % sys.argv[0])
-	sys.exit(1)
+        sys.exit(1)
     main(sys.argv[1], sys.argv[2])
