@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import sys, os, re
+import subprocess
 import configparser
 import library.libDRBD as libDRBD
 
@@ -16,6 +17,7 @@ section = 'DRBD'
 
 # TEST resource
 RESNAME = config.get(section, 'TEST_RESOURCE')
+
 
 def preRequirements(args=None):
     message = ""
@@ -42,7 +44,7 @@ def preRequirements(args=None):
                 break
     else:
         skipall = True
-        message = "No 2G TEST resource configured."
+        message = "Size of DRBD %s backing device smaller than 2G." % RESNAME
         output = str(line)
 
     #Skipall following test cases when this failed
@@ -58,6 +60,9 @@ def preRequirements(args=None):
 
 
 def removeTestRes(args=None):
+    '''
+    Remove DRBD test resource from pacemaker.
+    '''
     message = ""
     output = ""
     result = {"status":"fail", "message":"", "output":"", "skipall": False}
@@ -70,14 +75,24 @@ def removeTestRes(args=None):
 
     lines = os.popen("ssh root@%s crm resource status ms_%s" % (cluster_env["IP_NODE1"],
                                                                 RESNAME)).readlines()
+    process = subprocess.Popen("ssh root@%s crm resource status ms_%s" %
+                               (cluster_env["IP_NODE1"], RESNAME),
+                               shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+    _, err = process.communicate()
+
+    lines = err.decode("utf-8").split("\n")
 
     for l in lines:
-        if "NOT running" not in l:
-            message = "Failed to stop DRBD resource %s." % RESNAME
-            output = l
+        if "NOT running" in l:
             break
 
+    else:
+        message = "Failed to stop DRBD resource %s." % RESNAME
+        output = l
+
     if message == "":
+        #DRBD resource will stop after deleted
         os.system("ssh root@%s crm config delete ms_%s" % (cluster_env["IP_NODE1"], RESNAME))
         os.system("ssh root@%s crm config delete res-%s" % (cluster_env["IP_NODE1"], RESNAME))
 
@@ -88,11 +103,24 @@ def removeTestRes(args=None):
             message = "Failed to delete DRBD resource %s." % RESNAME
             output = lines[0]
 
-    #Start the TEST resource
+    #Start the TEST resource with drbdadm
     sleep(3)
     for key in cluster_env.keys():
         if key.startswith("IP_NODE"):
             os.system("ssh root@%s drbdadm up %s" % (cluster_env[key], RESNAME))
+
+        sleep(3)
+        process = subprocess.Popen("ssh root@%s drbdadm status _%s" %
+                                   (cluster_env[key], RESNAME), shell=True,
+                                   stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+        _, err = process.communicate()
+
+        if err:
+            lines = err.decode("utf-8")
+
+            message = "Failed to start DRBD resource %s." % RESNAME
+            output = lines
 
     #Skipall following test cases when this failed
     if message != "" or output != "":
@@ -146,6 +174,24 @@ def verifyMD5(args=None):
     return result
 
 
+def fioRequirements(args=None):
+    message = ""
+    output = ""
+    result = {"status":"fail", "message":"", "output":"", "skipall": False}
+
+    cluster_env = args[0]
+
+    #Own test steps
+    for key in cluster_env.keys():
+        if key.startswith("IP_NODE"):
+            os.system("ssh root@%s rpm -qi fio" % cluster_env[key])
+
+    result["message"] = message
+    result["output"] = output
+
+    return result
+
+
 def Run(conf, xmldir):
     cluster_env = readClusterConf(conf)
 
@@ -162,7 +208,8 @@ def Run(conf, xmldir):
     #Define function runPackmakerService before using
     cases_def = [('drbdAdvancedRequirements', 'TEST.requirements', preRequirements),
                  ('drbdAdvancedRemoveRes', 'TEST.RemoveRes', removeTestRes),
-                 ('drbdWriteMD5sum', 'DRBD.writeMD5', verifyMD5)]
+                 ('drbdWriteMD5sum', 'DRBD.writeMD5', verifyMD5),
+                 ('drbdFioRequirements', 'DRBD.Fio', fioRequirements)]
                  #('ConfigureRes', 'SetupCluster.resources', runConfigureRes)]
 
     #Not necessary to modify the lines below!
