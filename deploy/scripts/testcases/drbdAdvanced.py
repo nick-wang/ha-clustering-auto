@@ -75,7 +75,7 @@ def removeTestRes(args=None):
     #Demote the TEST resource
     shell("ssh root@%s crm resource stop ms_%s" % (cluster_env["IP_NODE1"], RESNAME))
 
-    sleep(3)
+    sleep(5)
     run = shell("ssh root@%s crm resource status ms_%s" % (cluster_env["IP_NODE1"],
                                                                 RESNAME))
     if run.errors():
@@ -93,6 +93,7 @@ def removeTestRes(args=None):
     if message == "":
         #DRBD resource will stop after deleted
         shell("ssh root@%s crm config delete ms_%s" % (cluster_env["IP_NODE1"], RESNAME))
+        sleep(5)
         shell("ssh root@%s crm config delete res-%s" % (cluster_env["IP_NODE1"], RESNAME))
 
         run = shell("ssh root@%s crm configure show |grep %s" % (cluster_env["IP_NODE1"], RESNAME))
@@ -102,7 +103,7 @@ def removeTestRes(args=None):
             output = "\n".join(run.output())
 
     #Start the TEST resource with drbdadm
-    sleep(3)
+    sleep(5)
     for key in cluster_env.keys():
         if key.startswith("IP_NODE"):
             shell("ssh root@%s drbdadm up %s" % (cluster_env[key], RESNAME))

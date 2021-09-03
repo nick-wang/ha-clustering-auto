@@ -80,6 +80,7 @@ def Run(conf, xmldir):
         if skip_flag:
             skipCase(case, "<skip reason>")
             continue
+        print("Running test case %s:%s()..." % (__file__, a_case[0])
         skip_flag = assertCase(case, a_case[2], cluster_env)
 
     ts = TestSuite(TestSuiteName, testcases)
