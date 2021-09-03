@@ -17,6 +17,7 @@ section = 'DRBD'
 
 # TEST resource
 RESNAME = config.get(section, 'TEST_RESOURCE')
+ENABLE_FIO= config.get(section, 'FIO_TEST')
 
 
 def preRequirements(args=None):
@@ -138,6 +139,7 @@ def verifyMD5(args=None):
     xmldir = args[2]
     loop = 2
 
+    #Need all role in secondary before test.
     cmd = "./testcases/scripts/drbdMD5sum.sh %s %s %s %s" % (RESNAME, loop,
             xmldir, cluster_conf)
 
@@ -173,9 +175,70 @@ def fioRequirements(args=None):
     cluster_env = args[0]
 
     #Own test steps
+    package = "fio"
     for key in cluster_env.keys():
         if key.startswith("IP_NODE"):
-            shell("ssh root@%s rpm -qi fio" % cluster_env[key])
+            run = shell("ssh root@%s rpm -qi %s" % (cluster_env[key], package))
+
+            if run.code != 0:
+                #Try install package fio
+                cmd = "zypper --non-interactive install --force-resolution %s" % package
+                run = shell("ssh root@%s %s" % (cluster_env[key], cmd))
+
+                if run.code != 0:
+                    message = "Can't install '%s' package." % package
+                    output = "\n".join(run.output())
+
+    #Skipall following test cases when this failed
+    if message != "" or output != "":
+        result["skipall"] = True
+
+    result["message"] = message
+    result["output"] = output
+
+    return result
+
+
+def fioTests(args=None):
+    message = ""
+    output = ""
+    result = {"status":"fail", "message":"", "output":"", "skipall": False}
+
+    cluster_env = args[0]
+
+    #Own test steps
+    cluster_conf = args[1]
+    xmldir = args[2]
+
+    for i in info:
+        if RESNAME == i["name"]:
+            device = i["device"]
+
+    if device:
+        #Promote on the first node
+        shell("ssh root@%s drbdadm primary %s" % (cluster_env["IP_NODE1"], RESNAME))
+
+        sleep(1)
+        run = shell("ssh root@%s drbdadm role %s" % (cluster_env["IP_NODE1"], RESNAME))
+
+        if not run.output() and run.output()[0] != "Primary":
+            message = "Can't promote DRBD res %s." % RESNAME
+            output = "\n".join(run.output())
+    else:
+        message = "Fail to find DRBD device of res %s." % RESNAME
+        output = RESNAME
+
+    if message == "":
+        # fio test
+        run = shell("./testcases/scripts/drbdFioTest.py -n {} -d {} -o {}".format(
+                    cluster_env["IP_NODE1"], device, xmldir))
+
+        if run.code != 0:
+            message = "Fail to run Fio test."
+            output = "\n".join(run.output())
+
+    if message == "":
+        result["status"] = "pass"
 
     result["message"] = message
     result["output"] = output
@@ -199,9 +262,11 @@ def Run(conf, xmldir):
     #Define function runPackmakerService before using
     cases_def = [('drbdAdvancedRequirements', 'TEST.requirements', preRequirements),
                  ('drbdAdvancedRemoveRes', 'TEST.RemoveRes', removeTestRes),
-                 ('drbdWriteMD5sum', 'DRBD.writeMD5', verifyMD5),
-                 ('drbdFioRequirements', 'DRBD.Fio', fioRequirements)]
+                 ('drbdWriteMD5sum', 'DRBD.writeMD5', verifyMD5)]
                  #('ConfigureRes', 'SetupCluster.resources', runConfigureRes)]
+
+    if ENABLE_FIO:
+        cases_def.extend([('drbdFioRequirements', 'DRBD.Fio', fioRequirements)])
 
     #Not necessary to modify the lines below!
     skip_flag = False
