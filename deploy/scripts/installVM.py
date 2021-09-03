@@ -520,6 +520,8 @@ def prepareVMs(vm_list=[], res={}, devices={}, autoyast=""):
             res[key] = default_res[key]
 
     if devices["backing_file"] or devices["sharing_backing_file"]:
+        vm_info_list = {}
+
         if devices["sharing_backing_file"]:
             # Get the disk_size based on the first node's configuration
             vm, _ = parse_vm_args(vm_list[0], devices)
@@ -532,14 +534,22 @@ def prepareVMs(vm_list=[], res={}, devices={}, autoyast=""):
         if not find_an_exist_backing_file(base_image):
             # Only installed one(1st) vm as backing file
             installVMs(vm_list[:1], res, devices, autoyast, os_settings, base_image)
-            if devices["sharing_backing_file"]:
-                time.sleep(100)
-                vm = vm_list[0]
-                ipaddr, netaddr, netmask = get_interface_info(vm['nic'])
-                ip_range = "%s/%d" % (ipaddr, netmask)
-                get_vm_info_list(vm_list[:1], ip_range, True)
+
+            time.sleep(100)
+            vm = vm_list[0]
+            ipaddr, netaddr, netmask = get_interface_info(vm['nic'])
+            ip_range = "%s/%d" % (ipaddr, netmask)
+            _, vm_info_list = get_vm_info_list(vm_list[:1], ip_range, True)
 
             create_base_image_git_entry(base_image)
+
+            #Remove the udev rule of base image
+            print(vm_info_list)
+            #Waiting for ssh service
+            time.sleep(70)
+            image_ip = vm_info_list[vm_list[0]['name']][0]
+
+            os.system("ssh root@{ip} rm -rf /etc/udev/rules.d/70-persistent-net.rules".format(ip=image_ip))
 
             # Destroy and undefine vm to use disk as backing file
             time.sleep(50)
