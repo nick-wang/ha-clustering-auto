@@ -267,7 +267,8 @@ def Run(conf, xmldir):
                  #('ConfigureRes', 'SetupCluster.resources', runConfigureRes)]
 
     if ENABLE_FIO:
-        cases_def.extend([('drbdFioRequirements', 'DRBD.Fio', fioRequirements)])
+        cases_def.extend([('drbdFioRequirements', 'DRBD.Fio', fioRequirements),
+                          ('drbdFioBasicTest', 'DRBD.Fio', fioTests)])
 
     #Not necessary to modify the lines below!
     skip_flag = False

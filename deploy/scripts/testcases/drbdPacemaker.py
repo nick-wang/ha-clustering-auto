@@ -347,7 +347,7 @@ def Run(conf, xmldir):
             skipCase(case, "Can not test!",
                      "Pacemaker service of the first node not started or didn't configure DRBD.")
             continue
-        print("Running test case %s:%s()..." % (__file__, a_case[0])
+        print("Running test case %s:%s()..." % (__file__, a_case[0]))
         skip_flag = assertCase(case, a_case[2], cluster_env)
         sleep(3)
 
