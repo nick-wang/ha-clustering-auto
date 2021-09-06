@@ -208,8 +208,9 @@ def fioTests(args=None):
     cluster_env = args[0]
 
     #Own test steps
-    cluster_conf = args[1]
     xmldir = args[2]
+
+    info = libDRBD.getDRBDInfo(cluster_env)
 
     for i in info:
         if RESNAME == i["name"]:

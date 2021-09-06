@@ -1,9 +1,10 @@
 #!/usr/bin/python3
 
 import argparse
+import datetime
 import sys, os, time
 
-sys.path.append('../')
+sys.path.extend(['../', '/tmp/jenkins-work/ha-share/deploy/scripts/testcases'])
 from library.shell import shell
 
 # Required package
@@ -75,7 +76,8 @@ def fioTest(host="", name="dummy", device="",
 
     if run.output():
         with open(os.path.dirname(output)+"/drbdFioTest-cases", 'a') as fd:
-            fd.write('%s:\n\t%s\n' % (os.path.basename(output), command))
+            fd.write('%s:\t%s\n\t%s\n' % (os.path.basename(output),
+                                          datetime.datetime.now(), command))
 
         with open(output, 'w') as fd:
             for line in run.output():
@@ -86,11 +88,13 @@ def main():
 
     validatePkg(options["node"])
 
-    output_dir = options["output-dir"] + ""
+    dirtemp = options["output-dir"] + "/drbdFioTest"
+    if os.path.exists(dirtemp) == False:
+        os.makedirs(dirtemp)
 
     for t in TEST_CASES:
         ts = time.time()
-        output = options["output-dir"] + "/drbdFioTest-{}-{}".format(t[0], str(int(ts)%10000))
+        output = dirtemp + "/drbdFioTest-{}-{}".format(t[0], str(int(ts)%10000))
         fioTest(options["node"], t[0],
                 options["device"], t[1], output)
         time.sleep(1)
