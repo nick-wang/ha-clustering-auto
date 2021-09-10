@@ -48,7 +48,7 @@
     <interfaces config:type="list">
         <interface>
         <bootproto>dhcp</bootproto>
-        <device>eth0</device>
+        <device>ens3</device>
         <startmode>auto</startmode>
         </interface>
     </interfaces>
@@ -90,10 +90,7 @@
       <package>ctdb</package>
       <package>drbd</package>
       <package>drbd-utils</package>
-      <package>ha-cluster-bootstrap</package>
-      <package>hawk2</package>
       <package>ldirectord</package>
-      <package>lvm2-clvm</package>
       <package>ocfs2-tools</package>
       <package>pacemaker</package>
       <package>pssh</package>
@@ -110,7 +107,6 @@
     <patterns config:type="list">
       <pattern>yast2_basis</pattern>
       <pattern>sw_management</pattern>
-      <pattern>non_oss</pattern>
       <pattern>enhanced_base</pattern>
       <pattern>apparmor</pattern>
       <pattern>base</pattern>
