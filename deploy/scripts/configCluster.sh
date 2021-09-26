@@ -43,6 +43,10 @@ then
     zypper ar -f -G ${repo} CUSTOM_${R_NUM}
     R_NUM=$((R_NUM+1))
   done
+
+  # Disable CA check when custom repo is from `download.suse.de`
+  # Can change this in `zypper ar` as backup plan
+  sed -i "/^baseurl=.*download.suse.de.*[^?ssl_verify=no]$/s/.*/&?ssl_verify=no/" /etc/zypp/repos.d/CUSTOM_*.repo
 fi
 
 # save log messages after reboot
