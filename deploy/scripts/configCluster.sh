@@ -125,6 +125,22 @@ else
 	echo "StrictHostKeyChecking no" >> /etc/ssh/ssh_config
 fi
 
+#Enable root login (disable in tumbleweed by default)
+#hauser could be used instead of root as well
+if [ -e /etc/ssh/ssh_config ]
+then
+    grep "^PermitRootLogin" /etc/ssh/sshd_config >/dev/null
+    if [ $? -ne 0 ]
+    then
+        sed -i "/PermitRootLogin no/a\SPermitRootLogin yes" \
+            /etc/ssh/sshd_config
+    fi
+else
+	echo "PermitRootLogin yes" >> /etc/ssh/sshd_config
+fi
+
+systemctl restart sshd.service
+
 #update ha packages
 zypper in -y -l open-iscsi iscsiuio ntp chrony
 zypper up -y -l -t pattern ha_sles
