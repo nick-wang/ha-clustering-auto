@@ -4,6 +4,9 @@
 . cluster_conf
 . scripts/functions
 
+# For PERMIT_ROOT_LOGIN
+loadConfigToENV > /dev/null
+
 hosts_content=""
 csync2_content=""
 TARGET_LUN=$SHARED_TARGET_LUN0
@@ -127,16 +130,18 @@ fi
 
 #Enable root login (disable in tumbleweed by default)
 #hauser could be used instead of root as well
-if [ -e /etc/ssh/ssh_config ]
-then
-    grep "^PermitRootLogin" /etc/ssh/sshd_config >/dev/null
-    if [ $? -ne 0 ]
+if [ x"${PERMIT_ROOT_LOGIN}" == x"True" ]
+    if [ -e /etc/ssh/ssh_config ]
     then
-        sed -i "/PermitRootLogin no/a\SPermitRootLogin yes" \
-            /etc/ssh/sshd_config
+        grep "^PermitRootLogin" /etc/ssh/sshd_config >/dev/null
+        if [ $? -ne 0 ]
+        then
+            sed -i "/PermitRootLogin no/a\SPermitRootLogin yes" \
+                /etc/ssh/sshd_config
+        fi
+    else
+        echo "PermitRootLogin yes" >> /etc/ssh/sshd_config
     fi
-else
-	echo "PermitRootLogin yes" >> /etc/ssh/sshd_config
 fi
 
 systemctl restart sshd.service
