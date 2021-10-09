@@ -49,6 +49,8 @@ scp ../template/*_template_1.4.7 root@${ip}:${CLUSTER_DIR}/template/
 scp ../template/authkey root@${ip}:${CLUSTER_DIR}/template/
 scp -p ../ssh_keys/id_rsa root@${ip}:/root/.ssh/
 scp ./configStonith.sh ./configCluster.sh ./functions ./replaceDHCPtoStatic.sh root@${ip}:${CLUSTER_DIR}/scripts/
+# For PERMIT_ROOT_LOGIN in ./configCluster.sh
+scp ./config.ini root@${ip}:${CLUSTER_DIR}/
 
 if [ x"${STATIC_IP}" == x"True" ]
 then

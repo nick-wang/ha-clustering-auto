@@ -131,12 +131,15 @@ fi
 #Enable root login (disable in tumbleweed by default)
 #hauser could be used instead of root as well
 if [ x"${PERMIT_ROOT_LOGIN}" == x"True" ]
+then
     if [ -e /etc/ssh/ssh_config ]
     then
         grep "^PermitRootLogin" /etc/ssh/sshd_config >/dev/null
         if [ $? -ne 0 ]
         then
-            sed -i "/PermitRootLogin no/a\SPermitRootLogin yes" \
+            echo "PermitRootLogin yes" >> /etc/ssh/sshd_config
+        else
+            sed -i "/PermitRootLogin no/a\PermitRootLogin yes" \
                 /etc/ssh/sshd_config
         fi
     else
