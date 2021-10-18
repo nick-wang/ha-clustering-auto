@@ -1,3 +1,29 @@
 1. Using "latest" as repo URL won't reflect the real version.
 which led to "zypper up" to the new beta/rc version when
 "latest" redirect to a new repo.
+
+2. Install via `virt-install` with disk for autoyast
+Current deploy is using:
+virt-install \
+...
+--disk path=/xxx/SUSE-HA-openSUSE-Tumbleweed-Tumbleweed-i586-x86_64-Build2938.3-size20480-base.qcow2,size=20 \
+--disk path=/xxx/SUSE-HA-tumbleweed-node1-autoyast.raw,bus=scsi         \
+...
+The 1st attached disk with virtIO is vda, the 2nd disk is sda with autoyast preload.
+However, due to lack of partitioning/device defined in autoyast file,
+the / will install on sda no matter how the order of this two disks attached.
+To fix this, need to add `<device>/dev/vda</device>` in autoyast file
+eg.  <device>/dev/vda</device> is added
+```
+  <partitioning config:type="list">
+    <drive>
+      <device>/dev/vda</device>
+      <initialize config:type="boolean">true</initialize>
+      <partitions config:type="list"/>
+      <type config:type="symbol">CT_DISK</type>
+      <use>all</use>
+    </drive>
+  </partitioning>
+```
+
+https://doc.opensuse.org/projects/autoyast/#ay-use-whole-disk
