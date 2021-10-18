@@ -37,4 +37,4 @@ HOST_IP="`cat ${TEST_CONF} | grep HOST_IP | cut -d "=" -f 2`"
 # __MAIN__
 
 # redirect testing runner output to logfile
-/usr/share/qa/tools/test_lvm2_2_02_120-run | tee /tmp/test_lvm2_2_02_120-run.log
+/usr/share/qa/tools/test_lvm2_2_02_120-run | tee /var/log/test_lvm2_2_02_120-run.log

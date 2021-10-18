@@ -7,7 +7,7 @@
 mdadm --zero-superblock $dev8 $dev9 $dev10 $dev11 $dev12 $dev13
 
 mdadm -CR $container -e ddf -l container -n 2 $dev11 $dev12
-#$dir/mdadm -CR $member0 -l raid1 -n 2 $container -z 10000  >/tmp/mdmon.txt 2>&1
+#$dir/mdadm -CR $member0 -l raid1 -n 2 $container -z 10000  >/var/tmp/mdmon.txt 2>&1
 mdadm -CR $member0 -l raid1 -n 2 $container -z 10000
 check wait
 fail0=$dev11
@@ -40,7 +40,7 @@ if mdadm -CR $member1 -l raid1 -n 2 $container; then
        echo $member0: $(get_raiddisks $member0)
        echo $member1: $(get_raiddisks $member1)
    fi
-   tmp=$(mktemp /tmp/mdest-XXXXXX)
+   tmp=$(mktemp /var/tmp/mdest-XXXXXX)
    mdadm -E $d0 >$tmp
    if [ x$(grep -c 'state\[[01]\] : Degraded' $tmp) != x2 ]; then
        echo ERROR: non-degraded array found
@@ -57,9 +57,9 @@ else
    ret=0
 fi
 
-[ -f /tmp/mdmon.txt ] && {
-    cat /tmp/mdmon.txt
-    rm -f /tmp/mdmon.txt
+[ -f /var/tmp/mdmon.txt ] && {
+    cat /var/tmp/mdmon.txt
+    rm -f /var/tmp/mdmon.txt
 }
 
 [ $ret -eq 0 ]

@@ -15,7 +15,7 @@ testdev $md0 3 $mdsize1 512
 mdadm -G $md0 -n 5
 sleep 3
 mdadm -S $md0
-mdadm -A $md0 --update=revert-reshape $devlist4 --backup-file=/tmp/md-backup
+mdadm -A $md0 --update=revert-reshape $devlist4 --backup-file=/var/tmp/md-backup
 check wait
 check raid5
 testdev $md0 3 $mdsize1 512
@@ -28,7 +28,7 @@ testdev $md0 2 $mdsize1 512
 mdadm -G $md0 -n 5
 sleep 3
 mdadm -S $md0
-mdadm -A $md0 --update=revert-reshape $devlist4 --backup-file=/tmp/md-backup
+mdadm -A $md0 --update=revert-reshape $devlist4 --backup-file=/var/tmp/md-backup
 check wait
 check raid6
 testdev $md0 2 $mdsize1 512
@@ -43,7 +43,7 @@ testdev $md0 2 $mdsize1 512
 mdadm -G $md0 -n 5
 sleep 3
 mdadm -S $md0
-strace -o /tmp/str ./mdadm -A $md0 --update=revert-reshape $devlist4
+strace -o /var/tmp/str ./mdadm -A $md0 --update=revert-reshape $devlist4
 check wait
 check raid10
 testdev $md0 2 $mdsize1 512

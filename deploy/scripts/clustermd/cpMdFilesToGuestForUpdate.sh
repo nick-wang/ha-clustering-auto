@@ -22,7 +22,7 @@ do
 	scp ../clustermd/run.sh \
 	root@${node}:${CLUSTERMD_DIR}/scripts/
 	scp ${CLUSTER_CONF} root@${node}:${CLUSTERMD_DIR}/scripts/
-	scp -r ../clustermd/clustermd-autotest root@${node}:/tmp/
+	scp -r ../clustermd/clustermd-autotest root@${node}:/var/lib/
 
 	ssh $node rpm -qa | grep -q mdadm-[0-9]
 	[ $? -eq 0 ] &&
@@ -63,7 +63,7 @@ done
 
 sleep 30
 source $CLUSTER_CONF
-scp root@${IP_NODE1}:/tmp/clustermd-autotest/tests/test_result $3
-scp root@${IP_NODE1}:/tmp/clustermd_test_result.tar.gz $3
+scp root@${IP_NODE1}:/var/lib/clustermd-autotest/tests/test_result $3
+scp root@${IP_NODE1}:/var/lib/clustermd_test_result.tar.gz $3
 
 exit 0

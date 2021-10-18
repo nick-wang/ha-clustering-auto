@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd /tmp/clustermd-autotest
+cd /var/lib/clustermd-autotest
 sleep 1
 rm -fr /root/tt
 ./test --testdir=clustermd_tests --save-logs --logdir=/root/tt --keep-going

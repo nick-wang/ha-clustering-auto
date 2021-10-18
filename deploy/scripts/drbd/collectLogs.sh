@@ -25,7 +25,7 @@ do
   ssh root@${ip} "mkdir -p ${TEMP_DIR}"
   ssh root@${ip} "rpm -qa|grep drbd>${TEMP_DIR}/drbd-rpm"
   ssh root@${ip} "rpm -qa>${TEMP_DIR}/all-rpms"
-  sle_ver=($(ssh root@${ip} ". /tmp/cluster-configuration/scripts/functions; getSLEVersion"))
+  sle_ver=($(ssh root@${ip} ". /var/lib/cluster-configuration/scripts/functions; getSLEVersion"))
   case ${sle_ver[0]} in
     12)
       ssh root@${ip} "cat /proc/drbd>${TEMP_DIR}/drbd-proc; drbd-overview>${TEMP_DIR}/drbd-overview; drbdadm dump >${TEMP_DIR}/drbdadm-dump"
@@ -42,8 +42,8 @@ do
   scp root@${ip}:/etc/drbd.d/* ${LOG_DIR}/${ip}_drbd
   scp root@${ip}:/var/log/messages* ${LOG_DIR}/${ip}_drbd 2>/dev/null
   scp root@${ip}:${TEMP_DIR}/* ${LOG_DIR}/${ip}_drbd
-  scp root@${ip}:/tmp/drbd-log-* ${LOG_DIR}/${ip}_drbd
-  scp root@${ip}:/tmp/rpm-* ${LOG_DIR}/${ip}_drbd 2>/dev/null
+  scp root@${ip}:/var/log/drbd-log-* ${LOG_DIR}/${ip}_drbd
+  scp root@${ip}:/var/log/rpm-* ${LOG_DIR}/${ip}_drbd 2>/dev/null
   scp -r root@${ip}:/var/log/pacemaker ${LOG_DIR}/${ip}_drbd 2>/dev/null
 
 } &

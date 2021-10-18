@@ -19,9 +19,9 @@ checked
 
 ## 	Properties Content
 ```
-LIB_DIR=/tmp/jenkins-work/ha-share/deploy/scripts
-MONITOR_LIB_DIR=/tmp/jenkins-work/ha-share/jenkins-monitor
-WORK_DIR=/tmp/jenkins-work/${JOB_NAME}/${BUILD_NUMBER}
+LIB_DIR=/var/lib/jenkins-work/ha-share/deploy/scripts
+MONITOR_LIB_DIR=/var/lib/jenkins-work/ha-share/jenkins-monitor
+WORK_DIR=/var/lib/jenkins-work/${JOB_NAME}/${BUILD_NUMBER}
 BUILD_LOG_DIR=${WORKSPACE}/${BUILD_NUMBER}
 ```
 

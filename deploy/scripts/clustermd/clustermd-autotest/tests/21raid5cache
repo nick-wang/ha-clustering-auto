@@ -6,18 +6,18 @@
 # then create another random 1kB chunk E, and a new random page with A, B, E, D:
 #    randchunk4: E    newrandfile:   ABED
 create_random_data() {
-    dd if=/dev/urandom of=/tmp/randfile bs=4k count=1
+    dd if=/dev/urandom of=/var/tmp/randfile bs=4k count=1
     for x in {0..3}
     do
-        dd if=/tmp/randfile of=/tmp/randchunk$x bs=1k count=1 skip=$x count=1
+        dd if=/var/tmp/randfile of=/var/tmp/randchunk$x bs=1k count=1 skip=$x count=1
     done
 
-    dd if=/dev/urandom of=/tmp/randchunk4 bs=1k count=1
+    dd if=/dev/urandom of=/var/tmp/randchunk4 bs=1k count=1
 
-    rm /tmp/newrandfile
+    rm /var/tmp/newrandfile
     for x in 0 1 4 3
     do
-        cat /tmp/randchunk$x >> /tmp/newrandfile
+        cat /var/tmp/randchunk$x >> /var/tmp/newrandfile
     done
 }
 
@@ -63,20 +63,20 @@ run_test() {
         mdadm --fail $md0 $dev0
     fi
 
-    dd if=/tmp/randfile of=$md0 bs=4k count=1
+    dd if=/var/tmp/randfile of=$md0 bs=4k count=1
     restart_array_write_back
-    cmp_first_page /tmp/randfile
-    restart_array_write_back
-    write_three_pages
-    cmp_first_page /tmp/randfile
-
-
-    dd if=/tmp/randchunk4 of=/dev/md0 bs=1k count=1 seek=2
-    restart_array_write_back
-    cmp_first_page /tmp/newrandfile
+    cmp_first_page /var/tmp/randfile
     restart_array_write_back
     write_three_pages
-    cmp_first_page /tmp/newrandfile
+    cmp_first_page /var/tmp/randfile
+
+
+    dd if=/var/tmp/randchunk4 of=/dev/md0 bs=1k count=1 seek=2
+    restart_array_write_back
+    cmp_first_page /var/tmp/newrandfile
+    restart_array_write_back
+    write_three_pages
+    cmp_first_page /var/tmp/newrandfile
 
     mdadm -S $md0
 }

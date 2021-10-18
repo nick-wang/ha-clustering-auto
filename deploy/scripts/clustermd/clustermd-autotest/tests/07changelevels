@@ -4,7 +4,7 @@
 # convert to RAID6, back to RAID5 and ultimately to RAID1
 
 testK=$[64*3*6]
-dd if=/dev/urandom of=/tmp/RandFile bs=1024 count=$testK
+dd if=/dev/urandom of=/var/tmp/RandFile bs=1024 count=$testK
 export MDADM_GROW_VERIFY=1
 
 dotest() {
@@ -12,11 +12,11 @@ dotest() {
  check wait
  testdev $md0 $1 19968 64 nd
  blockdev --flushbufs $md0
- cmp -s -n $[textK*1024] $md0 /tmp/RandFile || { echo cmp failed; exit 2; }
+ cmp -s -n $[textK*1024] $md0 /var/tmp/RandFile || { echo cmp failed; exit 2; }
  # write something new - shift chars 4 space
- tr ' -~' '$-~ -#' < /tmp/RandFile > /tmp/RandFile2
- mv /tmp/RandFile2 /tmp/RandFile
- dd if=/tmp/RandFile of=$md0
+ tr ' -~' '$-~ -#' < /var/tmp/RandFile > /var/tmp/RandFile2
+ mv /var/tmp/RandFile2 /var/tmp/RandFile
+ dd if=/var/tmp/RandFile of=$md0
 }
 
 checkgeo() {
@@ -41,11 +41,11 @@ checkgeo() {
 }
 
 
-bu=/tmp/md-test-backup
+bu=/var/tmp/md-test-backup
 rm -f $bu
 mdadm -CR $md0 -l1 -n2 -x1 $dev0 $dev1 $dev2 -z 19968
 testdev $md0 1 $mdsize1a 64
-dd if=/tmp/RandFile of=$md0
+dd if=/var/tmp/RandFile of=$md0
 dotest 1
 
 mdadm --grow $md0 -l5 -n3 --chunk 64
@@ -78,7 +78,7 @@ dotest 1
 # now repeat that last few steps only with a degraded array.
 mdadm -S $md0
 mdadm -CR $md0 -l6 -n5 $dev0 $dev1 $dev2 $dev3 $dev4
-dd if=/tmp/RandFile of=$md0
+dd if=/var/tmp/RandFile of=$md0
 dotest 3
 
 mdadm $md0 --fail $dev0

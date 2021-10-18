@@ -4,7 +4,7 @@
 # older meta data first.
 # This FAILS with mdadm 3.3
 . tests/env-ddf-template
-tmp=$(mktemp /tmp/mdtest-XXXXXX)
+tmp=$(mktemp /var/tmp/mdtest-XXXXXX)
 rm -f $tmp /var/tmp/mdmon.log
 ret=0
 

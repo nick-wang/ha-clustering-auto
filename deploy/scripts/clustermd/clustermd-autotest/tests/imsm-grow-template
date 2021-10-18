@@ -69,7 +69,7 @@ done
 
 imsm_check container $num_disks
 num_disks=$((num_disks + add_to_num_disks))
-backup_imsm=/tmp/backup_imsm
+backup_imsm=/var/tmp/backup_imsm
 
 # Grow each member or a container depending on the type of an operation
 if [ $migration_test -ne 0 ]; then

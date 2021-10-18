@@ -4,7 +4,7 @@ import argparse
 import datetime
 import sys, os, time
 
-sys.path.extend(['../', '/tmp/jenkins-work/ha-share/deploy/scripts/testcases'])
+sys.path.extend(['../', '/var/lib/jenkins-work/ha-share/deploy/scripts/testcases'])
 from library.shell import shell
 
 # Required package
@@ -36,7 +36,7 @@ def parse_argument():
                                      description="DRBD Fio test cases.",
                                      add_help=True,
                                      epilog="""
-example: \tdrbdFioTest.py -n 10.67.18.98 -d /dev/drbd4 -o /tmp
+example: \tdrbdFioTest.py -n 10.67.18.98 -d /dev/drbd4 -o /var/log
 """)
 
     options = parser.add_argument_group('options')

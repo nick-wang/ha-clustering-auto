@@ -31,10 +31,10 @@ wait
 sleep 10
 
 node=$(grep IP_NODE1 $CLUSTER_CONF | cut -d '=' -f2)
-scp clustermd/run.sh root@$node:/tmp
-scp -r clustermd/clustermd-autotest root@$node:/tmp/
+scp clustermd/run.sh root@$node:/var/lib
+scp -r clustermd/clustermd-autotest root@$node:/var/lib/
 
-ssh root@$node "chmod 0600 /root/.ssh/id_rsa; bash /tmp/run.sh"
+ssh root@$node "chmod 0600 /root/.ssh/id_rsa; bash /var/lib/run.sh"
 
 sleep 1
 scp root@$node:/root/tt/result $2

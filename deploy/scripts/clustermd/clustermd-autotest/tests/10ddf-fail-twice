@@ -44,7 +44,7 @@ fi
 eval "set -- \$devs$good"
 check=$1
 
-tmp=$(mktemp /tmp/mdtest-XXXXXX)
+tmp=$(mktemp /var/tmp/mdtest-XXXXXX)
 mdadm -E $check >$tmp
 
 { grep -q 'state\['$bad'\] : Degraded, Consistent' $tmp &&

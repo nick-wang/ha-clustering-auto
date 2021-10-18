@@ -39,7 +39,7 @@ A. Steps to setup drbd environment via raw disk:
     ./drbd/addVirioDisk.sh ${CLUSTER_FILE} 1 "/mnt/vm/sles_nick" 3G
     sleep 2
     #upgrade drbd
-    ./drbd/upgrade-drbd.sh ${CLUSTER_FILE} "/tmp"
+    ./drbd/upgrade-drbd.sh ${CLUSTER_FILE} "/var/log"
     sleep 3
     ./drbd/runDRBDFilesOnGuest.sh ${CLUSTER_FILE} ${CONFIG_CLUSTER_DIR} 1
     #Rebooting

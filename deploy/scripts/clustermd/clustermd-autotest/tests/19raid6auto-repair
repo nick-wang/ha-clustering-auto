@@ -9,7 +9,7 @@ devs="$dev0 $dev1 $dev2 $dev3 $dev4"
 data_offset_in_kib=$[2048/2]
 
 # make a raid5 from a file
-dd if=/dev/urandom of=/tmp/RandFile bs=1024 count=$array_data_size_in_kib
+dd if=/dev/urandom of=/var/tmp/RandFile bs=1024 count=$array_data_size_in_kib
 
 # perform test for every layout
 layouts="ls rs la ra parity-first ddf-zero-restart ddf-N-restart ddf-N-continue \
@@ -19,12 +19,12 @@ layouts="ls rs la ra parity-first ddf-zero-restart ddf-N-restart ddf-N-continue 
 for layout in $layouts
 do
     mdadm -CR $md0 -l6 --layout=$layout -n$number_of_disks -c $chunksize_in_kib $devs
-    dd if=/tmp/RandFile of=$md0 bs=1024 count=$array_data_size_in_kib
+    dd if=/var/tmp/RandFile of=$md0 bs=1024 count=$array_data_size_in_kib
     blockdev --flushbufs $md0; sync
     check wait
     blockdev --flushbufs $devs; sync
     echo 3 > /proc/sys/vm/drop_caches
-    cmp -s -n $array_data_size_in_b $md0 /tmp/RandFile || { echo sanity cmp failed ; exit 2; }
+    cmp -s -n $array_data_size_in_b $md0 /var/tmp/RandFile || { echo sanity cmp failed ; exit 2; }
 
     # wipe out 5 chunks on each device
     dd if=/dev/urandom of=$dev0 bs=1024 count=$[5*chunksize_in_kib] seek=$[data_offset_in_kib+chunksize_in_kib*0]
@@ -43,7 +43,7 @@ do
     echo 3 > /proc/sys/vm/drop_caches
 
     $dir/raid6check $md0 0 0 2>&1 | grep -qs "Error" && { echo errors detected; exit 2; }
-    cmp -s -n $array_data_size_in_b $md0 /tmp/RandFile || { echo cmp failed ; exit 2; }
+    cmp -s -n $array_data_size_in_b $md0 /var/tmp/RandFile || { echo cmp failed ; exit 2; }
 
     mdadm -S $md0
 done

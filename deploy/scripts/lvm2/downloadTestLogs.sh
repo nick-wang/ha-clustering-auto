@@ -17,7 +17,7 @@ MASTER_NODE_IP=$1
 BUILD_LOG_DIR_IN_HOST=$2
 
 LOG_DIR=/var/log/qa/ctcs2/
-runner_log=/tmp/test_lvm2_2_02_120-run.log
+runner_log=/var/log/test_lvm2_2_02_120-run.log
 
 # Pull test results into host server after testing done
 

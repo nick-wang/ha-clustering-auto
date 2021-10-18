@@ -13,9 +13,9 @@ ${WORKSPACE}/${BUILD_NUMBER}/build_no
 # Prepare an environment for the run
 ##	Properties Content
 ```
-LIB_DIR=/tmp/jenkins-work/ha-share/deploy/scripts
-WORK_DIR=/tmp/jenkins-work/jobs/${JOB_NAME}/${BUILD_NUMBER}
-CONFIG_CLUSTER_DIR=/tmp/cluster-configuration
+LIB_DIR=/var/lib/jenkins-work/ha-share/deploy/scripts
+WORK_DIR=/var/lib/jenkins-work/jobs/${JOB_NAME}/${BUILD_NUMBER}
+CONFIG_CLUSTER_DIR=/var/lib/cluster-configuration
 CLUSTER_FILE=${WORK_DIR}/cluster_conf
 YAML_FILE=${WORK_DIR}/vm_list.yaml
 BUILD_LOG_DIR=${WORKSPACE}/${BUILD_NUMBER}
@@ -111,7 +111,7 @@ sleep 3
 ./drbd/addVirioDisk.sh ${CLUSTER_FILE} 2 "/mnt/vm/sles_nick" 1G
 sleep 2
 #upgrade drbd
-#./drbd/upgrade-drbd.sh ${CLUSTER_FILE} "/tmp"
+#./drbd/upgrade-drbd.sh ${CLUSTER_FILE} "/var/log"
 #sleep 3
 ./drbd/runDRBDFilesOnGuest.sh ${CLUSTER_FILE} ${CONFIG_CLUSTER_DIR} 1
 sleep 10

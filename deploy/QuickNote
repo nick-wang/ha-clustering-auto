@@ -41,7 +41,7 @@ Q. How to deploy a virtual host (jenkins guest)?
      China ntp server: "cn.pool.ntp.org"
   2. Install package "java..." to connect to jenkins host
   3. Install git, gcc.
-     git clone root@10.67.160.200:/root/ha-share /tmp/jenkins-work/ha-share
+     git clone root@10.67.160.200:/root/ha-share /var/lib/jenkins-work/ha-share
      (Use the master branch)
   4. Install libvirt, kvm, vm-install, virt-manager.
   5. Configure a virbr0 for NAT and a bridge.
@@ -78,14 +78,14 @@ A.To setup nfs server/client on the virtual hosts:
   A.1 Install NFS packages:
     zypper in nfs-kernel-server nfs-client
   A.2 Create the Export Directory
-    mkdir -p /tmp/jenkins-work/ha-share/deploy/dummy_temp/nfs_share
+    mkdir -p /var/lib/jenkins-work/ha-share/deploy/dummy_temp/nfs_share
   A.3 To allow all clients to access
-    chown nobody:nogroup /tmp/jenkins-work/ha-share/deploy/dummy_temp/nfs_share
-    chmod 777 /tmp/jenkins-work/ha-share/deploy/dummy_temp/nfs_share
+    chown nobody:nogroup /var/lib/jenkins-work/ha-share/deploy/dummy_temp/nfs_share
+    chmod 777 /var/lib/jenkins-work/ha-share/deploy/dummy_temp/nfs_share
   A.4 Assign server access to client(s) through NFS export file
     vi /etc/exports:
-       # /tmp/jenkins-work/ha-share/deploy/dummy_temp/nfs_share `clientIP`(rw,sync,no_subtree_check)
-       /tmp/jenkins-work/ha-share/deploy/dummy_temp/nfs_share *(rw,sync,no_subtree_check)
+       # /var/lib/jenkins-work/ha-share/deploy/dummy_temp/nfs_share `clientIP`(rw,sync,no_subtree_check)
+       /var/lib/jenkins-work/ha-share/deploy/dummy_temp/nfs_share *(rw,sync,no_subtree_check)
   A.5 Export the shared directory:
        exportfs -a
   A.6 Restart the service

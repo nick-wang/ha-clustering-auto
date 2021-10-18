@@ -1,14 +1,14 @@
 # Simple fail / re-add test
 . tests/env-ddf-template
 
-tmp=$(mktemp /tmp/mdtest-XXXXXX)
+tmp=$(mktemp /var/tmp/mdtest-XXXXXX)
 rm -f $tmp
 
 mdadm --zero-superblock $dev8 $dev9
 mdadm -CR $container -e ddf -l container -n 2 $dev8 $dev9
 
 mdadm -CR $member0 -l raid1 -n 2 $container
-#$dir/mdadm -CR $member0 -l raid1 -n 2 $container >/tmp/mdmon.txt 2>&1
+#$dir/mdadm -CR $member0 -l raid1 -n 2 $container >/var/tmp/mdmon.txt 2>&1
 
 check wait
 

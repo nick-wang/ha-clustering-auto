@@ -4,7 +4,7 @@
 mdadm=$(which mdadm)
 targetdir="/var/tmp"
 logdir="$targetdir"
-config=/tmp/mdadm.conf
+config=/var/lib/mdadm.conf
 testdir=
 devlist=
 

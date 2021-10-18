@@ -16,11 +16,13 @@ class AutoyastDisk(object):
       import createAutoyastDisk
 
       i = createAutoyastDisk.AutoyastDisk("Name")
-      i.save_autoyast_to_image("/tmp/xxx-autoyast.xml")
+      i.save_autoyast_to_image("/var/tmp/xxx-autoyast.xml")
       # i.remove_img()
 
     '''
-    def __init__(self, name="dummynode", path="/tmp",
+    # /tmp maybe cleanup automatically after reboot,
+    # so better customized path to replace
+    def __init__(self, name="dummynode", path="/var/tmp",
             size="10M", fmt="raw"):
         '''
         Init function.
@@ -145,6 +147,6 @@ class AutoyastDisk(object):
 
 if __name__ == "__main__":
     a = AutoyastDisk("NickWang")
-    a.save_autoyast_to_image("/tmp/test-autoyast.xml")
+    a.save_autoyast_to_image("/var/tmp/test-autoyast.xml")
     a.remove_img()
 

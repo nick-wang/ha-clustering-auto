@@ -57,7 +57,7 @@ def usage():
     sys.exit(1)
 
 def get_option():
-    options = {"configuration": "/tmp/cluster-configuration/cluster_conf", "case": None,
+    options = {"configuration": "/var/lib/cluster-configuration/cluster_conf", "case": None,
                "resume": False}
 
     try:
@@ -79,7 +79,7 @@ def get_option():
 
     return options
 
-def get_node_list_from_conf(conf="/tmp/cluster-configuration/cluster_conf"):
+def get_node_list_from_conf(conf="/var/lib/cluster-configuration/cluster_conf"):
     fd = open(conf,"r")
     lines = [ line.strip() for line in fd.readlines() ]
     fd.close()
@@ -100,9 +100,9 @@ def find_dir(path):
             if os.path.isdir(d):
                 return d
         else:
-            return "/tmp"
+            return "/var/lib"
     else:
-        return "/tmp"
+        return "/var/lib"
 
 def working_node_list(num):
     if num <= 0 or num > len(nodelist):
@@ -270,7 +270,7 @@ class Testcase(object):
         # Need to cleanup on each node
         for node in nodelist:
             os.system('ssh root@%s \
-                "/tmp/cluster-configuration/scripts/drbd/libs/cleanLinbitTest.py"' %
+                "/var/lib/cluster-configuration/scripts/drbd/libs/cleanLinbitTest.py"' %
                 node)
 
 def main():
@@ -284,7 +284,7 @@ def main():
         # Need to cleanup on each node
         for node in nodelist:
             os.system('ssh root@%s \
-                "/tmp/cluster-configuration/scripts/drbd/libs/cleanLinbitTest.py"' %
+                "/var/lib/cluster-configuration/scripts/drbd/libs/cleanLinbitTest.py"' %
                 node)
         return 0
 

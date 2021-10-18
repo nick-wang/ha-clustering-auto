@@ -3,14 +3,14 @@
 # then run create again. Shouldn't use the failed disk for Create,
 . tests/env-ddf-template
 
-tmp=$(mktemp /tmp/mdtest-XXXXXX)
+tmp=$(mktemp /var/tmp/mdtest-XXXXXX)
 rm -f $tmp
 
 mdadm --zero-superblock $dev8 $dev9 $dev10 $dev11 $dev12 $dev13
 mdadm -CR $container -e ddf -l container -n 5 $dev8 $dev9 $dev10 $dev11 $dev12
 
 mdadm -CR $member0 -l raid1 -n 2 $container
-#$dir/mdadm -CR $member0 -l raid1 -n 2 $container >/tmp/mdmon.txt 2>&1
+#$dir/mdadm -CR $member0 -l raid1 -n 2 $container >/var/tmp/mdmon.txt 2>&1
 
 check wait
 
@@ -77,9 +77,9 @@ if [ $ret -eq 1 ]; then
     mdadm -E $fail0
 fi
 
-[ -f /tmp/mdmon.txt ] && {
-    cat /tmp/mdmon.txt
-    rm -f /tmp/mdmon.txt
+[ -f /var/tmp/mdmon.txt ] && {
+    cat /var/tmp/mdmon.txt
+    rm -f /var/tmp/mdmon.txt
 }
 
 rm -f $tmp

@@ -29,6 +29,8 @@ done
 wait
 
 source $CLUSTER_CONF
+# FIXME: "/tmp" may be cleaned after reboot since tumbleweed20211008
+# Please considering use /var/log instead of /tmp
 scp root@${IP_NODE1}:/tmp/cts-configuration/pacemaker.log $4
 echo "scp root@${IP_NODE1}:/tmp/cts-configuration/pacemaker.log $4"
 
