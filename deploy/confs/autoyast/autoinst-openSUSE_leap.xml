@@ -62,6 +62,7 @@
   </networking>
   <partitioning config:type="list">
     <drive>
+      <device>/dev/vda</device>
       <initialize config:type="boolean">true</initialize>
       <partitions config:type="list"/>
       <type config:type="symbol">CT_DISK</type>
