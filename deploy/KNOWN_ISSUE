@@ -60,4 +60,5 @@ Date:   Sun Aug 29 23:53:10 2021 +0000
     OpenBSD-Commit-ID: 189bcc4789c7254e09e23734bdd5def8354ff1d5
 
 Solution:
-	Add `PubkeyAcceptedAlgorithms ssh-rsa` in `/etc/ssh/sshd_config`
+	Add `PubkeyAcceptedAlgorithms=+ssh-rsa` in `/etc/ssh/sshd_config`
+    Check `sshd -T` after restart sshd service for the result
