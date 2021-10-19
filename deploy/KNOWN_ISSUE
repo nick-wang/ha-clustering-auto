@@ -1,8 +1,14 @@
 1. Using "latest" as repo URL won't reflect the real version.
+------
 which led to "zypper up" to the new beta/rc version when
 "latest" redirect to a new repo.
 
-2. Install via `virt-install` with disk for autoyast
+Solution:
+	Try not to use `latest` in customized repo
+
+
+2. Install via `virt-install` with disk for autoyast <FIXED>
+------
 Current deploy is using:
 virt-install \
 ...
@@ -27,3 +33,31 @@ eg.  <device>/dev/vda</device> is added
 ```
 
 https://doc.opensuse.org/projects/autoyast/#ay-use-whole-disk
+
+Solution:
+	Add <device>/dev/vda</device> in autoyast file.
+
+
+3. Fail to ssh login to TW (after 20211008) with rsa key on old SLE12(ha6)
+------
+Error message on the guest:
+userauth_pubkey: key type ssh-rsa not in PubkeyAcceptedAlgorithms [preauth]
+
+Mentioned in /usr/share/doc/packages/openssh-common/Changelog
+commit 2344750250247111a6c3c6a4fe84ed583a61cc11
+Author: djm@openbsd.org <djm@openbsd.org>
+Date:   Sun Aug 29 23:53:10 2021 +0000
+
+    upstream: After years of forewarning, disable the RSA/SHA-1
+    signature algorithm by default. It is feasible to create colliding SHA1
+    hashes, so we need to deprecate its use.
+    RSA/SHA-256/512 remains available and will be transparently selected
+    instead of RSA/SHA1 for most SSH servers released in the last five+
+    years. There is no need to regenerate RSA keys.
+    The use of RSA/SHA1 can be re-enabled by adding "ssh-rsa" to the
+    PubkeyAcceptedAlgorithms directives on the client and server.
+    ok dtucker deraadt
+    OpenBSD-Commit-ID: 189bcc4789c7254e09e23734bdd5def8354ff1d5
+
+Solution:
+	Add `PubkeyAcceptedAlgorithms ssh-rsa` in `/etc/ssh/sshd_config`
