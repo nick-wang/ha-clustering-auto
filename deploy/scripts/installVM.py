@@ -385,6 +385,11 @@ def installVM(VMName, disk, OSType, vcpus, memory, disk_size, source, nic, secon
                           source, nic, nic2, graphics, extra_args, autoyast)
         cmd = "echo << EOF| vm-install %s%s%s" % (options, "\n\n\n\n\n\n\n", "EOF")
 
+    for d in (disk, extra_disk):
+        if d != "":
+            parent = os.path.dirname(d)
+            os.makedirs(parent, exist_ok=True)
+
     print("Install command is: %s" % cmd)
     ret = os.system(cmd)
     exit(ret>>8)

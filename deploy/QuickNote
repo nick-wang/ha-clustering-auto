@@ -17,7 +17,7 @@ Q. How to deploy a host server?
      Like /mnt/vm/xxxxx
   9. Modify libvirtd to support TCP.
   10. Add a virbr0 for NAT.
-  11. Install python library junit-xml.
+  11. Install python library junit-xml and python-xml.
       For sles, need python-setuptools.
       or https://download.opensuse.org/distribution/leap/15.2/repo/oss/
   12. Install python library python-psutil.
