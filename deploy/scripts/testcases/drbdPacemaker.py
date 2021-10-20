@@ -292,7 +292,7 @@ def switchDRBD(args=None):
                 or "Already in requested state" in tmp:
                 # Already master, try the next node
                 continue
-            elif  "INFO: Move constraint created" in tmp:
+            elif  "Move constraint created" in tmp:
                 # Succeed on moving resource, change next resource
                 break
             else:
