@@ -281,10 +281,16 @@ def switchDRBD(args=None):
     result = {"status":"fail", "message":"", "output":"", "skipall": False}
 
     cluster_env = args[0]
+    info = libDRBD.getDRBDInfo(cluster_env)
+
+    if len(info) <= 0:
+        result["status"] = "skip"
+        return result
 
     #Own test steps
     node_list = [ line.strip().split()[1] for line in os.popen("ssh root@%s crm_node -l" % cluster_env["IP_NODE1"]).readlines() ]
 
+    # Find the resources configured in pacemaker. Not just via getDRBDInfo from drbdadm
     resource_lists = []
     lines = os.popen("ssh root@%s crm configure show" % cluster_env["IP_NODE1"]).readlines()
     for line in lines:
@@ -296,13 +302,25 @@ def switchDRBD(args=None):
     mv_command = "ssh root@%s crm resource move ms_%s %s 2>&1"
     for res in resource_lists:
         for node in node_list:
+            conflag = False
+
+            for i in info:
+                if i["name"] == res and node in i["primaries"]:
+                    conflag = True
+                    break
+
+            # Unnecessary to move res if target node already in Primary
+            if conflag:
+                continue
+
             tmp = os.popen(mv_command % (cluster_env["IP_NODE1"], res, node)).readline()
             # Example:
             # Succeed: INFO: Move constraint created for ms_1-multi-0 to Leap42_2-test-node1\n
             # Fail: Error performing operation: ms_1-multi-0 is already active on Leap42_2-test-node2\n
             if "is already active on" in tmp or "Situation already as requested" in tmp \
-                or "Already in requested state" in tmp:
+                or "Already in requested state" in tmp or "Requested item already exists" in tmp:
                 # Already master, try the next node
+                # Should not entry here! Since will continue when node not in Primary role.
                 continue
             elif  "Move constraint created" in tmp:
                 # Succeed on moving resource, change next resource
