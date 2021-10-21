@@ -7,8 +7,14 @@ from time import sleep
 from junit_xml import TestSuite, TestCase
 
 from library.libJunitXml import assertCase, skipCase
-from library.libReadConf import readClusterConf
+from library.libCommon import readClusterConf, recordInfo
 
+temp = readClusterConf(sys.argv[1])
+
+CMD_WRAPPER = "ssh root@%s {} 2>&1" % temp["IP_NODE1"]
+REC_FILE    = sys.argv[2] + "/" + "drbdPacemaker_state.output"
+
+@recordInfo(CMD_WRAPPER.format("drbdadm status all"), REC_FILE)
 def configurePacemaker(args=None):
     message = ""
     output = ""
@@ -48,6 +54,7 @@ def configurePacemaker(args=None):
 
     return result
 
+@recordInfo(CMD_WRAPPER.format("cat /proc/drbd"), REC_FILE)
 def checkDRBDVersion(args=None):
     message = ""
     output = ""
@@ -89,6 +96,7 @@ def checkDRBDVersion(args=None):
 
     return result
 
+@recordInfo(CMD_WRAPPER.format("drbdadm status all"), REC_FILE)
 def checkDRBDState(args=None):
     message = ""
     output = ""
@@ -118,6 +126,7 @@ def checkDRBDState(args=None):
 
     return result
 
+@recordInfo(CMD_WRAPPER.format("drbdadm status all"), REC_FILE)
 def checkDRBDRole(args=None):
     message = ""
     output = ""
@@ -154,6 +163,7 @@ def checkDRBDRole(args=None):
 
     return result
 
+@recordInfo(CMD_WRAPPER.format("blkid"), REC_FILE)
 def checkMakeFS(args=None):
     message = ""
     output = ""
@@ -224,6 +234,7 @@ def checkMakeFS(args=None):
 
     return result
 
+@recordInfo(CMD_WRAPPER.format("crm_mon -1r"), REC_FILE)
 def checkPacemakerStatus(args=None):
     message = ""
     output = ""
@@ -263,6 +274,7 @@ def checkPacemakerStatus(args=None):
 
     return result
 
+@recordInfo(CMD_WRAPPER.format("crm_mon -1r"), REC_FILE)
 def switchDRBD(args=None):
     message = ""
     output = ""

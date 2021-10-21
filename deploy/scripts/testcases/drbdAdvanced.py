@@ -8,7 +8,7 @@ from time import sleep
 from junit_xml import TestSuite, TestCase
 
 from library.libJunitXml import assertCase, skipCase
-from library.libReadConf import readClusterConf
+from library.libCommon import readClusterConf
 from library.shell import shell
 
 config = configparser.ConfigParser({'TEST_RESOURCE':'dummy'})
