@@ -8,7 +8,7 @@ from time import sleep
 from junit_xml import TestSuite, TestCase
 
 from library.libJunitXml import assertCase, skipCase
-from library.libCommon import readClusterConf
+from library.libCommon import readClusterConf, recordInfo
 from library.shell import shell
 
 config = configparser.ConfigParser({'TEST_RESOURCE':'dummy'})
@@ -19,7 +19,12 @@ section = 'DRBD'
 RESNAME = config.get(section, 'TEST_RESOURCE')
 ENABLE_FIO= config.get(section, 'FIO_TEST')
 
+# Record information before running test
+temp = readClusterConf(sys.argv[1])
+CMD_WRAPPER = "ssh root@%s {} 2>&1" % temp["IP_NODE1"]
+REC_FILE    = sys.argv[2] + "/" + "drbdAdvanced_state.output"
 
+@recordInfo(CMD_WRAPPER.format("fdisk -l"), REC_FILE)
 def preRequirements(args=None):
     message = ""
     output = ""
@@ -61,6 +66,7 @@ def preRequirements(args=None):
     return result
 
 
+@recordInfo(CMD_WRAPPER.format("crm_mon -1r"), REC_FILE)
 def removeTestRes(args=None):
     '''
     Remove DRBD test resource from pacemaker.
@@ -128,6 +134,7 @@ def removeTestRes(args=None):
     return result
 
 
+@recordInfo(CMD_WRAPPER.format("drbdadm status %s" % RESNAME), REC_FILE)
 def verifyMD5(args=None):
     message = ""
     output = ""
