@@ -17,7 +17,7 @@ module = 'pacemaker'
 packages_monitoring = ''
 proj_name = ""
 dir_name = ""
-dummy_dir = "/tmp/jenkins-dummy/pkgs-change/"
+dummy_dir = "/var/lib/jenkins-dummy/pkgs-change/"
 
 def isTheRPM(package):
     #version=re.groups()[0]

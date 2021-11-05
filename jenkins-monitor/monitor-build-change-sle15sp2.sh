@@ -15,7 +15,7 @@ PATCHLEVEL=2
 ARCH=x86_64
 
 SLP_URL="http://mirror.suse.asia/dist/install/SLP/"
-DIR="/tmp/jenkins-dummy/build-change/"
+DIR="/var/lib/jenkins-dummy/build-change/"
 TIMEOUT=5
 
 if [ ${PATCHLEVEL} != 0 ]

@@ -16,7 +16,7 @@ PATCHLEVEL=4
 ARCH=x86_64
 
 SLP_URL="http://147.2.207.1/dist/install/SLP"
-DIR="/tmp/jenkins-dummy/build-change/"
+DIR="/var/lib/jenkins-dummy/build-change/"
 TIMEOUT=5
 
 if [ ${PATCHLEVEL} != 0 ]
