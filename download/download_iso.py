@@ -288,5 +288,6 @@ def test():
 
 
 if __name__ == "__main__":
+    #./download_iso.py -l /srv/www/htdocs/ISO/openSUSE-Tumbleweed -m /srv/www/htdocs/SLP/openSUSE-Tumbleweed -c sha256 -r
     #test()
     main()
