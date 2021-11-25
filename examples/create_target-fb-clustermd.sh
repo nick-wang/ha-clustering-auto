@@ -81,7 +81,7 @@ luns/ create /backstores/block/${block_name}"2"
 luns/ create /backstores/block/${block_name}"3"
 luns/ create /backstores/block/${block_name}"4"
 luns/ create /backstores/block/${block_name}"5"
-portals/ create 0.0.0.0 3260
+portals/ create ${portals_ip}
 set attribute authentication=0 demo_mode_write_protect=0 generate_node_acls=1 cache_dynamic_acls=1
 cd /
 saveconfig
