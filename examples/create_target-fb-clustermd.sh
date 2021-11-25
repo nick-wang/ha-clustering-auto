@@ -81,6 +81,7 @@ luns/ create /backstores/block/${block_name}"2"
 luns/ create /backstores/block/${block_name}"3"
 luns/ create /backstores/block/${block_name}"4"
 luns/ create /backstores/block/${block_name}"5"
+portals/ create 0.0.0.0 3260
 set attribute authentication=0 demo_mode_write_protect=0 generate_node_acls=1 cache_dynamic_acls=1
 cd /
 saveconfig
@@ -91,6 +92,13 @@ sleep 2
 # For test
 echo ${target_name}
 echo ${portals_ip}
+echo -e "\n--------------- COMMANDS -------------------"
+echo "Discovery: iscsiadm -m discovery -t st -p ${portals_ip}"
 iscsiadm -m discovery -t st -p ${portals_ip}
+
+echo -e "\nLogin: iscsiadm -m node -T ${target_name} -p ${portals_ip}  -l"
 iscsiadm -m node -T ${target_name} -p ${portals_ip}  -l
+
+echo -e "\nLogout: iscsiadm -m node -T ${target_name} -p ${portals_ip}  -u"
 iscsiadm -m node -T ${target_name} -p ${portals_ip}  -u
+echo -e "--------------------------------------------"

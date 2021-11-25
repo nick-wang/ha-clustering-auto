@@ -54,7 +54,7 @@ net=${opt_net:="eth0"}
 year=`date +%y`
 month=`date +%m`
 target_name="iqn.20${year}-${month}.example.com:${block_name}"
-portals_ip=`ip a | grep -A 2 " ${net}:" |sed -n "s/.*inet \(.*\)\/.*/\1/p"`
+portals_ip=`ip a | grep -A 5 " ${net}:" |sed -n "s/.*inet \(.*\)\/.*/\1/p"`
 
 vgchange -a y ${vgname}
 
@@ -65,6 +65,7 @@ cd ../iscsi
 create ${target_name}
 cd /iscsi/${target_name}/tpg1/
 luns/ create /backstores/block/${block_name}
+portals/ create 0.0.0.0 3260
 set attribute authentication=0 demo_mode_write_protect=0 generate_node_acls=1 cache_dynamic_acls=1
 cd /
 saveconfig
@@ -75,6 +76,13 @@ sleep 2
 # For test
 echo ${target_name}
 echo ${portals_ip}
+echo -e "\n--------------- COMMANDS -------------------"
+echo "Discovery: iscsiadm -m discovery -t st -p ${portals_ip}"
 iscsiadm -m discovery -t st -p ${portals_ip}
+
+echo -e "\nLogin: iscsiadm -m node -T ${target_name} -p ${portals_ip}  -l"
 iscsiadm -m node -T ${target_name} -p ${portals_ip}  -l
+
+echo -e "\nLogout: iscsiadm -m node -T ${target_name} -p ${portals_ip}  -u"
 iscsiadm -m node -T ${target_name} -p ${portals_ip}  -u
+echo -e "--------------------------------------------"
