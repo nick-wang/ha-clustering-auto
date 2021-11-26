@@ -22,12 +22,35 @@ FILE_ROOT="/var/lib/jenkins-dummy/build-change/"
 Default = {
     "URL": "http://mirror.suse.asia/dist/install/SLP/",
     # The inner pattern need able to compare by library re
-    "Pattern" : "SLE-15-SP4-Full-\w+-\d+-LATEST/",
+    "Pattern" : "SLE-15-SP4-Full-\w+(-\d+)?-LATEST/",
     "File" : "/x86_64/DVD1/media.1/media",
     "JobLocation" : "dummy/project/version/name",
     # Record file should be like /var/lib/jenkins-dummy/build-change/${JOB_NAME}/${BUILD_NUMBER}/record
     "Record" : "",
 }
+
+def cmp_version(v1, v2):
+    '''
+    Input v1, v2 as string
+    '''
+    list1 = v1.split(".")
+    list2 = v2.split(".")
+
+    v1_integer = int(list1[0])
+    v2_integer = int(list2[0])
+
+    if v1_integer > v2_integer:
+        return True
+    elif v1_integer < v2_integer:
+        return False
+    else:
+        v1_decimal = 0 if len(list1) == 1 else int(list1[1])
+        v2_decimal = 0 if len(list2) == 1 else int(list2[1])
+
+        if v1_decimal >= v2_decimal:
+            return True
+        else:
+            return False
 
 class Resource:
     def __init__(self, url, name, file):
@@ -37,7 +60,7 @@ class Resource:
         self.file = file
         self.repo = url + "/" + name + REPO_POSTFIX
         self.full = url + "/" + name + "/" + file
-        self.version = 0
+        self.version = "0"
 
         page = urllib.urlopen(self.full)
         # use str() because python3 will make line in bytes
@@ -48,10 +71,10 @@ class Resource:
             reg = re.search(BUILD_NUM_PATTERN, line)
             if reg is not None:
                 #print(reg.groups())
-                self.version = reg.groups()[0].replace(".", "")
+                self.version = reg.groups()[0]
 
     def __cmp__(self, res2):
-        return cmp(self.version, res2.version)
+        return cmp_version(self.version, res2.version)
 
     def __repr__(self):
         return "%s" % (self.name.replace("/",""))
@@ -172,7 +195,7 @@ def main():
         lines = [ l.strip() for l in fd.readlines() ]
         fd.close()
 
-        if int(lines[0]) >= int(latest_res.getVersion()):
+        if cmp_version(lines[0], latest_res.getVersion()):
             print("Build number didn't increase, origin is %s. Do nothing." % lines[0])
             exit(1)
         else:
@@ -183,7 +206,7 @@ def main():
             exit(0)
 
 if __name__ == "__main__":
-    #./monitor-newbuild.py -l ${JOB_NAME} -p "SLE-15-SP4-Full-\w+-\d+-LATEST/" -r "${RECORD_FILE}"
+    #./monitor-newbuild.py -l ${JOB_NAME} -p "SLE-15-SP4-Full-\w+(-\d+)?-LATEST/" -r "${RECORD_FILE}"
     # Put `RECORD_FILE=/var/lib/jenkins-dummy/build-change/${JOB_NAME}/${BUILD_NUMBER}/record`
     # In Jenkins multijob predefined parameters
     # source the ${RECORD_FILE} will set the ENV
