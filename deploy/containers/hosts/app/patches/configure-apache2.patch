@@ -1,0 +1,22 @@
+--- default-server.conf.orig	2021-11-08 21:31:54.091377483 +0800
++++ default-server.conf	2021-11-08 21:35:23.960064172 +0800
+@@ -21,15 +21,15 @@
+ 	# for more information.
+ 	# NOTE: For directories where RewriteRule is used, FollowSymLinks
+ 	# or SymLinksIfOwnerMatch needs to be set in Options directive.
+-	Options None
++	Options Indexes FollowSymLinks Includes MultiViews
+ 	# AllowOverride controls what directives may be placed in .htaccess files.
+ 	# It can be "All", "None", or any combination of the keywords:
+ 	#   Options FileInfo AuthConfig Limit
+ 	AllowOverride None
+ 	# Controls who can get stuff from this server.
+-	<IfModule !mod_access_compat.c>
+-		Require all granted
+-	</IfModule>
++	# <IfModule !mod_access_compat.c>
++	Require all granted
++	# </IfModule>
+ 	<IfModule mod_access_compat.c>
+ 		Order allow,deny
+ 		Allow from all

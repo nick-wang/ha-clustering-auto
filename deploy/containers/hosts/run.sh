@@ -1,5 +1,7 @@
 #!/bin/bash
 
+#Docker_image="opensuse/leap:15.3"
+#docker commit xxx ci-test-image
 Docker_image="nickwang/jenkins-ci-host"
 NAME="jenkins-ci-host"
 
