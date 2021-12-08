@@ -45,12 +45,10 @@ fi
 
 if [ "yes" == $opt_create_lvm ]
 then
-    create_lvm $opt_vg ${opt_name}"0" $opt_size
-    create_lvm $opt_vg ${opt_name}"1" $opt_size
-    create_lvm $opt_vg ${opt_name}"2" $opt_size
-    create_lvm $opt_vg ${opt_name}"3" $opt_size
-    create_lvm $opt_vg ${opt_name}"4" $opt_size
-    create_lvm $opt_vg ${opt_name}"5" $opt_size
+    for i in $(seq 0 5)
+    do
+        create_lvm $opt_vg ${opt_name}"${i}" $opt_size
+    done
 fi
 
 block_name=${opt_name}
@@ -66,21 +64,17 @@ vgchange -a y ${vgname}
 
 echo "ls
 cd /backstores
-block/ create ${block_name}"0" /dev/${vgname}/${block_name}"0"
-block/ create ${block_name}"1" /dev/${vgname}/${block_name}"1"
-block/ create ${block_name}"2" /dev/${vgname}/${block_name}"2"
-block/ create ${block_name}"3" /dev/${vgname}/${block_name}"3"
-block/ create ${block_name}"4" /dev/${vgname}/${block_name}"4"
-block/ create ${block_name}"5" /dev/${vgname}/${block_name}"5"
+$(for i in $(seq 0 5)
+do
+echo "block/ create ${block_name}${i} /dev/${vgname}/${block_name}${i}"
+done)
 cd ../iscsi
 create ${target_name}
 cd /iscsi/${target_name}/tpg1/
-luns/ create /backstores/block/${block_name}"0"
-luns/ create /backstores/block/${block_name}"1"
-luns/ create /backstores/block/${block_name}"2"
-luns/ create /backstores/block/${block_name}"3"
-luns/ create /backstores/block/${block_name}"4"
-luns/ create /backstores/block/${block_name}"5"
+$(for i in $(seq 0 5)
+do
+echo "luns/ create /backstores/block/${block_name}${i}"
+done)
 portals/ create ${portals_ip}
 set attribute authentication=0 demo_mode_write_protect=0 generate_node_acls=1 cache_dynamic_acls=1
 cd /

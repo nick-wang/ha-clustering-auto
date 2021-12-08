@@ -46,20 +46,16 @@ echo "ls
 cd /iscsi
 delete ${target_name}
 cd /backstores/block/
-delete ${block_name}"0"
-delete ${block_name}"1"
-delete ${block_name}"2"
-delete ${block_name}"3"
-delete ${block_name}"4"
-delete ${block_name}"5"
+$(for i in $(seq 0 5)
+do
+echo "delete ${block_name}${i}"
+done)
 cd /
 saveconfig
 exit"|targetcli
 echo ""
 
-remove_lvm ${vgname} ${block_name}"0"
-remove_lvm ${vgname} ${block_name}"1"
-remove_lvm ${vgname} ${block_name}"2"
-remove_lvm ${vgname} ${block_name}"3"
-remove_lvm ${vgname} ${block_name}"4"
-remove_lvm ${vgname} ${block_name}"5"
+for i in $(seq 0 5)
+do
+    remove_lvm ${vgname} ${block_name}"${i}"
+done
