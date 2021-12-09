@@ -68,7 +68,7 @@ check_dlm()
 		crm configure clone base-clone base-group \
 			meta interleave=true
 	fi
-	sleep 1
+	sleep 30
 	for ip in $NODE1 $NODE2
 	do
 		ssh $ip "pgrep dlm_controld > /dev/null" || {
