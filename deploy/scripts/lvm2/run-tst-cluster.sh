@@ -81,6 +81,7 @@ echo `date +%Y%m%d-%H%M` > start.txt
 # start test.  "S=": skip test cases
 # NOTE: above (included) "shell/thin-large.sh cases are must skip cases.
 S="\
+shell/autoactivation-metadata.sh,\
 shell/dmeventd-restart.sh,\
 shell/lvchange-raid.sh,\
 shell/lvchange-raid1-writemostly.sh,\
