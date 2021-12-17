@@ -41,6 +41,9 @@ VIRT_INSTALL = config.getboolean(section, 'VIRT_INSTALL')
 # Force to use vm-install in SLE12SP0, since virt-install have bugs
 VM_INSTALL_DETECT = config.getboolean(section, 'VM_INSTALL_DETECT')
 
+# Initrd inject for autoyast
+INITRD_INJECT = config.getboolean(section, 'INITRD_INJECT')
+
 # Local NFS server for autoyast
 NFS_ENABLED = config.getboolean(section, 'NFS_ENABLED')
 NFS_LOCATION = config.get(section, 'NFS_LOCATION')
@@ -321,9 +324,14 @@ def installVM(VMName, disk, OSType, vcpus, memory, disk_size, source, nic, secon
         verbose = ""
 
     if VIRT_INSTALL:
-        if NFS_ENABLED:
-            extra_disk = ""
+        initrd_inject = ""
+        extra_disk = ""
 
+        if INITRD_INJECT:
+            initrd_inject = "--initrd-inject %s" % autoyast
+
+            autoinst = "autoyast=file:///%s" % os.path.basename(autoyast)
+        elif NFS_ENABLED:
             ip_list = _get_ip_list_via_interface(nic)
             if len(ip_list) == 0:
                 print("ERROR! Failed to get IP address via interface %s!\n \
@@ -362,10 +370,10 @@ def installVM(VMName, disk, OSType, vcpus, memory, disk_size, source, nic, secon
                 --disk path=%s,size=%d %s\
                 --network bridge=%s %s \
                 --watchdog i6300esb,action=reset \
-                --location=%s \
+                --location=%s %s \
                 -x \"YAST_SKIP_XML_VALIDATION=1 %s\"\
                 " % (verbose, VMName, OSType, vcpus, memory, graphics, disk,
-                        size, extra_disk, nic, nic2, source, autoinst)
+                        size, extra_disk, nic, nic2, source, initrd_inject, autoinst)
         if DEBUG:
             cmd = "virt-install %s" % options
         else:
@@ -618,9 +626,10 @@ def run_install_cmd(os_settings, vm_name, vm, disk, res):
     autoyast = "%s/%s" % (DUMMY_FOLDER,vm_name)
 
     # Change to NFS share if using virt-install with local NFS server
-    if VIRT_INSTALL and NFS_ENABLED:
-        shutil.move(autoyast, NFS_LOCATION + "/" + vm_name)
-        autoyast = NFS_LOCATION + "/" + vm_name
+    if VIRT_INSTALL and not INITRD_INJECT:
+        if NFS_ENABLED:
+            shutil.move(autoyast, NFS_LOCATION + "/" + vm_name)
+            autoyast = NFS_LOCATION + "/" + vm_name
 
     parent_fd, child_fd = multiprocessing.Pipe()
     process = multiprocessing.Process(target=installVM,
@@ -657,7 +666,7 @@ def installVMs(vm_list, res, devices, autoyast, os_settings, base_image = ""):
 
     exitcode = 0
     processes = {}
-    print("Note: Using virt-install: %s. NFS enabled %s." % (VIRT_INSTALL, NFS_ENABLED))
+    print("Note: Using virt-install: %s. INITRD_INJECT %s, NFS enabled %s." % (VIRT_INSTALL, INITRD_INJECT, NFS_ENABLED))
     for i in range(len(vm_list)):
         vm = vm_list[i]
         vm_name = vm['name']
