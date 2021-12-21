@@ -84,6 +84,21 @@ def fioTest(host="", name="dummy", device="",
                 fd.write('%s\n' % line)
 
 def main():
+    """
+    Fio command examples:
+drbdFioTest-SeqRead-9181:	2021-12-01 16:59:47.875543
+	fio -name=SeqRead -filename=/dev/drbd4 -direct=1 -iodepth=20 -rw=read -ioengine=libaio -bs=16k -size=2G -numjobs=2 -runtime=300 -thread -group_reporting
+drbdFioTest-SeqWrite-9188:	2021-12-01 17:02:01.096354
+	fio -name=SeqWrite -filename=/dev/drbd4 -direct=1 -iodepth=20 -rw=write -ioengine=libaio -bs=16k -size=2G -numjobs=2 -runtime=300 -thread -group_reporting
+drbdFioTest-RandomRead-9322:	2021-12-01 17:02:08.435534
+	fio -name=RandomRead -filename=/dev/drbd4 -direct=1 -iodepth=20 -rw=randread -ioengine=libaio -bs=16k -size=2G -numjobs=2 -runtime=300 -thread -group_reporting
+drbdFioTest-RandomWrite-9329:	2021-12-01 17:07:10.177713
+	fio -name=RandomWrite -filename=/dev/drbd4 -direct=1 -iodepth=20 -rw=randwrite -ioengine=libaio -bs=16k -size=2G -numjobs=2 -runtime=300 -thread -group_reporting
+drbdFioTest-MixSeqReadWrite-9631:	2021-12-01 17:08:19.742917
+	fio -name=MixSeqReadWrite -filename=/dev/drbd4 -direct=1 -iodepth=20 -rw=rw -ioengine=libaio -bs=16k -size=2G -numjobs=2 -runtime=300 -thread -group_reporting
+drbdFioTest-MixRandomReadWrite-9700:	2021-12-01 17:13:21.194191
+	fio -name=MixRandomReadWrite -filename=/dev/drbd4 -direct=1 -iodepth=20 -rw=randrw -ioengine=libaio -bs=16k -size=2G -numjobs=2 -runtime=300 -thread -group_reporting
+    """
     options = parse_argument()
 
     validatePkg(options["node"])
