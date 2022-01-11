@@ -1,3 +1,5 @@
+https://confluence.suse.com/pages/viewpage.action?pageId=400588810
+
 ### bj-ha-6
 10.67.160.106
 10.67.161.106
