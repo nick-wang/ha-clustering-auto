@@ -51,6 +51,7 @@ Q. How to deploy a virtual host (jenkins guest)?
   8. Create lvm pool for image, saved in /mnt/vm
   9. To use virt-install, may need nfs/http/ftp
 
+Q. How to configure libvirtd for stonith on VM host?
 A.To make the cmd on the guest
   https://hawk-guide.readthedocs.io/en/latest/stonith.html
   For libvirt via qemu+tcp:
@@ -74,6 +75,7 @@ A.To make the cmd on the guest
       instead, should `systemctl enable --now libvirtd-tcp.socket`
 
 
+Q. How to set NFS server on VM host?
 A.To setup nfs server/client on the virtual hosts:
   A.1 Install NFS packages:
     zypper in nfs-kernel-server nfs-client
@@ -81,7 +83,7 @@ A.To setup nfs server/client on the virtual hosts:
     mkdir -p /var/lib/jenkins-work/ha-share/deploy/dummy_temp/nfs_share
   A.3 To allow all clients to access
     chown nobody:nogroup /var/lib/jenkins-work/ha-share/deploy/dummy_temp/nfs_share
-    chmod 777 /var/lib/jenkins-work/ha-share/deploy/dummy_temp/nfs_share
+    chmod 777 /var/lib/jenkins-work/ha-share/deploy/dummy_temp/nfs_share  # Need to grant proper access instead of 777
   A.4 Assign server access to client(s) through NFS export file
     vi /etc/exports:
        # /var/lib/jenkins-work/ha-share/deploy/dummy_temp/nfs_share `clientIP`(rw,sync,no_subtree_check)

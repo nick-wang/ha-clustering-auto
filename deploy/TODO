@@ -1,6 +1,6 @@
-1. rpm package/script for deploy jenkins slave.
+[Done]1. rpm package/script or containerize to deploy jenkins server.
 
-2. rpm package/script for deploy virt guest.
+[Unnecessary]2. rpm package/script for deploy virt guest.
 
 [Done]3. Generic replace function for autoyast file.
 
@@ -39,7 +39,7 @@ and if you specify use sbd stonith or by default, we set up the 1st device to sb
 [Done]16. library to collect hb_report after running test-case
 Maybe We can use what pacemaker-cts did, added it to functions
 
-17. Using twopence instead of ssh only.
+[Unnecessary]17. Using twopence instead of ssh only.
 
 18. Using salt to configure cluster?
 

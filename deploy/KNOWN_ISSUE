@@ -35,7 +35,9 @@ eg.  <device>/dev/vda</device> is added
 https://doc.opensuse.org/projects/autoyast/#ay-use-whole-disk
 
 Solution:
-	Add <device>/dev/vda</device> in autoyast file.
+	S1. Add <device>/dev/vda</device> in autoyast file.
+	S2. Use NFS for autoyast file.
+	S3. Use initrd inject for autoyast file.
 
 
 3. Fail to ssh login to TW (after 20211008) with rsa key on old SLE12(ha6)
@@ -62,3 +64,4 @@ Date:   Sun Aug 29 23:53:10 2021 +0000
 Solution:
 	Add `PubkeyAcceptedAlgorithms=+ssh-rsa` in `/etc/ssh/sshd_config`
     Check `sshd -T` after restart sshd service for the result
+	SLE12 is updated to the latest.
