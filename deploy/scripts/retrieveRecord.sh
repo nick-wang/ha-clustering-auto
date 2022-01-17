@@ -13,9 +13,6 @@ then
   exit -1
 fi
 
-#Import ENV conf
-. functions
-
 case $1 in
 	*:*)
 		# Run in container

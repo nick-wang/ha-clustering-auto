@@ -40,20 +40,12 @@ mkdir -p ${WORK_DIR}
 # To get the changed build URL
 master_addr="10.67.160.200"
 jenkins_container="jenkins-ci-host"
-local_rec_file="/var/tmp/record"
+local_rec_file="/var/tmp/${JOB_NAME##*/}-${BUILD_NUMBER}"
 
 # Check the remote file exists?
-ssh root@${master_addr} docker exec -t ${jenkins_container} /bin/sh -c \"cat ${RECORD_FILE}\" >${local_rec_file}
+. ${LIB_DIR}/retrieveRecord.sh ${master_addr}:${jenkins_container} ${RECORD_FILE} ${local_rec_file}
 
-if [ $? == 0 ];then
-  cat ${local_rec_file}
-  # Remove extra ^M(/r) in the result
-  sed -i "s/\r//g" ${local_rec_file}
-  source ${local_rec_file}
-else
-  echo "Record file '${RECORD_FILE}' on '${jenkins_container}' is not existed"
-  NAME="SLE-15-SP4-Full-Alpha-202111-LATEST"
-fi
+source ${local_rec_file}
 rm -rf ${local_rec_file}
 
 # Create YAML_FILE
