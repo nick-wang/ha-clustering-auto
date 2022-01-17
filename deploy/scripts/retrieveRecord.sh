@@ -34,4 +34,7 @@ else
 	ssh root@${HOST} "cat ${2}" >${3}
 fi
 
+# Remove extra ^M(/r) in the result
+sed -i "s/\r//g" ${3}
+
 echo "Download the remote file to ${3}"
